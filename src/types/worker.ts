@@ -2,7 +2,7 @@ import type { TextBlock, TextRegion } from './ocr'
 
 // Workerへ送信するメッセージ
 export type WorkerInMessage =
-  | { type: 'INITIALIZE' }
+  | { type: 'INITIALIZE'; layoutOnly?: boolean }
   | {
       type: 'OCR_PROCESS'
       id: string

@@ -34,7 +34,7 @@ class OCRWorker {
     self.postMessage(message)
   }
 
-  async initialize(): Promise<void> {
+  async initialize(layoutOnly = false): Promise<void> {
     if (this.isInitialized) return
 
     try {
@@ -45,42 +45,58 @@ class OCRWorker {
         message: 'Initializing...',
       })
 
-      // 4モデルを並列ダウンロード（各モデルの進捗を合算してレポート）
-      const progresses = { layout: 0, rec30: 0, rec50: 0, rec100: 0 }
-      const reportProgress = () => {
-        const avg = (progresses.layout + progresses.rec30 + progresses.rec50 + progresses.rec100) / 4
-        this.post({
-          type: 'OCR_PROGRESS',
-          stage: 'loading_models',
-          progress: 0.02 + avg * 0.73,
-          message: `Loading models... ${Math.round(avg * 100)}%`,
-          modelProgress: { ...progresses },
+      if (layoutOnly) {
+        // モバイル: レイアウトモデルのみロード（認識モデルは processOCR 時に遅延ロード）
+        const layoutModelData = await loadModel('layout', (p) => {
+          this.post({
+            type: 'OCR_PROGRESS',
+            stage: 'loading_models',
+            progress: 0.02 + p * 0.73,
+            message: `Loading models... ${Math.round(p * 100)}%`,
+            modelProgress: { layout: p, rec30: 0, rec50: 0, rec100: 0 },
+          })
         })
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.76, message: 'Preparing layout model...' })
+        this.layoutDetector = new LayoutDetector()
+        await this.layoutDetector.initialize(layoutModelData)
+      } else {
+        // デスクトップ: 4モデルを並列ダウンロード（各モデルの進捗を合算してレポート）
+        const progresses = { layout: 0, rec30: 0, rec50: 0, rec100: 0 }
+        const reportProgress = () => {
+          const avg = (progresses.layout + progresses.rec30 + progresses.rec50 + progresses.rec100) / 4
+          this.post({
+            type: 'OCR_PROGRESS',
+            stage: 'loading_models',
+            progress: 0.02 + avg * 0.73,
+            message: `Loading models... ${Math.round(avg * 100)}%`,
+            modelProgress: { ...progresses },
+          })
+        }
+
+        const [layoutModelData, rec30Data, rec50Data, rec100Data] = await Promise.all([
+          loadModel('layout',        (p) => { progresses.layout = p; reportProgress() }),
+          loadModel('recognition30', (p) => { progresses.rec30  = p; reportProgress() }),
+          loadModel('recognition50', (p) => { progresses.rec50  = p; reportProgress() }),
+          loadModel('recognition100',(p) => { progresses.rec100 = p; reportProgress() }),
+        ])
+
+        // ONNXセッション作成（WASMシングルスレッドのため直列）
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.76, message: 'Preparing layout model...' })
+        this.layoutDetector = new LayoutDetector()
+        await this.layoutDetector.initialize(layoutModelData)
+
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.83, message: 'Preparing recognition model (30)...' })
+        this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
+        await this.recognizer30.initialize(rec30Data)
+
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.90, message: 'Preparing recognition model (50)...' })
+        this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
+        await this.recognizer50.initialize(rec50Data)
+
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.96, message: 'Preparing recognition model (100)...' })
+        this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+        await this.recognizer100.initialize(rec100Data)
       }
-
-      const [layoutModelData, rec30Data, rec50Data, rec100Data] = await Promise.all([
-        loadModel('layout',        (p) => { progresses.layout = p; reportProgress() }),
-        loadModel('recognition30', (p) => { progresses.rec30  = p; reportProgress() }),
-        loadModel('recognition50', (p) => { progresses.rec50  = p; reportProgress() }),
-        loadModel('recognition100',(p) => { progresses.rec100 = p; reportProgress() }),
-      ])
-
-      // ONNXセッション作成（WASMシングルスレッドのため直列）
-      this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.76, message: 'Preparing layout model...' })
-      this.layoutDetector = new LayoutDetector()
-      await this.layoutDetector.initialize(layoutModelData)
-
-      this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.83, message: 'Preparing recognition model (30)...' })
-      this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
-      await this.recognizer30.initialize(rec30Data)
-
-      this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.90, message: 'Preparing recognition model (50)...' })
-      this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
-      await this.recognizer50.initialize(rec50Data)
-
-      this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.96, message: 'Preparing recognition model (100)...' })
-      this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
-      await this.recognizer100.initialize(rec100Data)
 
       this.isInitialized = true
 
@@ -100,6 +116,23 @@ class OCRWorker {
     }
   }
 
+  /** 認識モデルを遅延ロード（layoutOnly モードで processOCR が呼ばれた場合） */
+  private async ensureRecognizers(): Promise<void> {
+    if (this.recognizer30 && this.recognizer50 && this.recognizer100) return
+
+    const [rec30Data, rec50Data, rec100Data] = await Promise.all([
+      loadModel('recognition30'),
+      loadModel('recognition50'),
+      loadModel('recognition100'),
+    ])
+    this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
+    await this.recognizer30.initialize(rec30Data)
+    this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
+    await this.recognizer50.initialize(rec50Data)
+    this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+    await this.recognizer100.initialize(rec100Data)
+  }
+
   /** charCountCategory に応じたモデルを選択 */
   private selectRecognizer(charCountCategory?: number): TextRecognizer {
     if (charCountCategory === 3) return this.recognizer30!
@@ -113,6 +146,7 @@ class OCRWorker {
       if (!this.isInitialized) {
         await this.initialize()
       }
+      await this.ensureRecognizers()
 
       // Stage 1: レイアウト検出
       this.post({
@@ -260,7 +294,7 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
 
   switch (message.type) {
     case 'INITIALIZE':
-      await ocrWorker.initialize()
+      await ocrWorker.initialize(message.layoutOnly)
       break
 
     case 'OCR_PROCESS':

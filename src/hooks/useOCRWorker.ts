@@ -51,7 +51,7 @@ export function useOCRWorker() {
     }
 
     // OCR Worker 初期化
-    worker.postMessage({ type: 'INITIALIZE' } satisfies WorkerInMessage)
+    worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile } satisfies WorkerInMessage)
 
     worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
       const msg = event.data
