@@ -1,131 +1,322 @@
 /**
- * 読み順処理モジュール
- * 参照実装: ndlkotenocr-worker/src/worker/reading-order.js
+ * 読み順処理モジュール（XY-Cut アルゴリズム）
+ * 参照実装: ndlocr-lite/src/reading_order/xy_cut/block_xy_cut.py
+ *
+ * 旧実装（閾値ベース貪欲グループ化）の問題点:
+ *   - 閾値 = 中央値の30% ≈ 行幅の30%（縦書きで約9px）
+ *   - 同一段内の行間距離（30〜40px）がこの閾値を超えるため、同じ段の行が別グループに分裂
+ *   - ページ全体の空白構造（段間ギャップ）を認識できない
+ *
+ * XY-Cut が解決する点:
+ *   - ページを2Dグリッドに投影し、x/yヒストグラムの最大ゼロ区間（= 段間ギャップ）を検出
+ *   - 再帰的に分割することで複合レイアウトを正しく処理
+ *   - 縦書き x分割ノードで children を逆順にすることで右→左の段順を実現
  */
 
 import type { TextBlock } from '../types/ocr'
 
-type ReadingDirection = 'vertical' | 'horizontal'
-type ColumnDirection = 'right-to-left' | 'left-to-right'
+interface XYNode {
+  x0: number
+  y0: number
+  x1: number
+  y1: number
+  children: XYNode[]
+  lineIndices: number[]
+  numLines: number
+  numVerticalLines: number
+  isXSplit: boolean  // true = 左右分割、false = 上下分割
+}
 
-interface ReadingOrderOptions {
-  readingDirection?: ReadingDirection
-  columnDirection?: ColumnDirection
-  groupThreshold?: number
-  minConfidence?: number
+function makeNode(x0: number, y0: number, x1: number, y1: number): XYNode {
+  return { x0, y0, x1, y1, children: [], lineIndices: [], numLines: 0, numVerticalLines: 0, isXSplit: false }
 }
 
 export class ReadingOrderProcessor {
-  private columnDirection: ColumnDirection = 'right-to-left'
+  // 正規化グリッドサイズ（参照実装の get_optimal_grid に対応）
+  private readonly GRID = 100
 
-  /** width < height のブロックが半数以上なら縦書きと判定（参照実装 reorder.py:110 と等価） */
-  private detectIsVertical(blocks: TextBlock[]): boolean {
-    const verticalCount = blocks.filter(b => b.width < b.height).length
-    return verticalCount * 2 >= blocks.length
-  }
-
-  /** 縦書き→幅の中央値×0.3、横書き→高さの中央値×0.3（参照実装 reorder.py:113-114 と等価） */
-  private calcThreshold(blocks: TextBlock[], isVertical: boolean): number {
-    const sizes = isVertical ? blocks.map(b => b.width) : blocks.map(b => b.height)
-    const sorted = [...sizes].sort((a, b) => a - b)
-    const median = sorted[Math.floor(sorted.length / 2)]
-    return Math.max(median * 0.3, 1)
-  }
-
-  process(textBlocks: TextBlock[], options: ReadingOrderOptions = {}): TextBlock[] {
+  /**
+   * 公開 API（シグネチャは旧実装と同一）
+   * minConfidence 未満のブロックを除外し、XY-Cut で読み順を付番して返す
+   */
+  process(textBlocks: TextBlock[], options: { minConfidence?: number } = {}): TextBlock[] {
     if (!textBlocks || textBlocks.length === 0) return []
-
     const { minConfidence = 0.1 } = options
 
     const validBlocks = textBlocks.filter(
-      (b) => b.confidence >= minConfidence && b.text && b.text.trim().length > 0
+      b => b.confidence >= minConfidence && b.text && b.text.trim().length > 0
     )
-
     if (validBlocks.length === 0) return []
+    if (validBlocks.length === 1) {
+      return [{ ...validBlocks[0], readingOrder: 1 }]
+    }
 
-    // 方向の自動判定（options で明示された場合はそちらを優先）
-    const isVertical = options.readingDirection
-      ? options.readingDirection === 'vertical'
-      : this.detectIsVertical(validBlocks)
+    // ブロック bbox を [x0, y0, x1, y1] 配列に変換
+    const rawBboxes = validBlocks.map(b => [b.x, b.y, b.x + b.width, b.y + b.height])
 
-    // スケール適応型の閾値（options で明示された場合はそちらを優先）
-    const threshold = options.groupThreshold ?? this.calcThreshold(validBlocks, isVertical)
+    // 1. 正規化 → 2. メッシュテーブル → 3. XY-Cut → 4. ブロック割り当て → 5. ソート → 6. ランク取得
+    const { normBboxes, w, h } = this.normalizeBboxes(rawBboxes)
+    const table = this.makeMeshTable(normBboxes, w, h)
+    const root = makeNode(0, 0, w, h)
+    this.xyCut(table, root)
+    this.assignBboxToNode(root, normBboxes)
+    this.sortNodes(root, normBboxes)
 
-    // 横書き自動判定時は left-to-right をデフォルトに
-    const colDir: ColumnDirection = options.columnDirection
-      ?? (isVertical ? this.columnDirection : 'left-to-right')
+    const ranks = new Array(validBlocks.length).fill(-1)
+    this.getRanking(root, ranks, 0)
 
-    let ordered: TextBlock[]
-    if (isVertical) {
-      ordered = this.processVertical(validBlocks, colDir, threshold)
+    // ranks[i] = validBlocks[i] の読み順（0-indexed）
+    const result = validBlocks.map((block, i) => ({ ...block, readingOrder: ranks[i] + 1 }))
+    result.sort((a, b) => a.readingOrder - b.readingOrder)
+    return result
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 normalize_bboxes に対応
+  // bboxes を [0, GRID] の整数グリッドにスケーリング
+  // ---------------------------------------------------------------------------
+  private normalizeBboxes(bboxes: number[][]): { normBboxes: number[][], w: number, h: number } {
+    const xMin = Math.min(...bboxes.map(b => b[0]))
+    const yMin = Math.min(...bboxes.map(b => b[1]))
+    const xMax = Math.max(...bboxes.map(b => b[2]))
+    const yMax = Math.max(...bboxes.map(b => b[3]))
+    const wPage = xMax - xMin
+    const hPage = yMax - yMin
+    if (wPage === 0 || hPage === 0) {
+      // 全ブロックが同一座標: 正規化不能 → そのまま返す
+      const norm = bboxes.map(b => [0, 0, 1, 1])
+      return { normBboxes: norm, w: 2, h: 2 }
+    }
+
+    // 短辺に GRID を割り当て、長辺はアスペクト比を維持
+    const isPortrait = hPage >= wPage
+    const xGrid = isPortrait ? this.GRID * (wPage / hPage) : this.GRID
+    const yGrid = isPortrait ? this.GRID : this.GRID * (hPage / wPage)
+    const w = Math.ceil(xGrid) + 1
+    const h = Math.ceil(yGrid) + 1
+
+    const normBboxes = bboxes.map(b => {
+      const nx0 = Math.max(0, Math.floor((b[0] - xMin) * xGrid / wPage))
+      const ny0 = Math.max(0, Math.floor((b[1] - yMin) * yGrid / hPage))
+      const nx1 = Math.min(w - 1, Math.ceil((b[2] - xMin) * xGrid / wPage))
+      const ny1 = Math.min(h - 1, Math.ceil((b[3] - yMin) * yGrid / hPage))
+      return [nx0, ny0, Math.max(nx0 + 1, nx1), Math.max(ny0 + 1, ny1)]
+    })
+    return { normBboxes, w, h }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 make_mesh_table に対応
+  // 正規化済み bboxes を w×h の 0/1 二値テーブルに描画
+  // ---------------------------------------------------------------------------
+  private makeMeshTable(bboxes: number[][], w: number, h: number): number[][] {
+    const table: number[][] = Array.from({ length: h }, () => new Array(w).fill(0))
+    for (const [x0, y0, x1, y1] of bboxes) {
+      for (let y = y0; y < Math.min(y1, h); y++) {
+        for (let x = x0; x < Math.min(x1, w); x++) {
+          table[y][x] = 1
+        }
+      }
+    }
+    return table
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 calc_hist に対応
+  // 領域 [x0,y0,x1,y1] 内の x方向（列和）・y方向（行和）ヒストグラムを計算
+  // ---------------------------------------------------------------------------
+  private calcHist(
+    table: number[][], x0: number, y0: number, x1: number, y1: number
+  ): { xHist: number[], yHist: number[] } {
+    const xHist = new Array(x1 - x0).fill(0)
+    const yHist = new Array(y1 - y0).fill(0)
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        const v = table[y][x]
+        xHist[x - x0] += v
+        yHist[y - y0] += v
+      }
+    }
+    return { xHist, yHist }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 calc_min_span に対応
+  // ヒストグラムの最小値が連続する最長区間を返す（= 最大ギャップ）
+  // 戻り値: [gapStart, gapEnd, score]  score = -minVal/maxVal（小さいほど明確なギャップ）
+  // ---------------------------------------------------------------------------
+  private calcMinSpan(hist: number[]): [number, number, number] {
+    if (hist.length <= 1) return [0, hist.length, 0]
+    const minVal = Math.min(...hist)
+    const maxVal = Math.max(...hist)
+    let bestStart = 0, bestEnd = 0, bestLen = 0
+    let gapStart = -1
+    for (let i = 0; i <= hist.length; i++) {
+      if (i < hist.length && hist[i] === minVal) {
+        if (gapStart === -1) gapStart = i
+      } else {
+        if (gapStart !== -1) {
+          const len = i - gapStart
+          if (len > bestLen) { bestLen = len; bestStart = gapStart; bestEnd = i }
+          gapStart = -1
+        }
+      }
+    }
+    const score = maxVal > 0 ? -minVal / maxVal : 0
+    return [bestStart, bestEnd, score]
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 block_xy_cut に対応（再帰）
+  // ---------------------------------------------------------------------------
+  private xyCut(table: number[][], node: XYNode): void {
+    const { x0, y0, x1, y1 } = node
+    if (x0 >= x1 || y0 >= y1) return
+
+    const { xHist, yHist } = this.calcHist(table, x0, y0, x1, y1)
+    let [xBeg, xEnd, xVal] = this.calcMinSpan(xHist)
+    let [yBeg, yEnd, yVal] = this.calcMinSpan(yHist)
+    xBeg += x0; xEnd += x0
+    yBeg += y0; yEnd += y0
+
+    // 全域と一致する場合（分割不能）→ 再帰終了
+    if (x0 === xBeg && x1 === xEnd && y0 === yBeg && y1 === yEnd) return
+
+    // x/y どちらの方向で分割するかを決定（参照実装の条件式と同一）
+    if (yVal < xVal) {
+      this.splitX(table, node, xBeg, xEnd)
+    } else if (xVal < yVal) {
+      this.splitY(table, node, yBeg, yEnd)
+    } else if ((xEnd - xBeg) < (yEnd - yBeg)) {
+      this.splitY(table, node, yBeg, yEnd)
     } else {
-      ordered = this.processHorizontal(validBlocks, colDir, threshold)
+      this.splitX(table, node, xBeg, xEnd)
     }
-
-    return ordered.map((block, index) => ({ ...block, readingOrder: index + 1 }))
   }
 
-  private processVertical(
-    blocks: TextBlock[],
-    columnDirection: ColumnDirection,
-    threshold: number
-  ): TextBlock[] {
-    const columns = this.groupIntoColumns(blocks, threshold)
-    const sorted = this.sortColumns(columns, columnDirection)
-    return sorted.flatMap((col) => col.sort((a, b) => a.y - b.y))
+  // 参照実装 split_x → 左・ギャップ・右 の3ノードを追加し再帰
+  private splitX(table: number[][], parent: XYNode, gapX0: number, gapX1: number): void {
+    parent.isXSplit = true
+    const { x0, y0, x1, y1 } = parent
+    this.addChildAndCut(table, parent, x0, y0, gapX0, y1)
+    this.addChildAndCut(table, parent, gapX0, y0, gapX1, y1)
+    this.addChildAndCut(table, parent, gapX1, y0, x1, y1)
   }
 
-  private processHorizontal(
-    blocks: TextBlock[],
-    columnDirection: ColumnDirection,
-    threshold: number
-  ): TextBlock[] {
-    const lines = this.groupIntoLines(blocks, threshold)
-    const sortedLines = lines.sort((a, b) => {
-      const avgYA = a.reduce((s, b) => s + b.y, 0) / a.length
-      const avgYB = b.reduce((s, b) => s + b.y, 0) / b.length
-      return avgYA - avgYB
+  // 参照実装 split_y → 上・ギャップ・下 の3ノードを追加し再帰
+  private splitY(table: number[][], parent: XYNode, gapY0: number, gapY1: number): void {
+    parent.isXSplit = false
+    const { x0, y0, x1, y1 } = parent
+    this.addChildAndCut(table, parent, x0, y0, x1, gapY0)
+    this.addChildAndCut(table, parent, x0, gapY0, x1, gapY1)
+    this.addChildAndCut(table, parent, x0, gapY1, x1, y1)
+  }
+
+  private addChildAndCut(
+    table: number[][], parent: XYNode,
+    x0: number, y0: number, x1: number, y1: number
+  ): void {
+    if (x0 >= x1 || y0 >= y1) return
+    // 親ノードと同一領域なら追加しない（無限ループ防止）
+    if (x0 === parent.x0 && y0 === parent.y0 && x1 === parent.x1 && y1 === parent.y1) return
+    const child = makeNode(x0, y0, x1, y1)
+    parent.children.push(child)
+    this.xyCut(table, child)
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 assign_bbox_to_node に対応
+  // 各 bbox を最大 IoU の葉ノードに割り当て
+  // ---------------------------------------------------------------------------
+  private assignBboxToNode(root: XYNode, bboxes: number[][]): void {
+    const leaves = this.collectLeaves(root)
+    const leafBboxes = leaves.map(l => [l.x0, l.y0, l.x1, l.y1])
+
+    for (let i = 0; i < bboxes.length; i++) {
+      const ious = this.calcIous(bboxes[i], leafBboxes)
+      let bestJ = 0, bestIou = -1
+      for (let j = 0; j < ious.length; j++) {
+        if (ious[j] > bestIou) { bestIou = ious[j]; bestJ = j }
+      }
+      leaves[bestJ].lineIndices.push(i)
+    }
+  }
+
+  private collectLeaves(node: XYNode): XYNode[] {
+    if (node.children.length === 0) return [node]
+    return node.children.flatMap(c => this.collectLeaves(c))
+  }
+
+  // IoU: 1対多
+  private calcIous(box: number[], boxes: number[][]): number[] {
+    return boxes.map(b => {
+      const ix0 = Math.max(box[0], b[0])
+      const iy0 = Math.max(box[1], b[1])
+      const ix1 = Math.min(box[2], b[2])
+      const iy1 = Math.min(box[3], b[3])
+      const inter = Math.max(0, ix1 - ix0) * Math.max(0, iy1 - iy0)
+      if (inter === 0) return 0
+      const areaA = (box[2] - box[0]) * (box[3] - box[1])
+      const areaB = (b[2] - b[0]) * (b[3] - b[1])
+      return inter / (areaA + areaB - inter)
     })
-    return sortedLines.flatMap((line) =>
-      columnDirection === 'left-to-right'
-        ? line.sort((a, b) => a.x - b.x)
-        : line.sort((a, b) => b.x - a.x)
-    )
   }
 
-  private groupIntoColumns(blocks: TextBlock[], threshold: number): TextBlock[][] {
-    const columns: TextBlock[][] = []
-    for (const block of blocks) {
-      const cx = block.x + block.width / 2
-      const col = columns.find((c) => {
-        const avgX = c.reduce((s, b) => s + b.x + b.width / 2, 0) / c.length
-        return Math.abs(cx - avgX) <= threshold
-      })
-      if (col) col.push(block)
-      else columns.push([block])
+  // ---------------------------------------------------------------------------
+  // 参照実装 sort_nodes に対応
+  // 各ノード内の lineIndices と children をソートし、縦書き x分割ノードを逆順に
+  // ---------------------------------------------------------------------------
+  private sortNodes(node: XYNode, bboxes: number[][]): [number, number] {
+    if (node.lineIndices.length > 0) {
+      // 葉ノード: このノードに直接割り当てられた行をソート
+      const indices = node.lineIndices
+      node.numLines = indices.length
+      node.numVerticalLines = indices.filter(i => {
+        const b = bboxes[i]
+        return (b[2] - b[0]) < (b[3] - b[1])  // width < height
+      }).length
+
+      if (indices.length > 1) {
+        const isVert = this.isVertical(node)
+        indices.sort((a, b) => {
+          const ba = bboxes[a], bb = bboxes[b]
+          const ax0 = ba[0], ay0 = ba[1]
+          const bx0 = bb[0], by0 = bb[1]
+          // 縦書き: x降順 y昇順、横書き: y昇順 x昇順（参照実装 lexsort と同等）
+          if (isVert) return ax0 !== bx0 ? bx0 - ax0 : ay0 - by0
+          return ay0 !== by0 ? ay0 - by0 : ax0 - bx0
+        })
+      }
+    } else {
+      // 内部ノード: 子ノードを再帰的にソートして統計を集計
+      for (const child of node.children) {
+        const [n, v] = this.sortNodes(child, bboxes)
+        node.numLines += n
+        node.numVerticalLines += v
+      }
+      // 縦書きの x分割ノード → children を逆順（右→左）
+      if (node.isXSplit && this.isVertical(node)) {
+        node.children.reverse()
+      }
     }
-    return columns
+    return [node.numLines, node.numVerticalLines]
   }
 
-  private groupIntoLines(blocks: TextBlock[], threshold: number): TextBlock[][] {
-    const lines: TextBlock[][] = []
-    for (const block of blocks) {
-      const cy = block.y + block.height / 2
-      const line = lines.find((l) => {
-        const avgY = l.reduce((s, b) => s + b.y + b.height / 2, 0) / l.length
-        return Math.abs(cy - avgY) <= threshold
-      })
-      if (line) line.push(block)
-      else lines.push([block])
+  // 縦書き判定: 縦長ブロックが過半数
+  private isVertical(node: XYNode): boolean {
+    return node.numLines < node.numVerticalLines * 2
+  }
+
+  // ---------------------------------------------------------------------------
+  // 参照実装 get_ranking に対応（深さ優先で rank を付番）
+  // ---------------------------------------------------------------------------
+  private getRanking(node: XYNode, ranks: number[], rank: number): number {
+    for (const i of node.lineIndices) {
+      ranks[i] = rank++
     }
-    return lines
-  }
-
-  private sortColumns(columns: TextBlock[][], direction: ColumnDirection): TextBlock[][] {
-    return columns.sort((a, b) => {
-      const avgXA = a.reduce((s, b) => s + b.x + b.width / 2, 0) / a.length
-      const avgXB = b.reduce((s, b) => s + b.x + b.width / 2, 0) / b.length
-      return direction === 'right-to-left' ? avgXB - avgXA : avgXA - avgXB
-    })
+    for (const child of node.children) {
+      rank = this.getRanking(child, ranks, rank)
+    }
+    return rank
   }
 }
