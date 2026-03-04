@@ -76,12 +76,16 @@ export class ReadingOrderProcessor {
       }
     }
 
-    // 2. 縦書き/横書き判定（割り当て済み行の過半数で判定）
+    // 2. カバー率が低い場合（< 70%）は XY-Cut にフォールバック
     const allAssigned = [...assigned.values()].flat()
-    const judgeLines = allAssigned.length > 0 ? allAssigned : lines
-    const isVert = judgeLines.filter(b => b.width < b.height).length * 2 >= judgeLines.length
+    if (allAssigned.length < lines.length * 0.7) {
+      return this.processXYCut(lines)
+    }
 
-    // 3. ブロックを読み順にソート（縦書き: 右→左、横書き: 上→下）
+    // 3. 縦書き/横書き判定（割り当て済み行の過半数で判定）
+    const isVert = allAssigned.filter(b => b.width < b.height).length * 2 >= allAssigned.length
+
+    // 4. ブロックを読み順にソート（縦書き: 右→左、横書き: 上→下）
     const sortedBlockIndices = [...assigned.keys()].sort((a, b) => {
       const ba = blocks[a], bb = blocks[b]
       const cax = ba.x + ba.width / 2, cay = ba.y + ba.height / 2
@@ -89,17 +93,16 @@ export class ReadingOrderProcessor {
       return isVert ? cbx - cax : cay - cby
     })
 
-    // 4. 各ブロック内の行をソート（縦書き: y昇順、横書き: x昇順）
+    // 5. 各ブロック内の行を XY-Cut で整序（ブロックが複数列を含む場合も正しく処理）
     const result: TextBlock[] = []
     for (const idx of sortedBlockIndices) {
       const blockLines = assigned.get(idx)!
-      blockLines.sort((a, b) => isVert ? a.y - b.y : a.x - b.x)
-      result.push(...blockLines)
+      result.push(...(blockLines.length > 1 ? this.processXYCut(blockLines) : blockLines))
     }
 
-    // 5. 未割り当て行を XY-Cut で処理して末尾に追加
+    // 6. 未割り当て行を XY-Cut で処理して末尾に追加
     if (unassigned.length > 0) {
-      result.push(...this.processXYCut(unassigned))
+      result.push(...(unassigned.length > 1 ? this.processXYCut(unassigned) : unassigned))
     }
 
     return result.map((b, i) => ({ ...b, readingOrder: i + 1 }))
