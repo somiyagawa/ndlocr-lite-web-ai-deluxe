@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
-import type { OCRJobState, OCRResult, ProcessedImage, TextBlock, TextRegion } from '../types/ocr'
+import type { OCRJobState, OCRResult, ProcessedImage, TextBlock, TextRegion, PageBlock } from '../types/ocr'
 import type { WorkerInMessage, WorkerOutMessage } from '../types/worker'
 import type { RecWorkerInMessage, RecWorkerOutMessage } from '../types/recognition-worker'
 import { imageDataToDataUrl } from '../utils/imageLoader'
@@ -153,7 +153,7 @@ export function useOCRWorker() {
             })
           } else if (msg.type === 'LAYOUT_DONE') {
             workerRef.current?.removeEventListener('message', handler)
-            runRecognition(id, imageDataUrl, image, msg.textRegions, msg.croppedImages, msg.startTime, resolve, reject)
+            runRecognition(id, imageDataUrl, image, msg.textRegions, msg.croppedImages, msg.pageBlocks, msg.startTime, resolve, reject)
           } else if (msg.type === 'OCR_ERROR') {
             workerRef.current?.removeEventListener('message', handler)
             setJobState((prev) => ({
@@ -197,6 +197,7 @@ export function useOCRWorker() {
     image: ProcessedImage,
     textRegions: TextRegion[],
     croppedImages: ImageData[],
+    pageBlocks: PageBlock[],
     startTime: number,
     resolve: (result: OCRResult) => void,
     reject: (error: Error) => void
@@ -268,7 +269,7 @@ export function useOCRWorker() {
           message: 'Processing reading order...',
         }))
 
-        const orderedResults = readingOrderProcessor.process(recognitionResults)
+        const orderedResults = readingOrderProcessor.process(recognitionResults, pageBlocks)
         const txt = orderedResults.filter(b => b.text).map(b => b.text).join('\n')
 
         const result: OCRResult = {

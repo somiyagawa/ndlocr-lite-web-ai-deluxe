@@ -19,7 +19,7 @@ import { loadModel } from './model-loader'
 import { LayoutDetector } from './layout-detector'
 import { TextRecognizer } from './text-recognizer'
 import { ReadingOrderProcessor } from './reading-order'
-import type { TextBlock, TextRegion } from '../types/ocr'
+import type { TextBlock } from '../types/ocr'
 import type { WorkerInMessage, WorkerOutMessage } from '../types/worker'
 
 class OCRWorker {
@@ -170,7 +170,7 @@ class OCRWorker {
         message: 'Detecting text regions...',
       })
 
-      const textRegions: TextRegion[] = await this.layoutDetector!.detect(
+      const { lines: textRegions, blocks: pageBlocks } = await this.layoutDetector!.detect(
         imageData,
         (progress) => {
           this.post({
@@ -223,7 +223,7 @@ class OCRWorker {
         message: 'Processing reading order...',
       })
 
-      const orderedResults = this.readingOrderProcessor.process(recognitionResults)
+      const orderedResults = this.readingOrderProcessor.process(recognitionResults, pageBlocks)
 
       // Stage 4: 出力生成
       this.post({
@@ -270,7 +270,7 @@ class OCRWorker {
         message: 'Detecting text regions...',
       })
 
-      const textRegions: TextRegion[] = await this.layoutDetector!.detect(
+      const { lines: textRegions, blocks: pageBlocks } = await this.layoutDetector!.detect(
         imageData,
         (progress) => {
           this.post({
@@ -288,7 +288,7 @@ class OCRWorker {
       const transferables = croppedImages.map(img => img.data.buffer)
 
       self.postMessage(
-        { type: 'LAYOUT_DONE', id, textRegions, croppedImages, startTime } satisfies WorkerOutMessage,
+        { type: 'LAYOUT_DONE', id, textRegions, croppedImages, pageBlocks, startTime } satisfies WorkerOutMessage,
         { transfer: transferables }
       )
     } catch (error) {

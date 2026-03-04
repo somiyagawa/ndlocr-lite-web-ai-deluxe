@@ -13,10 +13,11 @@
 
 import type * as OrtType from 'onnxruntime-web'
 import { ort, createSession } from './onnx-config'
-import type { TextRegion } from '../types/ocr'
+import type { TextRegion, PageBlock, LayoutDetectionResult } from '../types/ocr'
 
 // ndl.yaml の line クラスID (0-indexed, class_index = label - 1)
 const LINE_CLASS_IDS = new Set([1, 2, 3, 4, 5, 16]) // line_main, line_caption, line_ad, line_note, line_note_tochu, line_title
+const BLOCK_CLASS_ID = 0 // text_block (段・カラム境界)
 
 interface PreprocessResult {
   tensor: OrtType.Tensor
@@ -51,7 +52,7 @@ export class LayoutDetector {
   async detect(
     imageData: ImageData,
     onProgress?: (progress: number) => void
-  ): Promise<TextRegion[]> {
+  ): Promise<LayoutDetectionResult> {
     if (!this.initialized || !this.session) {
       throw new Error('Layout detector not initialized')
     }
@@ -77,11 +78,11 @@ export class LayoutDetector {
     const output = await this.session.run(inputs)
 
     if (onProgress) onProgress(0.8)
-    const detections = this.postprocessOutput(output, metadata)
+    const { lines, blocks } = this.postprocessOutput(output, metadata)
 
     if (onProgress) onProgress(1.0)
-    console.log(`[LayoutDetector] ${detections.length} line regions detected`)
-    return detections
+    console.log(`[LayoutDetector] ${lines.length} line regions, ${blocks.length} text blocks detected`)
+    return { lines, blocks }
   }
 
   private async preprocessImage(imageData: ImageData): Promise<PreprocessResult> {
@@ -154,8 +155,9 @@ export class LayoutDetector {
   private postprocessOutput(
     output: Record<string, OrtType.Tensor>,
     metadata: PreprocessResult['metadata']
-  ): TextRegion[] {
-    const detections: TextRegion[] = []
+  ): { lines: TextRegion[], blocks: PageBlock[] } {
+    const lineDetections: TextRegion[] = []
+    const blockDetections: PageBlock[] = []
 
     try {
       const outputNames = this.session!.outputNames
@@ -184,45 +186,43 @@ export class LayoutDetector {
         // class_ids は 1-indexed → 0-indexed に変換
         const classId = Number(classIdsRaw[i]) - 1
 
-        // ラインクラスのみ処理
-        if (!LINE_CLASS_IDS.has(classId)) continue
-
         const x1 = bboxesData[i * 4 + 0] * scaleX
         const y1 = bboxesData[i * 4 + 1] * scaleY
         const x2 = bboxesData[i * 4 + 2] * scaleX
         const y2 = bboxesData[i * 4 + 3] * scaleY
 
-        // バウンディングボックスを上下2%拡張
-        const boxHeight = y2 - y1
-        const deltaH = boxHeight * 0.02
-
-        const finalX1 = Math.max(0, Math.round(x1))
-        const finalY1 = Math.max(0, Math.round(y1 - deltaH))
-        const finalX2 = Math.min(metadata.originalWidth, Math.round(x2))
-        const finalY2 = Math.min(metadata.originalHeight, Math.round(y2 + deltaH))
-
-        const width = finalX2 - finalX1
-        const height = finalY2 - finalY1
-
-        if (width < 10 || height < 10) continue
-
-        const charCountCategory = charCountsData ? charCountsData[i] : 100
-
-        detections.push({
-          x: finalX1,
-          y: finalY1,
-          width,
-          height,
-          confidence: score,
-          classId,
-          charCountCategory,
-        })
+        if (classId === BLOCK_CLASS_ID) {
+          // text_block: 段・カラム境界として収集（高さ拡張なし）
+          const finalX1 = Math.max(0, Math.round(x1))
+          const finalY1 = Math.max(0, Math.round(y1))
+          const finalX2 = Math.min(metadata.originalWidth, Math.round(x2))
+          const finalY2 = Math.min(metadata.originalHeight, Math.round(y2))
+          const width = finalX2 - finalX1
+          const height = finalY2 - finalY1
+          if (width >= 10 && height >= 10) {
+            blockDetections.push({ x: finalX1, y: finalY1, width, height })
+          }
+        } else if (LINE_CLASS_IDS.has(classId)) {
+          // ライン: バウンディングボックスを上下2%拡張
+          const boxHeight = y2 - y1
+          const deltaH = boxHeight * 0.02
+          const finalX1 = Math.max(0, Math.round(x1))
+          const finalY1 = Math.max(0, Math.round(y1 - deltaH))
+          const finalX2 = Math.min(metadata.originalWidth, Math.round(x2))
+          const finalY2 = Math.min(metadata.originalHeight, Math.round(y2 + deltaH))
+          const width = finalX2 - finalX1
+          const height = finalY2 - finalY1
+          if (width >= 10 && height >= 10) {
+            const charCountCategory = charCountsData ? charCountsData[i] : 100
+            lineDetections.push({ x: finalX1, y: finalY1, width, height, confidence: score, classId, charCountCategory })
+          }
+        }
       }
 
-      return this.nms(detections)
+      return { lines: this.nms(lineDetections), blocks: blockDetections }
     } catch (error) {
       console.error('Error in postprocessing:', error)
-      return []
+      return { lines: [], blocks: [] }
     }
   }
 

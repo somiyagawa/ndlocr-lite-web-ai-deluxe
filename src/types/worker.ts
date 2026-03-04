@@ -1,4 +1,4 @@
-import type { TextBlock, TextRegion } from './ocr'
+import type { TextBlock, TextRegion, PageBlock } from './ocr'
 
 // Workerへ送信するメッセージ
 export type WorkerInMessage =
@@ -52,5 +52,6 @@ export type WorkerOutMessage =
       id: string
       textRegions: TextRegion[]
       croppedImages: ImageData[]
+      pageBlocks: PageBlock[]
       startTime: number
     }

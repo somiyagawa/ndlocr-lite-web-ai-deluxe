@@ -13,7 +13,7 @@
  *   - 縦書き x分割ノードで children を逆順にすることで右→左の段順を実現
  */
 
-import type { TextBlock } from '../types/ocr'
+import type { TextBlock, PageBlock } from '../types/ocr'
 
 interface XYNode {
   x0: number
@@ -36,10 +36,10 @@ export class ReadingOrderProcessor {
   private readonly GRID = 100
 
   /**
-   * 公開 API（シグネチャは旧実装と同一）
-   * minConfidence 未満のブロックを除外し、XY-Cut で読み順を付番して返す
+   * 公開 API
+   * blocks が渡された場合はブロック割り当て優先、なければ XY-Cut にフォールバック
    */
-  process(textBlocks: TextBlock[], options: { minConfidence?: number } = {}): TextBlock[] {
+  process(textBlocks: TextBlock[], blocks?: PageBlock[], options: { minConfidence?: number } = {}): TextBlock[] {
     if (!textBlocks || textBlocks.length === 0) return []
     const { minConfidence = 0.1 } = options
 
@@ -51,6 +51,62 @@ export class ReadingOrderProcessor {
       return [{ ...validBlocks[0], readingOrder: 1 }]
     }
 
+    if (blocks && blocks.length > 0) {
+      return this.processWithBlocks(validBlocks, blocks)
+    }
+    return this.processXYCut(validBlocks)
+  }
+
+  /** DEIMモデルの text_block 出力を使って段割り→行ソートを行う */
+  private processWithBlocks(lines: TextBlock[], blocks: PageBlock[]): TextBlock[] {
+    // 1. 各行の中心点がどのブロック内に収まるか判定
+    const assigned = new Map<number, TextBlock[]>()
+    const unassigned: TextBlock[] = []
+    for (const line of lines) {
+      const cx = line.x + line.width / 2
+      const cy = line.y + line.height / 2
+      const blockIdx = blocks.findIndex(
+        b => cx >= b.x && cx <= b.x + b.width && cy >= b.y && cy <= b.y + b.height
+      )
+      if (blockIdx >= 0) {
+        if (!assigned.has(blockIdx)) assigned.set(blockIdx, [])
+        assigned.get(blockIdx)!.push(line)
+      } else {
+        unassigned.push(line)
+      }
+    }
+
+    // 2. 縦書き/横書き判定（割り当て済み行の過半数で判定）
+    const allAssigned = [...assigned.values()].flat()
+    const judgeLines = allAssigned.length > 0 ? allAssigned : lines
+    const isVert = judgeLines.filter(b => b.width < b.height).length * 2 >= judgeLines.length
+
+    // 3. ブロックを読み順にソート（縦書き: 右→左、横書き: 上→下）
+    const sortedBlockIndices = [...assigned.keys()].sort((a, b) => {
+      const ba = blocks[a], bb = blocks[b]
+      const cax = ba.x + ba.width / 2, cay = ba.y + ba.height / 2
+      const cbx = bb.x + bb.width / 2, cby = bb.y + bb.height / 2
+      return isVert ? cbx - cax : cay - cby
+    })
+
+    // 4. 各ブロック内の行をソート（縦書き: y昇順、横書き: x昇順）
+    const result: TextBlock[] = []
+    for (const idx of sortedBlockIndices) {
+      const blockLines = assigned.get(idx)!
+      blockLines.sort((a, b) => isVert ? a.y - b.y : a.x - b.x)
+      result.push(...blockLines)
+    }
+
+    // 5. 未割り当て行を XY-Cut で処理して末尾に追加
+    if (unassigned.length > 0) {
+      result.push(...this.processXYCut(unassigned))
+    }
+
+    return result.map((b, i) => ({ ...b, readingOrder: i + 1 }))
+  }
+
+  /** XY-Cut アルゴリズムによる読み順推定（フォールバック） */
+  private processXYCut(validBlocks: TextBlock[]): TextBlock[] {
     // ブロック bbox を [x0, y0, x1, y1] 配列に変換
     const rawBboxes = validBlocks.map(b => [b.x, b.y, b.x + b.width, b.y + b.height])
 

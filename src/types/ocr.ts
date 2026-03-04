@@ -16,6 +16,18 @@ export interface TextBlock extends TextRegion {
   readingOrder: number
 }
 
+export interface PageBlock {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+export interface LayoutDetectionResult {
+  lines: TextRegion[]
+  blocks: PageBlock[]
+}
+
 export interface OCRResult {
   id: string
   fileName: string
