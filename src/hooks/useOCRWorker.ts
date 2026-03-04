@@ -8,7 +8,7 @@ import { ReadingOrderProcessor } from '../worker/reading-order'
 import RecognitionWorkerFactory from '../worker/recognition.worker.ts?worker'
 
 const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent)
-const N_REC_WORKERS = isMobile ? 1 : Math.min(Math.max(navigator.hardwareConcurrency ?? 4, 2), 8)
+const N_REC_WORKERS = isMobile ? 0 : Math.min(Math.max(navigator.hardwareConcurrency ?? 4, 2), 8)
 const readingOrderProcessor = new ReadingOrderProcessor()
 
 const initialJobState: OCRJobState = {
@@ -44,7 +44,7 @@ export function useOCRWorker() {
     let recReadyCount = 0
 
     const checkBothReady = () => {
-      if (ocrWorkerReady && recReadyCount >= N_REC_WORKERS) {
+      if (ocrWorkerReady && (N_REC_WORKERS === 0 || recReadyCount >= N_REC_WORKERS)) {
         setIsReady(true)
         setJobState(initialJobState)
       }
@@ -137,6 +137,20 @@ export function useOCRWorker() {
               status: 'processing',
               modelProgress: msg.modelProgress,
             }))
+          } else if (msg.type === 'OCR_COMPLETE') {
+            // モバイル(OCR_PROCESS)パスの完了
+            workerRef.current?.removeEventListener('message', handler)
+            const fileName = image.pageIndex ? `${image.fileName} (p.${image.pageIndex})` : image.fileName
+            setJobState((prev) => ({ ...prev, status: 'done', stageProgress: 1 }))
+            resolve({
+              id,
+              fileName,
+              imageDataUrl,
+              textBlocks: msg.textBlocks,
+              fullText: msg.txt,
+              processingTimeMs: msg.processingTime,
+              createdAt: Date.now(),
+            })
           } else if (msg.type === 'LAYOUT_DONE') {
             workerRef.current?.removeEventListener('message', handler)
             runRecognition(id, imageDataUrl, image, msg.textRegions, msg.croppedImages, msg.startTime, resolve, reject)
@@ -152,13 +166,24 @@ export function useOCRWorker() {
         }
 
         workerRef.current.addEventListener('message', handler)
-        // imageData は structured clone（参照を手放さない）
-        workerRef.current.postMessage({
-          type: 'LAYOUT_DETECT',
-          id,
-          imageData: image.imageData,
-          startTime: Date.now(),
-        } satisfies WorkerInMessage)
+
+        if (N_REC_WORKERS === 0) {
+          // モバイル: ocr.worker 1つで完結（recognition.worker なし）
+          workerRef.current.postMessage({
+            type: 'OCR_PROCESS',
+            id,
+            imageData: image.imageData,
+            startTime: Date.now(),
+          } satisfies WorkerInMessage)
+        } else {
+          // デスクトップ: LAYOUT_DETECT → 並列 recognition workers
+          workerRef.current.postMessage({
+            type: 'LAYOUT_DETECT',
+            id,
+            imageData: image.imageData,
+            startTime: Date.now(),
+          } satisfies WorkerInMessage)
+        }
       })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

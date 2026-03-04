@@ -29,6 +29,7 @@ class OCRWorker {
   private recognizer100: TextRecognizer | null = null // ≤100文字 [1,3,16,768]
   private readingOrderProcessor = new ReadingOrderProcessor()
   private isInitialized = false
+  private layoutOnly = false
 
   private post(message: WorkerOutMessage) {
     self.postMessage(message)
@@ -36,6 +37,7 @@ class OCRWorker {
 
   async initialize(layoutOnly = false): Promise<void> {
     if (this.isInitialized) return
+    this.layoutOnly = layoutOnly
 
     try {
       this.post({
@@ -118,26 +120,37 @@ class OCRWorker {
 
   /** 認識モデルを遅延ロード（layoutOnly モードで processOCR が呼ばれた場合） */
   private async ensureRecognizers(): Promise<void> {
-    if (this.recognizer30 && this.recognizer50 && this.recognizer100) return
+    if (this.recognizer100) return  // rec100 があれば最低限OK
 
-    const [rec30Data, rec50Data, rec100Data] = await Promise.all([
-      loadModel('recognition30'),
-      loadModel('recognition50'),
-      loadModel('recognition100'),
-    ])
-    this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
-    await this.recognizer30.initialize(rec30Data)
-    this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
-    await this.recognizer50.initialize(rec50Data)
-    this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
-    await this.recognizer100.initialize(rec100Data)
+    if (this.layoutOnly) {
+      // モバイル: rec100 のみ（WASM ランタイムを 1 つに抑えるため）
+      const rec100Data = await loadModel('recognition100')
+      this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+      await this.recognizer100.initialize(rec100Data)
+    } else {
+      // デスクトップ: 3モデル全部
+      if (this.recognizer30 && this.recognizer50) return
+      const [rec30Data, rec50Data, rec100Data] = await Promise.all([
+        loadModel('recognition30'),
+        loadModel('recognition50'),
+        loadModel('recognition100'),
+      ])
+      this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
+      await this.recognizer30.initialize(rec30Data)
+      this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
+      await this.recognizer50.initialize(rec50Data)
+      this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+      await this.recognizer100.initialize(rec100Data)
+    }
   }
 
   /** charCountCategory に応じたモデルを選択 */
   private selectRecognizer(charCountCategory?: number): TextRecognizer {
-    if (charCountCategory === 3) return this.recognizer30!
-    if (charCountCategory === 2) return this.recognizer50!
-    return this.recognizer100!
+    if (!this.layoutOnly) {
+      if (charCountCategory === 3) return this.recognizer30!
+      if (charCountCategory === 2) return this.recognizer50!
+    }
+    return this.recognizer100!  // モバイルは常に rec100
   }
 
   /** 領域OCR用: レイアウト検出 + 逐次認識 + 読み順処理 (processRegion から使用) */
@@ -170,7 +183,7 @@ class OCRWorker {
         }
       )
 
-      // Stage 2: 逐次文字認識
+      // Stage 2: 逐次文字認識（cropImageDataBatch で sourceCanvas を1回だけ生成）
       this.post({
         type: 'OCR_PROGRESS',
         id,
@@ -179,11 +192,12 @@ class OCRWorker {
         message: `Recognizing text in ${textRegions.length} regions...`,
       })
 
+      const croppedImages = TextRecognizer.cropImageDataBatch(imageData, textRegions)
       const recognitionResults: TextBlock[] = []
       for (let i = 0; i < textRegions.length; i++) {
         const region = textRegions[i]
         const recognizer = this.selectRecognizer(region.charCountCategory)
-        const result = await recognizer.recognize(imageData, region)
+        const result = await recognizer.recognizeCropped(croppedImages[i])
 
         recognitionResults.push({
           ...region,
