@@ -82,7 +82,7 @@ export function useOCRWorker() {
         }
         // REC_PROGRESS は初期化進捗として無視（OCR Worker のモデル進捗を主表示に使用）
       }
-      w.postMessage({ type: 'REC_INIT' } satisfies RecWorkerInMessage)
+      w.postMessage({ type: 'REC_INIT', singleModel: isMobile } satisfies RecWorkerInMessage)
     })
 
     return () => {

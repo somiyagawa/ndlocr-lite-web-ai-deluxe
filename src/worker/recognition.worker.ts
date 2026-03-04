@@ -11,10 +11,12 @@ import type { RecWorkerInMessage, RecWorkerOutMessage } from '../types/recogniti
 let rec30: TextRecognizer | null = null
 let rec50: TextRecognizer | null = null
 let rec100: TextRecognizer | null = null
+let singleModelMode = false
 
-function selectRecognizer(charCountCategory?: number): TextRecognizer {
-  if (charCountCategory === 3) return rec30!
-  if (charCountCategory === 2) return rec50!
+function selectRecognizer(_charCountCategory?: number): TextRecognizer {
+  if (singleModelMode) return rec100!
+  if (_charCountCategory === 3) return rec30!
+  if (_charCountCategory === 2) return rec50!
   return rec100!
 }
 
@@ -22,22 +24,30 @@ self.onmessage = async (e: MessageEvent<RecWorkerInMessage>) => {
   const msg = e.data
 
   if (msg.type === 'REC_INIT') {
+    singleModelMode = msg.singleModel ?? false
     try {
-      const progresses = [0, 0, 0]
-      const reportProgress = () => {
-        const avg = (progresses[0] + progresses[1] + progresses[2]) / 3
-        self.postMessage({ type: 'REC_PROGRESS', progress: avg } satisfies RecWorkerOutMessage)
+      if (singleModelMode) {
+        const d100 = await loadModel('recognition100', (p) => {
+          self.postMessage({ type: 'REC_PROGRESS', progress: p } satisfies RecWorkerOutMessage)
+        })
+        rec100 = new TextRecognizer([1, 3, 16, 768]); await rec100.initialize(d100)
+      } else {
+        const progresses = [0, 0, 0]
+        const reportProgress = () => {
+          const avg = (progresses[0] + progresses[1] + progresses[2]) / 3
+          self.postMessage({ type: 'REC_PROGRESS', progress: avg } satisfies RecWorkerOutMessage)
+        }
+
+        const [d30, d50, d100] = await Promise.all([
+          loadModel('recognition30',  (p) => { progresses[0] = p; reportProgress() }),
+          loadModel('recognition50',  (p) => { progresses[1] = p; reportProgress() }),
+          loadModel('recognition100', (p) => { progresses[2] = p; reportProgress() }),
+        ])
+
+        rec30  = new TextRecognizer([1, 3, 16, 256]); await rec30.initialize(d30)
+        rec50  = new TextRecognizer([1, 3, 16, 384]); await rec50.initialize(d50)
+        rec100 = new TextRecognizer([1, 3, 16, 768]); await rec100.initialize(d100)
       }
-
-      const [d30, d50, d100] = await Promise.all([
-        loadModel('recognition30',  (p) => { progresses[0] = p; reportProgress() }),
-        loadModel('recognition50',  (p) => { progresses[1] = p; reportProgress() }),
-        loadModel('recognition100', (p) => { progresses[2] = p; reportProgress() }),
-      ])
-
-      rec30  = new TextRecognizer([1, 3, 16, 256]); await rec30.initialize(d30)
-      rec50  = new TextRecognizer([1, 3, 16, 384]); await rec50.initialize(d50)
-      rec100 = new TextRecognizer([1, 3, 16, 768]); await rec100.initialize(d100)
 
       self.postMessage({ type: 'REC_READY' } satisfies RecWorkerOutMessage)
     } catch (err) {

@@ -1,5 +1,5 @@
 export type RecWorkerInMessage =
-  | { type: 'REC_INIT' }
+  | { type: 'REC_INIT'; singleModel?: boolean }
   | { type: 'REC_PROCESS'; jobs: Array<{ id: number; croppedImageData: ImageData; charCountCategory?: number }> }
   | { type: 'REC_TERMINATE' }
 
