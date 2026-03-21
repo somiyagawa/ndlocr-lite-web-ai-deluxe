@@ -1562,36 +1562,19 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   }
 }
 
-/* ===== MOBILE (<600px) ===== */
-@media (max-width: 600px) {
-  .header {
-    padding: 0.5rem 0.75rem;
-  }
-  .header-title h1 {
-    font-size: 1rem;
-  }
-  .header-version {
-    display: none;
-  }
-  .ai-status-text {
-    display: none;
-  }
-  .zoom-controls {
-    flex-wrap: wrap;
-  }
-  .text-editor-header-left {
-    width: 100%;
-  }
-  .text-editor-header-buttons {
-    width: 100%;
-    justify-content: flex-start;
-  }
-  .upload-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .bottom-toolbar-right {
-    gap: 0.5rem;
-    flex-wrap: wrap;
+/* ===== MOBILE WARNING (<768px) ===== */
+.mobile-warning {
+  display: none;
+}
+@media (max-width: 767px) {
+  .mobile-warning {
+    display: block;
+    background: #fff3cd;
+    border-bottom: 1px solid #ffc107;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    color: #664d03;
+    line-height: 1.5;
+    text-align: center;
   }
 }

@@ -284,6 +284,15 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* モバイル警告メッセージ（768px未満） */}
+      <div className="mobile-warning">
+        <p>
+          {lang === 'ja'
+            ? 'このアプリはPC環境（画面幅768px以上）での利用を推奨しています。スマートフォンでは画面が狭く、一部機能が正常に動作しない場合があります。'
+            : 'This app is designed for desktop use (screen width 768px or wider). Some features may not work properly on smartphones.'}
+        </p>
+      </div>
+
       <Header
         lang={lang}
         onToggleLanguage={toggleLanguage}
