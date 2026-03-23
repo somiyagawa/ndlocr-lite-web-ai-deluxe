@@ -56,7 +56,7 @@ export function generateTEI(result: OCRResult): string {
     </fileDesc>
     <encodingDesc>
       <appInfo>
-        <application ident="ndlocr-lite-web-ai" version="0.1.0">
+        <application ident="ndlocr-lite-web-ai" version="0.2.0">
           <label>NDL-OCR Lite AI Ultra</label>
         </application>
       </appInfo>

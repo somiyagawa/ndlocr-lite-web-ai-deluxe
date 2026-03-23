@@ -1993,6 +1993,25 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: var(--color-primary-light);
 }
 
+/* ── Block selection highlight (pulsing glow) ── */
+.text-editor-textarea-highlighted {
+  animation: highlight-pulse 2s ease-in-out;
+}
+
+.text-editor-textarea-highlighted::selection {
+  background: rgba(255, 180, 50, 0.45);
+}
+
+[data-theme="dark"] .text-editor-textarea-highlighted::selection {
+  background: rgba(230, 164, 76, 0.45);
+}
+
+@keyframes highlight-pulse {
+  0% { box-shadow: inset 0 0 0 2px rgba(255, 180, 50, 0.6); }
+  50% { box-shadow: inset 0 0 0 2px rgba(255, 180, 50, 0.2); }
+  100% { box-shadow: inset 0 0 0 0px rgba(255, 180, 50, 0); }
+}
+
 /* ── Line numbers ── */
 .line-numbers-container {
   display: flex;
@@ -2422,6 +2441,32 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: var(--color-primary-light) !important;
   color: var(--color-primary) !important;
   border-color: var(--color-primary-subtle) !important;
+}
+
+/* ── Text toggle button (e.g. 縦書き) ── */
+.btn-text-toggle {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.btn-text-toggle:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.btn-text-toggle-active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary-subtle);
 }
 
 .btn-nav {

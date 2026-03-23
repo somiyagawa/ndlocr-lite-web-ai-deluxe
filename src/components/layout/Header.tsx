@@ -75,7 +75,7 @@ export function Header({
           <span className="header-title-main">NDL-OCR Lite</span>
           <span className="header-title-accent">AI Ultra</span>
         </div>
-        <span className="header-version header-version-pulse">v0.1.0</span>
+        <span className="header-version header-version-pulse">v0.2.0</span>
       </button>
 
       {/* Actions Section */}

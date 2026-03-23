@@ -63,10 +63,12 @@ export function TextEditor({
   const [redoStack, setRedoStack] = useState<UndoRedoEntry[]>([])
   const [saved, setSaved] = useState(true)
   const [showExportMenu, setShowExportMenu] = useState(false)
+  const [highlightRange, setHighlightRange] = useState<{ start: number; end: number } | null>(null)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // editedText が null なら result.fullText を使う
   const displayText = editedText ?? result?.fullText ?? ''
@@ -162,6 +164,64 @@ export function TextEditor({
     setRedoStack([])
     setSaved(true)
   }
+
+  // ブロック選択時のハイライト＆スクロール
+  useEffect(() => {
+    const ta = textareaRef.current
+    if (!ta || !displayText) return
+
+    // 選択されたテキストを取得
+    let targetText: string | null = null
+    if (selectedPageBlockText != null) {
+      targetText = selectedPageBlockText
+    } else if (selectedBlock) {
+      targetText = selectedBlock.text
+    }
+
+    if (!targetText || !targetText.trim()) {
+      setHighlightRange(null)
+      return
+    }
+
+    // displayText 内でターゲットテキストの位置を探す
+    // 完全一致を試み、なければ各行の最初の一致を探す
+    let start = displayText.indexOf(targetText)
+    if (start === -1) {
+      // 複数行テキストの場合、最初の行で検索
+      const firstLine = targetText.split('\n')[0].trim()
+      if (firstLine) {
+        start = displayText.indexOf(firstLine)
+      }
+    }
+
+    if (start === -1) {
+      setHighlightRange(null)
+      return
+    }
+
+    const end = start + targetText.length
+
+    // ハイライト範囲を設定
+    setHighlightRange({ start, end })
+
+    // textarea にフォーカスして選択範囲を設定（スクロールが自動で起こる）
+    ta.focus()
+    ta.setSelectionRange(start, end)
+
+    // 自動消去タイマーをリセット
+    if (highlightTimerRef.current) {
+      clearTimeout(highlightTimerRef.current)
+    }
+    highlightTimerRef.current = setTimeout(() => {
+      setHighlightRange(null)
+    }, 4000)
+
+    return () => {
+      if (highlightTimerRef.current) {
+        clearTimeout(highlightTimerRef.current)
+      }
+    }
+  }, [selectedBlock, selectedPageBlockText]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const applyOptions = (text: string) =>
     ignoreNewlines ? text.replace(/\n/g, '') : text
@@ -470,27 +530,13 @@ export function TextEditor({
           </button>
 
           <button
-            className={`btn btn-icon btn-sm${isVertical ? ' btn-icon-active' : ''}`}
+            className={`btn btn-sm btn-text-toggle${isVertical ? ' btn-text-toggle-active' : ''}`}
             onClick={() => setIsVertical(!isVertical)}
-            title={lang === 'ja' ? (isVertical ? '横書きに切替' : '縦書きに切替') : (isVertical ? 'Horizontal' : 'Vertical')}
+            title={lang === 'ja' ? (isVertical ? '横書きに切替' : '縦書きに切替') : (isVertical ? 'Switch to horizontal' : 'Switch to vertical')}
             aria-label="Toggle vertical text"
             aria-pressed={isVertical}
           >
-            {isVertical ? (
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <line x1="11" y1="2" x2="11" y2="14" />
-                <line x1="8" y1="2" x2="8" y2="14" />
-                <line x1="5" y1="2" x2="5" y2="14" />
-                <polyline points="13 4 11 2 9 4" fill="none" />
-              </svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <line x1="2" y1="5" x2="14" y2="5" />
-                <line x1="2" y1="8" x2="14" y2="8" />
-                <line x1="2" y1="11" x2="14" y2="11" />
-                <polyline points="12 3 14 5 12 7" fill="none" />
-              </svg>
-            )}
+            {lang === 'ja' ? '縦書き' : 'Vertical'}
           </button>
 
           <span className="text-editor-toolbar-sep" />
@@ -734,7 +780,7 @@ export function TextEditor({
             )}
             <textarea
               ref={textareaRef}
-              className={`text-editor-textarea font-${fontFamily}`}
+              className={`text-editor-textarea font-${fontFamily}${highlightRange ? ' text-editor-textarea-highlighted' : ''}`}
               value={displayText}
               onChange={handleTextChange}
               onScroll={handleTextareaScroll}
