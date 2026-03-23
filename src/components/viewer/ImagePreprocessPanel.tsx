@@ -49,6 +49,8 @@ type TranslationStrings = {
   autoCrop: string
   splitCenter: string
   splitAuto: string
+  splitCenterTip: string
+  splitAutoTip: string
   rotation: string
   apply: string
   reset: string
@@ -71,6 +73,8 @@ const t: Record<Language, TranslationStrings> = {
     autoCrop: '自動裁ち落とし',
     splitCenter: 'センター分割',
     splitAuto: '自動分割',
+    splitCenterTip: '見開き画像を中央で左右2ページに分割します',
+    splitAutoTip: '綴じ目（空白の多い縦線）を自動検出して左右2ページに分割します',
     rotation: '回転',
     apply: '適用',
     reset: 'リセット',
@@ -91,6 +95,8 @@ const t: Record<Language, TranslationStrings> = {
     autoCrop: 'Auto Crop',
     splitCenter: 'Split Center',
     splitAuto: 'Split Auto',
+    splitCenterTip: 'Split a double-page scan into two pages at the exact center',
+    splitAutoTip: 'Auto-detect the binding gap (whitespace column) and split into two pages',
     rotation: 'Rotation',
     apply: 'Apply',
     reset: 'Reset',
