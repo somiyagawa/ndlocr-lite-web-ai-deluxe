@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { L } from '../../i18n'
 import type { Language } from '../../i18n'
 
 interface BottomToolbarProps {
@@ -59,7 +60,15 @@ export const BottomToolbar = memo(function BottomToolbar({
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            {correctionCount} {lang === 'ja' ? '件修正' : 'corrections'}
+            {correctionCount} {L(lang, {
+              ja: '件修正',
+              en: 'corrections',
+              'zh-CN': '项校正',
+              'zh-TW': '項校正',
+              ko: '건 교정',
+              la: 'correctiones',
+              eo: 'korektoj',
+            })}
           </span>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 export interface PreprocessOptions {
   brightness: number
@@ -168,6 +169,50 @@ const t: Record<Language, TranslationStrings> = {
     reset: '재설정',
     degrees: '°',
     processing: '처리 중...',
+  },
+  la: {
+    imagePreprocessing: 'Praeparatio imaginis',
+    brightness: 'Claritas',
+    contrast: 'Oppositio',
+    sharpness: 'Acuitas',
+    grayscale: 'Scala grisea',
+    blackWhite: 'Nigrum et album',
+    binarizeThreshold: 'Limen binarizationis',
+    denoise: 'Strepitum removere',
+    invertColors: 'Colores invertere',
+    deskewAuto: 'Automatice corrigere',
+    autoCrop: 'Automatice secare',
+    splitCenter: 'In medio dividere',
+    splitAuto: 'Automatice dividere',
+    splitCenterTip: 'Scansionem gemini folii in medio dividite',
+    splitAutoTip: 'Rimam ligaturae automatice invenit et dividit',
+    rotation: 'Rotatio',
+    apply: 'Applicare',
+    reset: 'Restituere',
+    degrees: '°',
+    processing: 'Processus...',
+  },
+  eo: {
+    imagePreprocessing: 'Bildo-antaŭprilaborado',
+    brightness: 'Brileco',
+    contrast: 'Kontrasto',
+    sharpness: 'Akuteco',
+    grayscale: 'Grizskalo',
+    blackWhite: 'Nigra kaj blanka',
+    binarizeThreshold: 'Sojlo de binarigo',
+    denoise: 'Forigi bruon',
+    invertColors: 'Inversigi kolorojn',
+    deskewAuto: 'Aŭtomate korekti',
+    autoCrop: 'Aŭtomate tondi',
+    splitCenter: 'Dividi centre',
+    splitAuto: 'Aŭtomate dividi',
+    splitCenterTip: 'Dividu duel-paĝan skanaĵon en la centro en du paĝojn',
+    splitAutoTip: 'Aŭtomate detektu la bindron-fendron kaj dividu en du paĝojn',
+    rotation: 'Rotacio',
+    apply: 'Apliki',
+    reset: 'Restarigi',
+    degrees: '°',
+    processing: 'Prilaboras...',
   },
 }
 
@@ -357,7 +402,7 @@ export function ImagePreprocessPanel({
           {/* Slider Controls */}
           <div className="preprocess-controls">
             <label className="preprocess-controls-group-label">
-              {lang === 'ja' ? 'スライダー' : 'Adjustments'}
+              {L(lang, { ja: 'スライダー', en: 'Adjustments', 'zh-CN': '调整', 'zh-TW': '調整', ko: '조정', la: 'Coagulationes', eo: 'Ĝustigoj' })}
             </label>
             {sliderControlData.map(({ key, label, min, max, step }) => (
               <div key={key} className="preprocess-slider">

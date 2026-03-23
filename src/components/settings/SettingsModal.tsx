@@ -4,6 +4,7 @@ import type { AISettings, AIProvider, AIConnectionMode } from '../../types/ai'
 import { DEFAULT_MODELS, DEFAULT_AI_SETTINGS } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 interface SettingsModalProps {
   onClose: () => void
@@ -39,9 +40,15 @@ export function SettingsModal({
 
   const handleClearModels = async () => {
     if (!window.confirm(
-      lang === 'ja'
-        ? 'キャッシュされたONNXモデルを削除しますか？次回起動時に再ダウンロードが必要です。'
-        : 'Delete cached ONNX models? They will be re-downloaded on next startup.'
+      L(lang, {
+        ja: 'キャッシュされたONNXモデルを削除しますか？次回起動時に再ダウンロードが必要です。',
+        en: 'Delete cached ONNX models? They will be re-downloaded on next startup.',
+        'zh-CN': '缓存的ONNX模型将被删除。下次启动时需要重新下载。是否继续？',
+        'zh-TW': '快取的ONNX模型將被刪除。下次啟動時需要重新下載。是否繼續？',
+        ko: '캐시된 ONNX 모델이 삭제됩니다. 다음 시작 시 다시 다운로드됩니다. 계속하시겠습니까?',
+        la: 'Exemplaria ONNX in memoria delenda sunt. Visne procedere?',
+        eo: 'Kaŝmemoritaj ONNX-modeloj estos forigitaj. Ĉu daŭrigi?',
+      })
     )) return
 
     setClearing(true)
@@ -78,10 +85,10 @@ export function SettingsModal({
 
   const statusLabel = (() => {
     switch (connectionStatus) {
-      case 'connected': return lang === 'ja' ? '接続済み' : 'Connected'
-      case 'connecting': return lang === 'ja' ? '接続中...' : 'Connecting...'
-      case 'error': return lang === 'ja' ? '接続エラー' : 'Connection Error'
-      default: return lang === 'ja' ? '未接続' : 'Disconnected'
+      case 'connected': return L(lang, { ja: '接続済み', en: 'Connected', 'zh-CN': '已连接', 'zh-TW': '已連接', ko: '연결됨', la: 'Connexum', eo: 'Konektita' })
+      case 'connecting': return L(lang, { ja: '接続中...', en: 'Connecting...', 'zh-CN': '连接中...', 'zh-TW': '連接中...', ko: '연결 중...', la: 'Connexio...', eo: 'Konektanta...' })
+      case 'error': return L(lang, { ja: '接続エラー', en: 'Connection Error', 'zh-CN': '连接错误', 'zh-TW': '連接錯誤', ko: '연결 오류', la: 'Error connexionis', eo: 'Konekta eraro' })
+      default: return L(lang, { ja: '未接続', en: 'Disconnected', 'zh-CN': '未连接', 'zh-TW': '未連接', ko: '미연결', la: 'Non connexum', eo: 'Malkonektita' })
     }
   })()
 
@@ -89,8 +96,8 @@ export function SettingsModal({
     <div className="panel-overlay" onClick={onClose}>
       <div className="panel" onClick={(e) => e.stopPropagation()}>
         <div className="panel-header">
-          <h2>{lang === 'ja' ? '設定' : 'Settings'}</h2>
-          <button className="btn-close" onClick={onClose}>✕</button>
+          <h2>{L(lang, { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj' })}</h2>
+          <button className="btn-close" onClick={onClose} title={L(lang, { ja: '閉じる', en: 'Close', 'zh-CN': '关闭', 'zh-TW': '關閉', ko: '닫기', la: 'Claudere', eo: 'Fermi' })}>✕</button>
         </div>
 
         {/* タブ */}
@@ -99,13 +106,13 @@ export function SettingsModal({
             className={`settings-tab ${activeTab === 'ai' ? 'active' : ''}`}
             onClick={() => setActiveTab('ai')}
           >
-            {lang === 'ja' ? 'AI接続' : 'AI Connection'}
+            {L(lang, { ja: 'AI接続', en: 'AI Connection', 'zh-CN': 'AI连接', 'zh-TW': 'AI連接', ko: 'AI 연결', la: 'Connexio AI', eo: 'AI-konekto' })}
           </button>
           <button
             className={`settings-tab ${activeTab === 'cache' ? 'active' : ''}`}
             onClick={() => setActiveTab('cache')}
           >
-            {lang === 'ja' ? 'キャッシュ' : 'Cache'}
+            {L(lang, { ja: 'キャッシュ', en: 'Cache', 'zh-CN': '缓存', 'zh-TW': '快取', ko: '캐시', la: 'Memoria', eo: 'Kaŝmemoro' })}
           </button>
         </div>
 
@@ -115,7 +122,7 @@ export function SettingsModal({
             <>
               {/* 接続モード切替 */}
               <section className="settings-section">
-                <h3>{lang === 'ja' ? '接続モード' : 'Connection Mode'}</h3>
+                <h3>{L(lang, { ja: '接続モード', en: 'Connection Mode', 'zh-CN': '连接模式', 'zh-TW': '連接模式', ko: '연결 모드', la: 'Modus connexionis', eo: 'Konektoreĝimo' })}</h3>
                 <div className="settings-mode-toggle">
                   <button
                     className={`btn ${aiSettings.mode === 'direct' ? 'btn-primary' : 'btn-secondary'}`}
@@ -135,7 +142,7 @@ export function SettingsModal({
               {/* Direct API設定 */}
               {aiSettings.mode === 'direct' && (
                 <section className="settings-section">
-                  <h3>{lang === 'ja' ? 'プロバイダ' : 'Provider'}</h3>
+                  <h3>{L(lang, { ja: 'プロバイダ', en: 'Provider', 'zh-CN': '服务提供商', 'zh-TW': '服務提供商', ko: '제공자', la: 'Provisor', eo: 'Provizanto' })}</h3>
                   <select
                     className="settings-select"
                     value={aiSettings.directApi.provider}
@@ -147,7 +154,7 @@ export function SettingsModal({
                   </select>
 
                   {/* APIキー */}
-                  <h3>{lang === 'ja' ? 'APIキー' : 'API Key'}</h3>
+                  <h3>{L(lang, { ja: 'APIキー', en: 'API Key', 'zh-CN': 'API密钥', 'zh-TW': 'API金鑰', ko: 'API 키', la: 'Clavis API', eo: 'API-ŝlosilo' })}</h3>
                   <input
                     type="password"
                     className="settings-input"
@@ -155,16 +162,22 @@ export function SettingsModal({
                     onChange={(e) => onUpdateAISettings({
                       directApi: { ...aiSettings.directApi, apiKey: e.target.value },
                     })}
-                    placeholder={lang === 'ja' ? 'APIキーを入力' : 'Enter API key'}
+                    placeholder={L(lang, { ja: 'APIキーを入力', en: 'Enter API key', 'zh-CN': '输入 API 密钥', 'zh-TW': '輸入 API 金鑰', ko: 'API 키 입력', la: 'Clavis API inde', eo: 'Enmetu API-ŝlosilon' })}
                   />
                   <p className="settings-description">
-                    {lang === 'ja'
-                      ? 'APIキーはブラウザ内で暗号化して保存されます。サーバーには送信されません。'
-                      : 'API keys are encrypted and stored locally. They are never sent to our servers.'}
+                    {L(lang, {
+                      ja: 'APIキーはブラウザ内で暗号化して保存されます。サーバーには送信されません。',
+                      en: 'API keys are encrypted and stored locally. They are never sent to our servers.',
+                      'zh-CN': 'API密钥在浏览器内加密保存，不会发送到服务器。',
+                      'zh-TW': 'API金鑰在瀏覽器內加密保存，不會發送到伺服器。',
+                      ko: 'API 키는 브라우저에서 암호화되어 저장되며, 서버로 전송되지 않습니다.',
+                      la: 'Claves API in navigatre encryptantur. Nunquam mittuntur.',
+                      eo: 'API-ŝlosiloj estas ĉifritaj kaj konservitaj loke. Neniam sendas al serviloj.',
+                    })}
                   </p>
 
                   {/* モデル選択 */}
-                  <h3>{lang === 'ja' ? 'モデル' : 'Model'}</h3>
+                  <h3>{L(lang, { ja: 'モデル', en: 'Model', 'zh-CN': '模型', 'zh-TW': '模型', ko: '모델', la: 'Exemplar', eo: 'Modelo' })}</h3>
                   {DEFAULT_MODELS[aiSettings.directApi.provider].length > 0 ? (
                     <select
                       className="settings-select"
@@ -173,7 +186,7 @@ export function SettingsModal({
                         directApi: { ...aiSettings.directApi, model: e.target.value },
                       })}
                     >
-                      <option value="">{lang === 'ja' ? 'モデルを選択' : 'Select model'}</option>
+                      <option value="">{L(lang, { ja: 'モデルを選択', en: 'Select model', 'zh-CN': '选择模型', 'zh-TW': '選擇模型', ko: '모델 선택', la: 'Exemplar elige', eo: 'Elektu modelon' })}</option>
                       {DEFAULT_MODELS[aiSettings.directApi.provider].map((m) => (
                         <option key={m} value={m}>{m}</option>
                       ))}
@@ -186,14 +199,14 @@ export function SettingsModal({
                       onChange={(e) => onUpdateAISettings({
                         directApi: { ...aiSettings.directApi, model: e.target.value },
                       })}
-                      placeholder={lang === 'ja' ? 'モデル名を入力' : 'Enter model name'}
+                      placeholder={L(lang, { ja: 'モデル名を入力', en: 'Enter model name', 'zh-CN': '输入模型名称', 'zh-TW': '輸入模型名稱', ko: '모델 이름 입력', la: 'Exemplaris nomen inde', eo: 'Enmetu modelo-nomon' })}
                     />
                   )}
 
                   {/* カスタムエンドポイント */}
                   {aiSettings.directApi.provider === 'custom' && (
                     <>
-                      <h3>{lang === 'ja' ? 'エンドポイントURL' : 'Endpoint URL'}</h3>
+                      <h3>{L(lang, { ja: 'エンドポイントURL', en: 'Endpoint URL', 'zh-CN': '端点URL', 'zh-TW': '端點URL', ko: '끝점 URL', la: 'URL extremum', eo: 'Pinto-URL' })}</h3>
                       <input
                         type="url"
                         className="settings-input"
@@ -211,7 +224,7 @@ export function SettingsModal({
               {/* MCP Server設定 */}
               {aiSettings.mode === 'mcp' && (
                 <section className="settings-section">
-                  <h3>{lang === 'ja' ? 'MCPサーバーURL' : 'MCP Server URL'}</h3>
+                  <h3>{L(lang, { ja: 'MCPサーバーURL', en: 'MCP Server URL', 'zh-CN': 'MCP服务器URL', 'zh-TW': 'MCP伺服器URL', ko: 'MCP 서버 URL', la: 'URL Servidor MCP', eo: 'URL de Servilo MCP' })}</h3>
                   <input
                     type="url"
                     className="settings-input"
@@ -222,12 +235,18 @@ export function SettingsModal({
                     placeholder="http://localhost:3000/mcp"
                   />
                   <p className="settings-description">
-                    {lang === 'ja'
-                      ? 'MCPプロトコル対応のサーバーURLを指定してください。Streamable HTTP Transportを使用します。'
-                      : 'Specify the URL of your MCP-compatible server. Uses Streamable HTTP Transport.'}
+                    {L(lang, {
+                      ja: 'MCPプロトコル対応のサーバーURLを指定してください。Streamable HTTP Transportを使用します。',
+                      en: 'Specify the URL of your MCP-compatible server. Uses Streamable HTTP Transport.',
+                      'zh-CN': '指定MCP兼容服务器的URL。使用Streamable HTTP Transport。',
+                      'zh-TW': '指定MCP相容伺服器的URL。使用Streamable HTTP Transport。',
+                      ko: 'MCP 호환 서버의 URL을 지정하세요. Streamable HTTP Transport를 사용합니다.',
+                      la: 'URL serveri MCP-compatibilis specifica. Utitur Transport HTTP Fluxibili.',
+                      eo: 'Specifu la URL de via MCP-konforma servilo. Uzas Fluan HTTP-Transporton.',
+                    })}
                   </p>
 
-                  <h3>{lang === 'ja' ? 'ツール名（任意）' : 'Tool Name (optional)'}</h3>
+                  <h3>{L(lang, { ja: 'ツール名（任意）', en: 'Tool Name (optional)', 'zh-CN': '工具名（可选）', 'zh-TW': '工具名（可選）', ko: '도구 이름 (선택사항)', la: 'Nomen Instrumenti (optionale)', eo: 'Nomo de Ilo (nedeviga)' })}</h3>
                   <input
                     type="text"
                     className="settings-input"
@@ -235,14 +254,14 @@ export function SettingsModal({
                     onChange={(e) => onUpdateAISettings({
                       mcp: { ...aiSettings.mcp, toolName: e.target.value || undefined },
                     })}
-                    placeholder={lang === 'ja' ? '空欄で自動検出' : 'Leave empty for auto-detection'}
+                    placeholder={L(lang, { ja: '空欄で自動検出', en: 'Leave empty for auto-detection', 'zh-CN': '留空自动检测', 'zh-TW': '留空自動偵測', ko: '자동 감지하려면 비워두세요', la: 'Relinqua vacuum ad detectionem automata', eo: 'Lasu malplena por aŭtomata detekto' })}
                   />
                 </section>
               )}
 
               {/* 校正プロンプト */}
               <section className="settings-section">
-                <h3>{lang === 'ja' ? '校正プロンプト' : 'Proofreading Prompt'}</h3>
+                <h3>{L(lang, { ja: '校正プロンプト', en: 'Proofreading Prompt', 'zh-CN': '校对提示', 'zh-TW': '校對提示', ko: '교정 프롬프트', la: 'Monitio correctionis', eo: 'Ĝusta-legado-invito' })}</h3>
                 <textarea
                   className="settings-textarea"
                   value={aiSettings.customPrompt}
@@ -254,7 +273,7 @@ export function SettingsModal({
                   style={{ marginTop: '0.5rem' }}
                   onClick={() => onUpdateAISettings({ customPrompt: DEFAULT_AI_SETTINGS.customPrompt })}
                 >
-                  {lang === 'ja' ? 'デフォルトに戻す' : 'Reset to Default'}
+                  {L(lang, { ja: 'デフォルトに戻す', en: 'Reset to Default', 'zh-CN': '恢复默认', 'zh-TW': '恢復預設', ko: '기본값으로 복원', la: 'Ad praefinitum restituere', eo: 'Restarigi defaŭlton' })}
                 </button>
               </section>
 
@@ -267,20 +286,20 @@ export function SettingsModal({
                     disabled={connectionStatus === 'connecting'}
                   >
                     {connectionStatus === 'connecting'
-                      ? (lang === 'ja' ? 'テスト中...' : 'Testing...')
-                      : (lang === 'ja' ? '接続テスト' : 'Test Connection')}
+                      ? L(lang, { ja: 'テスト中...', en: 'Testing...', 'zh-CN': '测试中...', 'zh-TW': '測試中...', ko: '테스트 중...', la: 'Probans...', eo: 'Testas...' })
+                      : L(lang, { ja: '接続テスト', en: 'Test Connection', 'zh-CN': '测试连接', 'zh-TW': '測試連接', ko: '연결 테스트', la: 'Connexionem probare', eo: 'Testi konekton' })}
                   </button>
                   <span className={`settings-connection-status status-${connectionStatus}`}>
                     {statusLabel}
                   </span>
                   {testResult === 'success' && (
                     <span className="settings-test-ok">
-                      {lang === 'ja' ? '成功' : 'Success'}
+                      {L(lang, { ja: '成功', en: 'Success', 'zh-CN': '成功', 'zh-TW': '成功', ko: '성공', la: 'Successus', eo: 'Sukceso' })}
                     </span>
                   )}
                   {testResult === 'fail' && (
                     <span className="settings-test-fail">
-                      {lang === 'ja' ? '失敗' : 'Failed'}
+                      {L(lang, { ja: '失敗', en: 'Failed', 'zh-CN': '失败', 'zh-TW': '失敗', ko: '실패', la: 'Defectio', eo: 'Malsukceso' })}
                     </span>
                   )}
                 </div>
@@ -291,11 +310,17 @@ export function SettingsModal({
           {/* ===== キャッシュタブ ===== */}
           {activeTab === 'cache' && (
             <section className="settings-section">
-              <h3>{lang === 'ja' ? 'モデルキャッシュ' : 'Model Cache'}</h3>
+              <h3>{L(lang, { ja: 'モデルキャッシュ', en: 'Model Cache', 'zh-CN': '模型缓存', 'zh-TW': '模型快取', ko: '모델 캐시', la: 'Memoria exemplarium', eo: 'Modelkaŝmemoro' })}</h3>
               <p className="settings-description">
-                {lang === 'ja'
-                  ? 'ダウンロード済みのONNXモデルはIndexedDBにキャッシュされています。キャッシュをクリアすると次回起動時に再ダウンロードが必要です。'
-                  : 'Downloaded ONNX models are cached in IndexedDB. Clearing the cache requires re-downloading on next startup.'}
+                {L(lang, {
+                  ja: 'ダウンロード済みのONNXモデルはIndexedDBにキャッシュされています。キャッシュをクリアすると次回起動時に再ダウンロードが必要です。',
+                  en: 'Downloaded ONNX models are cached in IndexedDB. Clearing the cache requires re-downloading on next startup.',
+                  'zh-CN': '已下载的ONNX模型缓存在IndexedDB中。清除缓存后下次启动时需要重新下载。',
+                  'zh-TW': '已下載的ONNX模型快取在IndexedDB中。清除快取後下次啟動時需要重新下載。',
+                  ko: '다운로드된 ONNX 모델이 IndexedDB에 캐시됩니다. 캐시를 지우면 다음 시작 시 다시 다운로드해야 합니다.',
+                  la: 'Exemplaria ONNX in memoria IndexedDB servantur. Si memoria purgatur, iterum accedere necesse est.',
+                  eo: 'Elŝutitaj ONNX-modeloj estas kaŝmemoritaj en IndexedDB. Se forviŝas la kaŝmemoron, devi relŝuti poste.',
+                })}
               </p>
               <button
                 className="btn btn-secondary"
@@ -303,10 +328,10 @@ export function SettingsModal({
                 disabled={clearing}
               >
                 {cleared
-                  ? (lang === 'ja' ? '✓ クリア完了' : '✓ Cleared')
+                  ? L(lang, { ja: '✓ クリア完了', en: '✓ Cleared', 'zh-CN': '✓ 已清除', 'zh-TW': '✓ 已清除', ko: '✓ 삭제됨', la: '✓ Purgatum', eo: '✓ Forviŝita' })
                   : clearing
-                    ? (lang === 'ja' ? 'クリア中...' : 'Clearing...')
-                    : (lang === 'ja' ? 'モデルキャッシュをクリア' : 'Clear Model Cache')}
+                    ? L(lang, { ja: 'クリア中...', en: 'Clearing...', 'zh-CN': '清除中...', 'zh-TW': '清除中...', ko: '삭제 중...', la: 'Purgans...', eo: 'Forviŝas...' })
+                    : L(lang, { ja: 'モデルキャッシュをクリア', en: 'Clear Model Cache', 'zh-CN': '清除模型缓存', 'zh-TW': '清除模型快取', ko: '모델 캐시 삭제', la: 'Memoriam purgare', eo: 'Forviŝi modelkaŝmemoron' })}
               </button>
             </section>
           )}

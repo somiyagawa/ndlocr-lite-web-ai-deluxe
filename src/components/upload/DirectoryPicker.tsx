@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { L } from '../../i18n'
 import type { Language } from '../../i18n'
 
 interface DirectoryPickerProps {
@@ -26,7 +27,15 @@ export function DirectoryPicker({ onFilesSelected, lang, disabled = false }: Dir
         onClick={() => !disabled && inputRef.current?.click()}
         disabled={disabled}
       >
-        📂 {lang === 'ja' ? 'フォルダを選択' : 'Select Folder'}
+        📂 {L(lang, {
+          ja: 'フォルダを選択',
+          en: 'Select Folder',
+          'zh-CN': '选择文件夹',
+          'zh-TW': '選擇資料夾',
+          ko: '폴더 선택',
+          la: 'Involucrum eligere',
+          eo: 'Elekti dosierujon',
+        })}
       </button>
       <input
         ref={inputRef}

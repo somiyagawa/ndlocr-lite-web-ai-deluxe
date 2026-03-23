@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { DBRunEntry } from '../../types/db'
 import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 interface HistoryPanelProps {
   runs: DBRunEntry[]
@@ -24,7 +25,16 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
   }
 
   const formatDate = (ts: number) => {
-    return new Date(ts).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+    const localeMap: Record<Language, string> = {
+      ja: 'ja-JP',
+      en: 'en-US',
+      'zh-CN': 'zh-CN',
+      'zh-TW': 'zh-TW',
+      ko: 'ko-KR',
+      la: 'en-US',
+      eo: 'en-US',
+    }
+    return new Date(ts).toLocaleString(localeMap[lang], {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -45,12 +55,12 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" />
             </svg>
-            <h2>{lang === 'ja' ? '処理履歴' : 'History'}</h2>
+            <h2>{L(lang, { ja: '処理履歴', en: 'Processing History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia processuum', eo: 'Prilaborhistorio' })}</h2>
             {runs.length > 0 && (
               <span className="history-count">{runs.length}</span>
             )}
           </div>
-          <button className="btn-close" onClick={onClose}>✕</button>
+          <button className="btn-close" onClick={onClose} title={L(lang, { ja: '閉じる', en: 'Close', 'zh-CN': '关闭', 'zh-TW': '關閉', ko: '닫기', la: 'Claudere', eo: 'Fermi' })}>✕</button>
         </div>
 
         {/* Body */}
@@ -60,8 +70,8 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
                 <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" />
               </svg>
-              <p>{lang === 'ja' ? '処理履歴がありません' : 'No history yet'}</p>
-              <span>{lang === 'ja' ? '画像やPDFをOCR処理すると、ここに履歴が表示されます' : 'OCR results will appear here after processing'}</span>
+              <p>{L(lang, { ja: '処理履歴がありません', en: 'No history yet', 'zh-CN': '暂无处理历史', 'zh-TW': '暫無處理紀錄', ko: '처리 기록이 없습니다', la: 'Nulla historia', eo: 'Neniu historio' })}</p>
+              <span>{L(lang, { ja: '画像やPDFをOCR処理すると、ここに履歴が表示されます', en: 'OCR results will appear here after processing', 'zh-CN': '处理图像或PDF后，历史记录将显示在这里', 'zh-TW': '處理圖像或PDF後，紀錄將顯示在這裡', ko: '이미지 또는 PDF를 OCR 처리한 후 기록이 여기에 나타납니다', la: 'Historia apparebit post processus OCR', eo: 'Historio aperos ĉi tie post OCR-prilaborado' })}</span>
             </div>
           ) : (
             <ul className="history-list">
@@ -97,11 +107,11 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
                       <div className="history-meta">
                         {fileCount > 1 && (
                           <span className="history-meta-tag">
-                            {lang === 'ja' ? `${fileCount}ページ` : `${fileCount} pages`}
+                            {L(lang, { ja: `${fileCount}ページ`, en: `${fileCount} pages`, 'zh-CN': `${fileCount}页`, 'zh-TW': `${fileCount}頁`, ko: `${fileCount}페이지`, la: `${fileCount} paginae`, eo: `${fileCount} paĝoj` })}
                           </span>
                         )}
                         <span className="history-meta-tag">
-                          {totalChars.toLocaleString()} {lang === 'ja' ? '文字' : 'chars'}
+                          {totalChars.toLocaleString()} {L(lang, { ja: '文字', en: 'chars', 'zh-CN': '字符', 'zh-TW': '字元', ko: '자', la: 'characteres', eo: 'signoj' })}
                         </span>
                         <span className="history-meta-tag">
                           {formatTime(totalTime)}
@@ -121,7 +131,7 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
         {/* Footer */}
         <div className="panel-footer">
           <span className="history-footer-hint">
-            {lang === 'ja' ? '項目をクリックして復元' : 'Click an item to restore'}
+            {L(lang, { ja: '項目をクリックして復元', en: 'Click an item to restore', 'zh-CN': '点击项目恢复', 'zh-TW': '點擊項目恢復', ko: '항목을 클릭하여 복원', la: 'Clica itemum ad restituendum', eo: 'Klaku eron por restarigi' })}
           </span>
           <button
             className={`btn btn-sm ${confirmClear ? 'btn-danger' : 'btn-secondary'}`}
@@ -129,8 +139,8 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
             disabled={runs.length === 0}
           >
             {confirmClear
-              ? (lang === 'ja' ? '本当に削除？' : 'Confirm?')
-              : (lang === 'ja' ? '履歴を削除' : 'Clear All')}
+              ? L(lang, { ja: '本当に削除？', en: 'Confirm?', 'zh-CN': '确定删除？', 'zh-TW': '確定刪除？', ko: '정말 삭제?', la: 'Visne vere delere?', eo: 'Ĉu vere forigi?' })
+              : L(lang, { ja: '履歴を削除', en: 'Clear All', 'zh-CN': '全部删除', 'zh-TW': '全部刪除', ko: '전체 삭제', la: 'Omnia delere', eo: 'Forigi ĉiujn' })}
           </button>
         </div>
       </div>

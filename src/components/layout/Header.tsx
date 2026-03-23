@@ -1,14 +1,14 @@
 import { memo } from 'react'
-import { LANGUAGES, LANGUAGE_LABELS } from '../../i18n'
+import { LANGUAGES, LANGUAGE_LABELS, L } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Theme } from '../../hooks/useTheme'
 
 const STATUS_LABELS: Record<AIConnectionStatus, Record<string, string>> = {
-  connected:    { ja: 'AI接続済み', en: 'AI Connected', 'zh-CN': 'AI已连接', 'zh-TW': 'AI已連接', ko: 'AI 연결됨' },
-  connecting:   { ja: 'AI接続中...', en: 'AI Connecting...', 'zh-CN': 'AI连接中...', 'zh-TW': 'AI連接中...', ko: 'AI 연결 중...' },
-  error:        { ja: 'AI接続エラー', en: 'AI Error', 'zh-CN': 'AI连接错误', 'zh-TW': 'AI連接錯誤', ko: 'AI 오류' },
-  disconnected: { ja: 'AI未接続', en: 'AI Disconnected', 'zh-CN': 'AI未连接', 'zh-TW': 'AI未連接', ko: 'AI 미연결' },
+  connected:    { ja: 'AI接続済み', en: 'AI Connected', 'zh-CN': 'AI已连接', 'zh-TW': 'AI已連接', ko: 'AI 연결됨', la: 'AI connexum', eo: 'AI konektita' },
+  connecting:   { ja: 'AI接続中...', en: 'AI Connecting...', 'zh-CN': 'AI连接中...', 'zh-TW': 'AI連接中...', ko: 'AI 연결 중...', la: 'AI conectens...', eo: 'AI konektanta...' },
+  error:        { ja: 'AI接続エラー', en: 'AI Error', 'zh-CN': 'AI连接错误', 'zh-TW': 'AI連接錯誤', ko: 'AI 오류', la: 'AI error', eo: 'AI eraro' },
+  disconnected: { ja: 'AI未接続', en: 'AI Disconnected', 'zh-CN': 'AI未连接', 'zh-TW': 'AI未連接', ko: 'AI 미연결', la: 'AI disiunctum', eo: 'AI malkonektita' },
 }
 
 interface HeaderProps {
@@ -42,19 +42,21 @@ export const Header = memo(function Header({
     ?? ''
 
   const THEME_LABELS: Record<string, Record<string, string>> = {
-    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환' },
-    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환' },
-    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록' },
-    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정' },
-    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내' },
+    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo' },
+    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo' },
+    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio' },
+    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj' },
+    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo' },
   }
 
   const FLAG_EMOJI: Record<string, string> = {
     ja: '\u{1F1EF}\u{1F1F5}',      // 🇯🇵
     en: '\u{1F1EC}\u{1F1E7}',      // 🇬🇧
     'zh-CN': '\u{1F1E8}\u{1F1F3}', // 🇨🇳
-    'zh-TW': '\u{1F1F9}\u{1F1FC}', // 🇹🇼
+    'zh-TW': '\u{1F1ED}\u{1F1FA}', // 🇭🇰
     ko: '\u{1F1F0}\u{1F1F7}',      // 🇰🇷
+    la: '\u{1F3DB}\uFE0F',          // 🏛️
+    eo: '\u{1F30D}',                // 🌍
   }
 
   const themeTitle = theme === 'dark'
@@ -99,7 +101,15 @@ export const Header = memo(function Header({
           {aiConnectionStatus === 'disconnected' || aiConnectionStatus === 'error' ? (
             <button
               className={`${statusClass} ai-status-clickable`}
-              title={lang === 'ja' ? 'クリックしてAI接続方法を確認' : 'Click to learn how to connect AI'}
+              title={L(lang, {
+                ja: 'クリックしてAI接続方法を表示',
+                en: 'Click to see how to connect AI',
+                'zh-CN': '点击查看AI连接方法',
+                'zh-TW': '點擊查看AI連接方法',
+                ko: '클릭하여 AI 연결 방법 보기',
+                la: 'Preme ut connexionem AI videas',
+                eo: 'Alklaku por vidi kiel konekti AI',
+              })}
               onClick={onAIStatusClick}
             >
               <span className="ai-status-dot" />

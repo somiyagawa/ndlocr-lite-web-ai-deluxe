@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react
 import type { OCRResult, TextBlock, BoundingBox, PageBlock } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { useI18n } from './hooks/useI18n'
+import { L } from './i18n'
 import { useOCRWorker } from './hooks/useOCRWorker'
 import { useFileProcessor } from './hooks/useFileProcessor'
 import { useResultCache } from './hooks/useResultCache'
@@ -258,9 +259,15 @@ export default function App() {
 
   const handleClear = () => {
     if (sessionResults.length > 0) {
-      const msg = lang === 'ja'
-        ? '現在のOCR結果は破棄されます。よろしいですか？'
-        : 'Current OCR results will be discarded. Continue?'
+      const msg = L(lang, {
+        ja: '現在のOCR結果は破棄されます。よろしいですか？',
+        en: 'Current OCR results will be discarded. Continue?',
+        'zh-CN': '当前OCR结果将被丢弃。是否继续？',
+        'zh-TW': '目前的OCR結果將被捨棄。是否繼續？',
+        ko: '현재 OCR 결과가 삭제됩니다. 계속하시겠습니까?',
+        la: 'Eventus OCR praesentes delentur. Visne procedere?',
+        eo: 'Nuna OCR-rezulto estos forĵetita. Ĉu daŭrigi?'
+      })
       if (!window.confirm(msg)) return
     }
     clearImages()
@@ -323,7 +330,7 @@ export default function App() {
         className="btn-nav"
         onClick={() => { setIndex((prev) => prev - 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
         disabled={index === 0}
-        title={lang === 'ja' ? '前のファイル' : 'Previous file'}
+        title={L(lang, { ja: '前のファイル', en: 'Previous file', 'zh-CN': '上一个文件', 'zh-TW': '上一個檔案', ko: '이전 파일', la: 'Fasciculus prior', eo: 'Antaŭa dosiero' })}
       >←</button>
       <select
         className="result-page-select"
@@ -348,7 +355,7 @@ export default function App() {
         className="btn-nav"
         onClick={() => { setIndex((prev) => prev + 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
         disabled={index >= maxIndex}
-        title={lang === 'ja' ? '次のファイル' : 'Next file'}
+        title={L(lang, { ja: '次のファイル', en: 'Next file', 'zh-CN': '下一个文件', 'zh-TW': '下一個檔案', ko: '다음 파일', la: 'Fasciculus proximus', eo: 'Sekva dosiero' })}
       >→</button>
     </div>
   )
@@ -358,9 +365,15 @@ export default function App() {
       {/* モバイル警告メッセージ（768px未満） */}
       <div className="mobile-warning">
         <p>
-          {lang === 'ja'
-            ? 'このアプリはPC環境（画面幅768px以上）での利用を推奨しています。スマートフォンでは画面が狭く、一部機能が正常に動作しない場合があります。'
-            : 'This app is designed for desktop use (screen width 768px or wider). Some features may not work properly on smartphones.'}
+          {L(lang, {
+            ja: 'このアプリはPC環境（画面幅768px以上）での利用を推奨しています。スマートフォンでは画面が狭く、一部機能が正常に動作しない場合があります。',
+            en: 'This app is designed for desktop use (screen width 768px or wider). Some features may not work properly on smartphones.',
+            'zh-CN': '本应用建议在电脑环境（屏幕宽度768px以上）使用。智能手机上部分功能可能无法正常工作。',
+            'zh-TW': '本應用建議在電腦環境（螢幕寬度768px以上）使用。智慧型手機上部分功能可能無法正常運作。',
+            ko: '이 앱은 PC 환경(화면 너비 768px 이상)에서 사용하는 것을 권장합니다. 스마트폰에서는 일부 기능이 제대로 작동하지 않을 수 있습니다.',
+            la: 'Haec applicatio ad usum in computatro (latitudo 768px vel plus) commendatur.',
+            eo: 'Ĉi tiu aplikaĵo estas desegnita por labortabla uzo (ekranlarĝo 768px aŭ pli). Iuj funkcioj eble ne funkcias ĝuste sur inteligentaj telefonoj.'
+          })}
         </p>
       </div>
 
@@ -385,16 +398,22 @@ export default function App() {
             <div className="upload-actions">
               <DirectoryPicker onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
               <button className="btn btn-secondary" onClick={handlePasteFromClipboard} disabled={isWorking}>
-                {lang === 'ja' ? 'クリップボードから貼り付け' : 'Paste from Clipboard'}
+                {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo' })}
               </button>
               <button className="btn btn-secondary" onClick={handleSampleLoad} disabled={isWorking}>
-                {lang === 'ja' ? 'サンプルを試す' : 'Try Sample'}
+                {L(lang, { ja: 'サンプルを試す', en: 'Try Sample', 'zh-CN': '试用示例', 'zh-TW': '試用範例', ko: '샘플 사용해보기', la: 'Exemplum temptare', eo: 'Provi ekzemplon' })}
               </button>
             </div>
             <span className="bluepond-credit">
-              {lang === 'ja'
-                ? '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0'
-                : 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0'}
+              {L(lang, {
+                ja: '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0',
+                en: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
+                'zh-CN': '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
+                'zh-TW': '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
+                ko: '배경 사진: 비에이·아오이이케 — MaedaAkihiko, CC BY-SA 4.0',
+                la: 'Imago: Lacus Caeruleus, Biei — MaedaAkihiko, CC BY-SA 4.0',
+                eo: 'Fono: Blua Lageto, Biei — MaedaAkihiko, CC BY-SA 4.0'
+              })}
             </span>
           </section>
         )}
@@ -412,12 +431,12 @@ export default function App() {
                 <div className="pending-viewer-buttons">
                   <button className="btn btn-primary" onClick={() => setIsReadyToProcess(true)}>
                     {selectedRegion
-                      ? (lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region')
-                      : (lang === 'ja' ? 'OCRを開始' : 'Start OCR')}
+                      ? L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono' })
+                      : L(lang, { ja: 'OCRを開始', en: 'Start OCR', 'zh-CN': '开始OCR', 'zh-TW': '開始OCR', ko: 'OCR 시작', la: 'OCR incipere', eo: 'Komenci OCR' })}
                   </button>
                   {selectedRegion && (
                     <button className="btn btn-secondary" onClick={handleClearRegion}>
-                      {lang === 'ja' ? '選択解除' : 'Clear Selection'}
+                      {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti' })}
                     </button>
                   )}
                   <button
@@ -427,7 +446,7 @@ export default function App() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
                     </svg>
-                    {lang === 'ja' ? '画像補正' : 'Adjust'}
+                    {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon' })}
                   </button>
                 </div>
                 <div className="image-with-preprocess">
@@ -441,9 +460,15 @@ export default function App() {
                       selectedRegion={selectedRegion}
                     />
                     <p className="region-select-hint">
-                      {lang === 'ja'
-                        ? 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます'
-                        : 'Drag to select a region, then click "Start OCR" to recognize'}
+                      {L(lang, {
+                        ja: 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます',
+                        en: 'Drag to select a region, then click "Start OCR" to recognize',
+                        'zh-CN': '拖动鼠标选择区域，然后点击"开始OCR"进行识别',
+                        'zh-TW': '拖曳滑鼠選取區域，然後點擊「開始OCR」進行辨識',
+                        ko: '마우스로 영역을 드래그하여 선택하고 "OCR 시작"으로 인식합니다',
+                        la: 'Trahe murem ad regionem seligendam, deinde "OCR incipere" preme',
+                        eo: 'Trenu por elekti regionon, poste alklaku "Komenci OCR" por rekoni'
+                      })}
                     </p>
                   </div>
                   {showPreprocessPanel && (
@@ -466,26 +491,48 @@ export default function App() {
         {/* ===== ローディング画面 ===== */}
         {(isLoadingFiles || isModelLoading) && (
           <div className="processing-section">
+            <div className="processing-bluepond-title">
+              <span className="processing-bluepond-main">Model BLUEPOND</span>
+              <span className="processing-bluepond-sub">NDLOCR-lite Web AI</span>
+            </div>
             {isLoadingFiles && fileLoadingState && (
               <div className="file-loading-status">
                 <div className="file-loading-spinner" />
                 <span className="file-loading-message">
                   {fileLoadingState.currentPage != null && fileLoadingState.totalPages != null
-                    ? lang === 'ja'
-                      ? `${fileLoadingState.fileName} をレンダリング中... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages} ページ)`
-                      : `Rendering ${fileLoadingState.fileName}... (page ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`
-                    : lang === 'ja'
-                      ? `${fileLoadingState.fileName} を読み込み中...`
-                      : `Loading ${fileLoadingState.fileName}...`}
+                    ? L(lang, {
+                        ja: `${fileLoadingState.fileName} をレンダリング中... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages} ページ)`,
+                        en: `Rendering ${fileLoadingState.fileName}... (page ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
+                        'zh-CN': `正在渲染 ${fileLoadingState.fileName}... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages} 页)`,
+                        'zh-TW': `正在轉譯 ${fileLoadingState.fileName}... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages} 頁)`,
+                        ko: `${fileLoadingState.fileName} 렌더링 중... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages} 페이지)`,
+                        la: `Reddens ${fileLoadingState.fileName}... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
+                        eo: `Bildas ${fileLoadingState.fileName}... (paĝo ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`
+                      })
+                    : L(lang, {
+                        ja: `${fileLoadingState.fileName} を読み込み中...`,
+                        en: `Loading ${fileLoadingState.fileName}...`,
+                        'zh-CN': `正在加载 ${fileLoadingState.fileName}...`,
+                        'zh-TW': `正在載入 ${fileLoadingState.fileName}...`,
+                        ko: `${fileLoadingState.fileName} 로드 중...`,
+                        la: `Legens ${fileLoadingState.fileName}...`,
+                        eo: `Ŝarĝas ${fileLoadingState.fileName}...`
+                      })}
                 </span>
               </div>
             )}
             <ProgressBar jobState={jobState} lang={lang} />
             {!isReady && !isModelLoading && (
               <p className="model-loading-note">
-                {lang === 'ja'
-                  ? '初回起動時はモデルのダウンロードに時間がかかります（数分程度）。次回以降はキャッシュから高速起動します。'
-                  : 'First run requires model download (may take a few minutes). Subsequent runs will use the cached model.'}
+                {L(lang, {
+                  ja: '初回起動時はモデルのダウンロードに時間がかかります（数分程度）。次回以降はキャッシュから高速起動します。',
+                  en: 'First run requires model download (may take a few minutes). Subsequent runs will use the cached model.',
+                  'zh-CN': '首次启动需要下载模型（可能需要几分钟）。之后将使用缓存模型快速启动。',
+                  'zh-TW': '首次啟動需要下載模型（可能需要幾分鐘）。之後將使用快取模型快速啟動。',
+                  ko: '첫 실행 시 모델 다운로드가 필요합니다(몇 분 소요). 이후에는 캐시된 모델로 빠르게 시작합니다.',
+                  la: 'Primo usu exemplaria descarganda sunt (paucas minutas). Postea ex memoria celeri incipiet.',
+                  eo: 'Unua uzo postulas modelŝarĝon (kelkaj minutoj). Sekvaj uzoj uzos la kaŝmemorigitan modelon.'
+                })}
               </p>
             )}
           </div>
@@ -508,7 +555,7 @@ export default function App() {
                 {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1)}
                 {!isProcessing && (
                   <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
-                    {lang === 'ja' ? '新しいファイルを処理' : 'Process New Files'}
+                    {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn' })}
                   </button>
                 )}
               </div>
@@ -527,7 +574,7 @@ export default function App() {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
                             </svg>
-                            {lang === 'ja' ? '画像補正' : 'Adjust'}
+                            {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon' })}
                           </button>
                         </div>
                         <div className="image-with-preprocess">
@@ -548,17 +595,23 @@ export default function App() {
                             {selectedRegion && (
                               <div className="region-action-bar">
                                 <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
-                                  {lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region'}
+                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono' })}
                                 </button>
                                 <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
-                                  {lang === 'ja' ? '選択解除' : 'Clear Selection'}
+                                  {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti' })}
                                 </button>
                               </div>
                             )}
                             <p className="region-select-hint">
-                              {lang === 'ja'
-                                ? 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます'
-                                : 'Drag to select a region, then click "OCR Selected Region" to re-recognize'}
+                              {L(lang, {
+                                ja: 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます',
+                                en: 'Drag to select a region, then click "OCR Selected Region" to re-recognize',
+                                'zh-CN': '拖动鼠标选择区域，然后点击"对选定区域执行OCR"重新识别',
+                                'zh-TW': '拖曳滑鼠選取區域，然後點擊「對選取區域執行OCR」重新辨識',
+                                ko: '마우스로 영역을 드래그하여 선택하고 "선택 영역 OCR 실행"으로 재인식합니다',
+                                la: 'Trahe murem ad regionem seligendam, deinde "OCR regionis selectae" preme',
+                                eo: 'Trenu por elekti regionon, poste alklaku "OCR de elektita regiono" por rerekoni'
+                              })}
                             </p>
                           </div>
                           {showPreprocessPanel && (

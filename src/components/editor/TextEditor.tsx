@@ -8,6 +8,7 @@ import { downloadHOCR } from '../../utils/exportHOCR'
 import { downloadPDF } from '../../utils/exportPDF'
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 interface TextEditorProps {
   result: OCRResult | null
@@ -52,6 +53,7 @@ export function TextEditor({
   const [ignoreNewlines, setIgnoreNewlines] = useState(false)
   const [proofreadState, setProofreadState] = useState<ProofreadState>({ status: 'idle' })
   const [fontSize, setFontSize] = useState(14)
+  const [lineSpacing, setLineSpacing] = useState(1.9)
   const [fontFamily, setFontFamily] = useState<string>('mono')
   const [showLineNumbers, setShowLineNumbers] = useState(false)
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -86,10 +88,10 @@ export function TextEditor({
     if (!isNaN(lh) && lh > 0) {
       setComputedLineHeight(lh)
     } else {
-      // fallback: fontSize × line-height ratio (CSS: 1.9)
-      setComputedLineHeight(fontSize * 1.9)
+      // fallback: fontSize × line-height ratio
+      setComputedLineHeight(fontSize * lineSpacing)
     }
-  }, [fontSize, isVertical])
+  }, [fontSize, lineSpacing, isVertical])
 
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
@@ -401,9 +403,15 @@ export function TextEditor({
 
     // AI未接続（接続テスト未実施）の場合、警告を表示
     if (aiConnectionStatus !== 'connected') {
-      const msg = lang === 'ja'
-        ? 'AI接続が確認されていません。設定画面で接続テストを実行してください。続行しますか？'
-        : 'AI connection has not been verified. Please run a connection test in Settings. Continue anyway?'
+      const msg = L(lang, {
+        ja: 'AI接続が確認されていません。設定画面で接続テストを実行してください。続行しますか？',
+        en: 'AI connection has not been verified. Please run a connection test in Settings. Continue anyway?',
+        'zh-CN': 'AI连接未验证。请在设置中运行连接测试。是否继续？',
+        'zh-TW': 'AI連接未驗證。請在設定中執行連接測試。是否繼續？',
+        ko: 'AI 연결이 확인되지 않았습니다. 설정에서 연결 테스트를 실행하십시오. 계속 진행하시겠습니까?',
+        la: 'Connexio AI non verificata est. Testem connexionis in Apparatibus praecipe. Pergere tamen?',
+        eo: 'AI-konekto ne estas verifikita. Bonvolu ruli ligpruvon en Agordoj. Ĉu daŭrigi?'
+      })
       if (!window.confirm(msg)) return
     }
 
@@ -475,7 +483,7 @@ export function TextEditor({
   if (!result) {
     return (
       <div className="text-editor empty">
-        <p>{lang === 'ja' ? '結果なし' : 'No results'}</p>
+        <p>{L(lang, { ja: '結果なし', en: 'No results', 'zh-CN': '无结果', 'zh-TW': '無結果', ko: '결과 없음', la: 'Nulla eventus', eo: 'Neniuj rezultoj' })}</p>
       </div>
     )
   }
@@ -486,12 +494,12 @@ export function TextEditor({
       <div className="text-editor-header">
         <div className="text-editor-header-left">
           <span className="text-editor-label">
-            {lang === 'ja' ? 'OCR結果' : 'OCR Result'}
-            {!saved && <span className="text-editor-unsaved-indicator" title={lang === 'ja' ? '未保存' : 'Unsaved'} />}
+            {L(lang, { ja: 'OCR結果', en: 'OCR Result', 'zh-CN': 'OCR结果', 'zh-TW': 'OCR結果', ko: 'OCR 결과', la: 'Eventus OCR', eo: 'OCR-rezulto' })}
+            {!saved && <span className="text-editor-unsaved-indicator" title={L(lang, { ja: '未保存', en: 'Unsaved', 'zh-CN': '未保存', 'zh-TW': '未保存', ko: '저장되지 않음', la: 'Asservatione carens', eo: 'Nekonservita' })} />}
           </span>
           <span className="text-editor-stats">
             {result.textBlocks.length}
-            {lang === 'ja' ? '領域' : ' regions'}
+            {L(lang, { ja: '領域', en: ' regions', 'zh-CN': ' 个区域', 'zh-TW': ' 個區域', ko: ' 영역', la: ' regiones', eo: ' regionoj' })}
             {' · '}
             {(result.processingTimeMs / 1000).toFixed(1)}s
           </span>
@@ -501,19 +509,19 @@ export function TextEditor({
             className="btn btn-ai"
             onClick={handleProofread}
             disabled={!aiConnector || proofreadState.status === 'loading' || result.textBlocks.length === 0}
-            title={!aiConnector ? (lang === 'ja' ? '設定でAI接続を構成してください' : 'Configure AI connection in Settings') : ''}
+            title={!aiConnector ? L(lang, { ja: '設定でAI接続を構成してください', en: 'Configure AI connection in Settings', 'zh-CN': '在设置中配置 AI 连接', 'zh-TW': '在設定中設定 AI 連接', ko: '설정에서 AI 연결 구성', la: 'In Apparatibus connexionem AI configura', eo: 'Agordu AI-konekton en Agordoj' }) : ''}
           >
             {proofreadState.status === 'loading' ? (
               <>
                 <span className="btn-ai-spinner" />
-                {lang === 'ja' ? 'AI校正中...' : 'Proofreading...'}
+                {L(lang, { ja: 'AI校正中...', en: 'Proofreading...', 'zh-CN': '正在进行AI校正...', 'zh-TW': '正在進行AI校正...', ko: 'AI 교정 중...', la: 'AI corrigens...', eo: 'AI-korektado en progreso...' })}
               </>
             ) : (
               <>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M8 2l2 6h6l-5 3.5 2 6.5L8 14l-5 4 2-6.5L0 8h6z" />
                 </svg>
-                {lang === 'ja' ? 'AI校正' : 'AI Proofread'}
+                {L(lang, { ja: 'AI校正', en: 'AI Proofread', 'zh-CN': 'AI校正', 'zh-TW': 'AI校正', ko: 'AI 교정', la: 'Correctio AI', eo: 'AI-korektado' })}
               </>
             )}
           </button>
@@ -528,7 +536,7 @@ export function TextEditor({
             className="btn btn-icon btn-sm"
             onClick={handleUndo}
             disabled={undoStack.length === 0}
-            title={lang === 'ja' ? '戻す (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
+            title={L(lang, { ja: '戻す (Ctrl+Z)', en: 'Undo (Ctrl+Z)', 'zh-CN': '撤销 (Ctrl+Z)', 'zh-TW': '復原 (Ctrl+Z)', ko: '실행 취소 (Ctrl+Z)', la: 'Revocare (Ctrl+Z)', eo: 'Malfari (Ctrl+Z)' })}
             aria-label="Undo"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -540,7 +548,7 @@ export function TextEditor({
             className="btn btn-icon btn-sm"
             onClick={handleRedo}
             disabled={redoStack.length === 0}
-            title={lang === 'ja' ? 'やり直す (Ctrl+Shift+Z)' : 'Redo (Ctrl+Shift+Z)'}
+            title={L(lang, { ja: 'やり直す (Ctrl+Shift+Z)', en: 'Redo (Ctrl+Shift+Z)', 'zh-CN': '重做 (Ctrl+Shift+Z)', 'zh-TW': '重做 (Ctrl+Shift+Z)', ko: '다시 실행 (Ctrl+Shift+Z)', la: 'Reficere (Ctrl+Shift+Z)', eo: 'Refari (Ctrl+Shift+Z)' })}
             aria-label="Redo"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -554,7 +562,7 @@ export function TextEditor({
           <button
             className="btn btn-icon btn-sm"
             onClick={() => setShowSearchBar(!showSearchBar)}
-            title={lang === 'ja' ? '検索と置換 (Ctrl+F)' : 'Find & Replace (Ctrl+F)'}
+            title={L(lang, { ja: '検索と置換 (Ctrl+F)', en: 'Find & Replace (Ctrl+F)', 'zh-CN': '查找与替换 (Ctrl+F)', 'zh-TW': '尋找與取代 (Ctrl+F)', ko: '찾기 및 바꾸기 (Ctrl+F)', la: 'Quaerere et substituere (Ctrl+F)', eo: 'Serĉi kaj anstataŭigi (Ctrl+F)' })}
             aria-label="Search"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -566,7 +574,7 @@ export function TextEditor({
           <button
             className={`btn btn-icon btn-sm${showLineNumbers ? ' btn-icon-active' : ''}`}
             onClick={() => setShowLineNumbers(!showLineNumbers)}
-            title={lang === 'ja' ? '行番号' : 'Line numbers'}
+            title={L(lang, { ja: '行番号', en: 'Line numbers', 'zh-CN': '行号', 'zh-TW': '行號', ko: '행 번호', la: 'Numeri versuum', eo: 'Lininumeroj' })}
             aria-label="Toggle line numbers"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -580,11 +588,14 @@ export function TextEditor({
           <button
             className={`btn btn-sm btn-text-toggle${isVertical ? ' btn-text-toggle-active' : ''}`}
             onClick={() => setIsVertical(!isVertical)}
-            title={lang === 'ja' ? (isVertical ? '横書きに切替' : '縦書きに切替') : (isVertical ? 'Switch to horizontal' : 'Switch to vertical')}
+            title={isVertical
+              ? L(lang, { ja: '横書きに切替', en: 'Switch to horizontal', 'zh-CN': '切换为横排', 'zh-TW': '切換為橫書', ko: '가로쓰기로 전환', la: 'Ad horizontalem mutare', eo: 'Ŝanĝi al horizontala' })
+              : L(lang, { ja: '縦書きに切替', en: 'Switch to vertical', 'zh-CN': '切换为竖排', 'zh-TW': '切換為直書', ko: '세로쓰기로 전환', la: 'Ad verticalem mutare', eo: 'Ŝanĝi al vertikala' })
+            }
             aria-label="Toggle vertical text"
             aria-pressed={isVertical}
           >
-            {lang === 'ja' ? '縦書き' : 'Vertical'}
+            {L(lang, { ja: '縦書き', en: 'Vertical', 'zh-CN': '竖排', 'zh-TW': '直書', ko: '세로쓰기', la: 'Verticalis', eo: 'Vertikala' })}
           </button>
 
           <span className="text-editor-toolbar-sep" />
@@ -592,7 +603,7 @@ export function TextEditor({
           <button
             className="btn btn-sm btn-text-toggle"
             onClick={handleRemoveEmptyLines}
-            title={lang === 'ja' ? '空行を削除' : 'Remove empty lines'}
+            title={L(lang, { ja: '空行を削除', en: 'Remove empty lines', 'zh-CN': '删除空行', 'zh-TW': '刪除空行', ko: '빈 줄 삭제', la: 'Versus vacuos delere', eo: 'Forigi malplenajn liniojn' })}
             aria-label="Remove empty lines"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
@@ -601,13 +612,13 @@ export function TextEditor({
               <path d="M7 7l2 2M9 7l-2 2" strokeWidth="1.2" />
               <line x1="2" y1="13" x2="14" y2="13" />
             </svg>
-            {lang === 'ja' ? '空行削除' : 'Del blank'}
+            {L(lang, { ja: '空行削除', en: 'Del blank', 'zh-CN': '删空行', 'zh-TW': '刪空行', ko: '빈줄삭제', la: 'Del. vac.', eo: 'For. malplen.' })}
           </button>
 
           <button
             className="btn btn-sm btn-text-toggle"
             onClick={handleJoinLines}
-            title={lang === 'ja' ? '改行を削除して結合' : 'Join lines'}
+            title={L(lang, { ja: '改行を削除して結合', en: 'Join lines', 'zh-CN': '合并行', 'zh-TW': '合併行', ko: '행 합치기', la: 'Versus coniungere', eo: 'Kunigi liniojn' })}
             aria-label="Join lines"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
@@ -615,21 +626,21 @@ export function TextEditor({
               <polyline points="5 5 2 8 5 11" fill="none" />
               <polyline points="11 5 14 8 11 11" fill="none" />
             </svg>
-            {lang === 'ja' ? '行結合' : 'Join'}
+            {L(lang, { ja: '行結合', en: 'Join', 'zh-CN': '合并', 'zh-TW': '合併', ko: '합치기', la: 'Coniung.', eo: 'Kunigi' })}
           </button>
 
           <button
             className="btn btn-sm btn-text-toggle"
             onClick={handleRestoreNewlines}
             disabled={undoStack.length === 0}
-            title={lang === 'ja' ? '直前の操作を元に戻す（改行の復元等）' : 'Undo last operation (restore newlines, etc.)'}
+            title={L(lang, { ja: '直前の操作を元に戻す（改行の復元等）', en: 'Undo last operation (restore newlines, etc.)', 'zh-CN': '撤销上一次操作（恢复换行等）', 'zh-TW': '復原上次操作（恢復換行等）', ko: '마지막 작업 취소 (줄바꿈 복원 등)', la: 'Ultimam operationem revocare', eo: 'Malfari lastan operacion' })}
             aria-label="Restore"
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
               <path d="M4 7h6a3 3 0 0 1 0 6H8" />
               <polyline points="7 4 4 7 7 10" fill="none" />
             </svg>
-            {lang === 'ja' ? '元に戻す' : 'Undo'}
+            {L(lang, { ja: '元に戻す', en: 'Undo', 'zh-CN': '撤销', 'zh-TW': '復原', ko: '실행 취소', la: 'Revocare', eo: 'Malfari' })}
           </button>
         </div>
 
@@ -641,8 +652,8 @@ export function TextEditor({
               <path d="M3 11V3a1 1 0 0 1 1-1h8" />
             </svg>
             {copied
-              ? (lang === 'ja' ? 'OK!' : 'OK!')
-              : (lang === 'ja' ? 'コピー' : 'Copy')}
+              ? L(lang, { ja: 'OK!', en: 'OK!', 'zh-CN': '已复制！', 'zh-TW': '已複製！', ko: '복사됨!', la: 'Transcriptum!', eo: 'Kopiita!' })
+              : L(lang, { ja: 'コピー', en: 'Copy', 'zh-CN': '复制', 'zh-TW': '複製', ko: '복사', la: 'Transcribere', eo: 'Kopii' })}
           </button>
           <div className="export-dropdown-wrapper" ref={exportMenuRef}>
             <button className="btn btn-secondary btn-sm" onClick={() => setShowExportMenu(!showExportMenu)}>
@@ -650,7 +661,7 @@ export function TextEditor({
                 <path d="M8 2v9M4 8l4 4 4-4" />
                 <path d="M2 12v2h12v-2" />
               </svg>
-              {lang === 'ja' ? 'DL' : 'DL'}
+              {L(lang, { ja: 'DL', en: 'DL', 'zh-CN': '下载', 'zh-TW': '下載', ko: '다운로드', la: 'Devehere', eo: 'Elŝuti' })}
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '2px' }}>
                 <path d="M4 6l4 4 4-4" />
               </svg>
@@ -659,19 +670,19 @@ export function TextEditor({
               <div className="export-dropdown-menu">
                 <button className="export-dropdown-item" onClick={() => handleExport('txt')}>
                   <span className="export-dropdown-icon">TXT</span>
-                  <span>{lang === 'ja' ? 'プレーンテキスト (.txt)' : 'Plain Text (.txt)'}</span>
+                  <span>{L(lang, { ja: 'プレーンテキスト (.txt)', en: 'Plain Text (.txt)', 'zh-CN': '纯文本 (.txt)', 'zh-TW': '純文字 (.txt)', ko: '일반 텍스트 (.txt)', la: 'Textus simplex (.txt)', eo: 'Simpla teksto (.txt)' })}</span>
                 </button>
                 <button className="export-dropdown-item" onClick={() => handleExport('tei')}>
                   <span className="export-dropdown-icon">TEI</span>
-                  <span>{lang === 'ja' ? 'TEI XML (.xml)' : 'TEI XML (.xml)'}</span>
+                  <span>{L(lang, { ja: 'TEI XML (.xml)', en: 'TEI XML (.xml)', 'zh-CN': 'TEI XML (.xml)', 'zh-TW': 'TEI XML (.xml)', ko: 'TEI XML (.xml)', la: 'TEI XML (.xml)', eo: 'TEI XML (.xml)' })}</span>
                 </button>
                 <button className="export-dropdown-item" onClick={() => handleExport('hocr')}>
                   <span className="export-dropdown-icon">hOCR</span>
-                  <span>{lang === 'ja' ? 'hOCR (.hocr)' : 'hOCR (.hocr)'}</span>
+                  <span>{L(lang, { ja: 'hOCR (.hocr)', en: 'hOCR (.hocr)', 'zh-CN': 'hOCR (.hocr)', 'zh-TW': 'hOCR (.hocr)', ko: 'hOCR (.hocr)', la: 'hOCR (.hocr)', eo: 'hOCR (.hocr)' })}</span>
                 </button>
                 <button className="export-dropdown-item" onClick={() => handleExport('pdf')}>
                   <span className="export-dropdown-icon">PDF</span>
-                  <span>{lang === 'ja' ? 'テキスト付きPDF (.pdf)' : 'Text-embedded PDF (.pdf)'}</span>
+                  <span>{L(lang, { ja: 'テキスト付きPDF (.pdf)', en: 'Text-embedded PDF (.pdf)', 'zh-CN': '带文字图层的PDF (.pdf)', 'zh-TW': '含文字圖層的PDF (.pdf)', ko: '텍스트 오버레이 PDF (.pdf)', la: 'PDF cum textu (.pdf)', eo: 'PDF kun teksto (.pdf)' })}</span>
                 </button>
               </div>
             )}
@@ -682,7 +693,7 @@ export function TextEditor({
               <path d="M5 2v4h5V2" />
               <rect x="4" y="9" width="8" height="5" rx="0.5" />
             </svg>
-            {lang === 'ja' ? '保存' : 'Save'}
+            {L(lang, { ja: '保存', en: 'Save', 'zh-CN': '保存', 'zh-TW': '儲存', ko: '저장', la: 'Servare', eo: 'Konservi' })}
           </button>
         </div>
       </div>
@@ -694,7 +705,7 @@ export function TextEditor({
             <input
               type="text"
               className="text-editor-search-input"
-              placeholder={lang === 'ja' ? '検索...' : 'Find...'}
+              placeholder={L(lang, { ja: '検索...', en: 'Find...', 'zh-CN': '搜索...', 'zh-TW': '搜尋...', ko: '검색...', la: 'Quaerere...', eo: 'Serĉi...' })}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -707,13 +718,13 @@ export function TextEditor({
               autoFocus
             />
             <span className="text-editor-search-count">
-              {searchMatches.length > 0 ? `${currentMatchIndex + 1}/${searchMatches.length}` : lang === 'ja' ? '0件' : '0'}
+              {searchMatches.length > 0 ? `${currentMatchIndex + 1}/${searchMatches.length}` : L(lang, { ja: '0件', en: '0', 'zh-CN': '0个', 'zh-TW': '0個', ko: '0개', la: '0', eo: '0' })}
             </span>
             <button
               className="btn btn-sm btn-icon"
               onClick={handlePreviousMatch}
               disabled={searchMatches.length === 0}
-              title={lang === 'ja' ? '前へ' : 'Previous'}
+              title={L(lang, { ja: '前へ', en: 'Previous', 'zh-CN': '上一个', 'zh-TW': '上一個', ko: '이전', la: 'Prior', eo: 'Antaŭa' })}
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M10 12l-4-4 4-4" />
@@ -723,7 +734,7 @@ export function TextEditor({
               className="btn btn-sm btn-icon"
               onClick={handleNextMatch}
               disabled={searchMatches.length === 0}
-              title={lang === 'ja' ? '次へ' : 'Next'}
+              title={L(lang, { ja: '次へ', en: 'Next', 'zh-CN': '下一个', 'zh-TW': '下一個', ko: '다음', la: 'Sequens', eo: 'Sekvanta' })}
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M6 4l4 4-4 4" />
@@ -734,7 +745,7 @@ export function TextEditor({
             <input
               type="text"
               className="text-editor-replace-input"
-              placeholder={lang === 'ja' ? '置換...' : 'Replace...'}
+              placeholder={L(lang, { ja: '置換...', en: 'Replace...', 'zh-CN': '替换...', 'zh-TW': '取代...', ko: '바꾸기...', la: 'Substituere...', eo: 'Anstataŭigi...' })}
               value={replaceQuery}
               onChange={(e) => setReplaceQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -747,19 +758,19 @@ export function TextEditor({
               onClick={handleReplace}
               disabled={searchMatches.length === 0}
             >
-              {lang === 'ja' ? '置換' : 'Replace'}
+              {L(lang, { ja: '置換', en: 'Replace', 'zh-CN': '替换', 'zh-TW': '取代', ko: '바꾸기', la: 'Substituere', eo: 'Anstataŭigi' })}
             </button>
             <button
               className="btn btn-sm btn-secondary"
               onClick={handleReplaceAll}
               disabled={searchMatches.length === 0}
             >
-              {lang === 'ja' ? '全置換' : 'All'}
+              {L(lang, { ja: '全置換', en: 'All', 'zh-CN': '全部替换', 'zh-TW': '全部取代', ko: '모두 바꾸기', la: 'Omnia', eo: 'Ĉiuj' })}
             </button>
             <button
               className="btn btn-sm btn-icon"
               onClick={() => setShowSearchBar(false)}
-              title={lang === 'ja' ? '閉じる' : 'Close'}
+              title={L(lang, { ja: '閉じる', en: 'Close', 'zh-CN': '关闭', 'zh-TW': '關閉', ko: '닫기', la: 'Claudere', eo: 'Fermi' })}
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M4 4l8 8M12 4L4 12" />
@@ -775,12 +786,12 @@ export function TextEditor({
           {proofreadState.status === 'loading' && (
             <>
               <span className="ai-bar-spinner" />
-              <span className="ai-bar-hint">{lang === 'ja' ? 'AIが画像とテキストを比較中...' : 'AI is comparing image and text...'}</span>
+              <span className="ai-bar-hint">{L(lang, { ja: 'AIが画像とテキストを比較中...', en: 'AI is comparing image and text...', 'zh-CN': 'AI正在比较图像和文本...', 'zh-TW': 'AI正在比較圖像和文字...', ko: 'AI가 이미지와 텍스트를 비교 중...', la: 'AI imaginem et textum comparabit...', eo: 'AI komparas bildon kaj tekston...' })}</span>
             </>
           )}
           {proofreadState.status === 'error' && (
             <span className="ai-bar-error" title={proofreadState.message}>
-              {lang === 'ja' ? '校正エラー: ' : 'Error: '}{proofreadState.message?.slice(0, 80)}
+              {L(lang, { ja: '校正エラー: ', en: 'Error: ', 'zh-CN': '校正错误: ', 'zh-TW': '校正錯誤: ', ko: '교정 오류: ', la: 'Error: ', eo: 'Eraro: ' })}{proofreadState.message?.slice(0, 80)}
             </span>
           )}
         </div>
@@ -790,7 +801,7 @@ export function TextEditor({
       <div className="text-editor-body">
         {result.textBlocks.length === 0 ? (
           <p className="text-editor-empty-text">
-            {lang === 'ja' ? 'テキストが検出されませんでした' : 'No text detected'}
+            {L(lang, { ja: 'テキストが検出されませんでした', en: 'No text detected', 'zh-CN': '未检测到文本', 'zh-TW': '未檢測到文字', ko: '감지된 텍스트 없음', la: 'Nullus textus detectus', eo: 'Neniuj tekstoj detektitaj' })}
           </p>
         ) : shouldShowDiff ? (
           <DiffView
@@ -842,6 +853,7 @@ export function TextEditor({
               spellCheck={false}
               style={{
                 fontSize: `${fontSize}px`,
+                lineHeight: `${lineSpacing}`,
                 writingMode: isVertical ? 'vertical-rl' : 'horizontal-tb',
                 textOrientation: isVertical ? 'mixed' : 'initial',
               }}
@@ -854,45 +866,57 @@ export function TextEditor({
       <div className="text-editor-statusbar">
         <div className="text-editor-statusbar-left">
           <span className="text-editor-stat-item">
-            {charCount.toLocaleString()} {lang === 'ja' ? '文字' : 'chars'}
+            {charCount.toLocaleString()} {L(lang, { ja: '文字', en: 'chars', 'zh-CN': '个字符', 'zh-TW': '個字元', ko: '문자', la: 'littera', eo: 'signoj' })}
           </span>
           <span className="text-editor-stat-sep" />
           <span className="text-editor-stat-item">
-            {lineCount.toLocaleString()} {lang === 'ja' ? '行' : 'lines'}
+            {lineCount.toLocaleString()} {L(lang, { ja: '行', en: 'lines', 'zh-CN': '行', 'zh-TW': '行', ko: '줄', la: 'versus', eo: 'linioj' })}
           </span>
           {!saved && (
             <>
               <span className="text-editor-stat-sep" />
-              <span className="text-editor-stat-modified">{lang === 'ja' ? '変更あり' : 'Modified'}</span>
+              <span className="text-editor-stat-modified">{L(lang, { ja: '変更あり', en: 'Modified', 'zh-CN': '已修改', 'zh-TW': '已修改', ko: '수정됨', la: 'Mutatum', eo: 'Modifita' })}</span>
             </>
           )}
         </div>
         <div className="text-editor-statusbar-right">
           <label
             className="text-editor-option-compact"
-            title={lang === 'ja'
-              ? 'コピー・保存時にファイル名をヘッダーとして付加します'
-              : 'Prepend the filename as a header when copying or saving'}
+            title={L(lang, {
+              ja: 'コピー・保存時にファイル名をヘッダーとして付加します',
+              en: 'Prepend the filename as a header when copying or saving',
+              'zh-CN': '复制/保存时将文件名作为标题添加',
+              'zh-TW': '複製/儲存時將檔案名稱作為標題加入',
+              ko: '복사/저장 시 파일 이름을 제목으로 추가',
+              la: 'Nomen fasciculi ut titulum adde',
+              eo: 'Aldoni dosiernomon kiel titolon'
+            })}
           >
             <input
               type="checkbox"
               checked={includeFileName}
               onChange={(e) => setIncludeFileName(e.target.checked)}
             />
-            {lang === 'ja' ? 'ファイル名' : 'Filename'}
+            {L(lang, { ja: 'ファイル名', en: 'Filename', 'zh-CN': '文件名', 'zh-TW': '檔案名', ko: '파일명', la: 'Nomen', eo: 'Dosiernomo' })}
           </label>
           <label
             className="text-editor-option-compact"
-            title={lang === 'ja'
-              ? 'コピー・保存時に改行を除去して1行にまとめます'
-              : 'Remove all line breaks when copying or saving'}
+            title={L(lang, {
+              ja: 'コピー・保存時に改行を除去して1行にまとめます',
+              en: 'Remove all line breaks when copying or saving',
+              'zh-CN': '复制/保存时删除所有换行合为一行',
+              'zh-TW': '複製/儲存時刪除所有換行合為一行',
+              ko: '복사/저장 시 모든 줄바꿈을 제거하여 한 줄로',
+              la: 'Omnes versus in unum coniunge',
+              eo: 'Forigi ĉiujn linirompojn'
+            })}
           >
             <input
               type="checkbox"
               checked={ignoreNewlines}
               onChange={(e) => setIgnoreNewlines(e.target.checked)}
             />
-            {lang === 'ja' ? '改行無視' : 'No newlines'}
+            {L(lang, { ja: '改行無視', en: 'No newlines', 'zh-CN': '忽略换行', 'zh-TW': '忽略換行', ko: '줄바꿈 무시', la: 'Sine fractis', eo: 'Sen linirompoj' })}
           </label>
           <span className="text-editor-stat-sep" />
           <div className="text-editor-font-controls-compact">
@@ -900,7 +924,7 @@ export function TextEditor({
               className="text-editor-font-select"
               value={fontFamily}
               onChange={(e) => setFontFamily(e.target.value)}
-              title={lang === 'ja' ? 'フォント' : 'Font'}
+              title={L(lang, { ja: 'フォント', en: 'Font', 'zh-CN': '字体', 'zh-TW': '字體', ko: '글꼴', la: 'Typus', eo: 'Tiparo' })}
             >
               <option value="mono">Monospace</option>
               <option value="serif">Serif (明朝)</option>
@@ -915,6 +939,19 @@ export function TextEditor({
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               title={`${fontSize}px`}
+            />
+            <span className="text-editor-font-sep-compact">|</span>
+            <span className="text-editor-font-label-compact">{L(lang, { ja: '行間', en: 'Spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interl.', eo: 'Interlinio' })}</span>
+            <span className="text-editor-font-value-compact">{lineSpacing.toFixed(1)}</span>
+            <input
+              type="range"
+              className="text-editor-font-slider-compact"
+              min="1.0"
+              max="3.0"
+              step="0.1"
+              value={lineSpacing}
+              onChange={(e) => setLineSpacing(Number(e.target.value))}
+              title={`${L(lang, { ja: '行間', en: 'Line spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interlineum', eo: 'Interlinio' })}: ${lineSpacing.toFixed(1)}`}
             />
           </div>
         </div>

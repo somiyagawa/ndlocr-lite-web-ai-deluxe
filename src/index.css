@@ -653,6 +653,34 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
               url('/bluepond.jpg') center / cover no-repeat;
 }
 
+.processing-bluepond-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  animation: fade-in-down 0.6s ease;
+}
+.processing-bluepond-main {
+  display: block;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--color-primary);
+  text-shadow: 0 1px 8px rgba(255,255,255,0.7);
+}
+[data-theme="dark"] .processing-bluepond-main {
+  text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+}
+.processing-bluepond-sub {
+  display: block;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--color-text-secondary);
+  margin-top: 0.3rem;
+}
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .progress-container {
   max-width: 640px;
   margin: 0 auto;
@@ -2343,6 +2371,18 @@ button.ai-status-clickable .ai-status-text {
   font-variant-numeric: tabular-nums;
   min-width: 2.5ch;
   text-align: right;
+}
+
+.text-editor-font-sep-compact {
+  color: var(--color-border-light);
+  font-size: 0.7rem;
+  margin: 0 0.1rem;
+}
+
+.text-editor-font-label-compact {
+  font-size: 0.65rem;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
 }
 
 .text-editor-font-slider-compact {

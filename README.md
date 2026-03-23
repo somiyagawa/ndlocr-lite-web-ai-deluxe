@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.0-teal?style=for-the-badge" alt="v0.2.0" />
+  <img src="https://img.shields.io/badge/version-3.0.0-teal?style=for-the-badge" alt="v3.0.0" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="MIT License" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
-  <img src="https://img.shields.io/badge/lang-JP_EN_ZH_KO-orange?style=for-the-badge" alt="Multilingual" />
+  <img src="https://img.shields.io/badge/lang-JP_EN_ZH_KO_LA_EO-orange?style=for-the-badge" alt="Multilingual" />
 </p>
 
-# NDL-OCR Lite Web AI Ultra
+# NDLOCR-lite Web AI: Model BLUEPOND
 
 ### ブラウザ完結型 日本語OCR＋AI校正ツール
 
-> **旧称 NDLOCR-Lite Web AI Deluxe** — v0.2.0 より **Ultra** に改称しました。
+> **旧称 NDLOCR-Lite Web AI Ultra** — v3.0 より **Model BLUEPOND** に改称しました。名称は北海道美瑛町の青い池（Blue Pond）に由来します。
 
 画像やPDFをブラウザにドロップするだけで日本語OCRを実行し、AIが誤認識を自動校正します。
 **画像データはサーバーに送信されません。** すべての処理がブラウザ内で完結します。
@@ -20,7 +20,7 @@
 
 国立国会図書館（NDL）が開発した **[NDLOCR-Lite](https://github.com/ndl-lab/ndlocr-lite)** のOCRモデルを、ONNX Runtime Web（WASM）でブラウザ内実行する日本語OCRツールです。
 
-橋本雄太氏（国立歴史民俗博物館）による **[ndlocrlite-web](https://github.com/yuta1984/ndlocrlite-web)** のWeb移植をベースに、小形克宏氏（一般社団法人ビブリオスタイル）による **[NDLOCR-Lite Web AI](https://github.com/ogwata/ndlocr-lite-web-ai)** のAI校正機能を統合し、宮川創（筑波大学）がUIデザイン・画像前処理・縦書き対応・多言語UI・エクスポート拡張等の **Ultra 機能** を追加しました。
+橋本雄太氏（国立歴史民俗博物館）による **[ndlocrlite-web](https://github.com/yuta1984/ndlocrlite-web)** のWeb移植をベースに、小形克宏氏（一般社団法人ビブリオスタイル）による **[NDLOCR-Lite Web AI](https://github.com/ogwata/ndlocr-lite-web-ai)** のAI校正機能を統合し、宮川創（筑波大学）がUIデザイン・画像前処理・縦書き対応・多言語UI・エクスポート拡張等の **BLUEPOND 機能** を追加しました。
 
 ---
 
@@ -95,10 +95,10 @@ OCR前に画像を補正して認識精度を向上させます。
 
 ### 多言語UI
 
-| 🇯🇵 日本語 | 🇺🇸 English | 🇨🇳 简体中文 | 🇹🇼 繁體中文 | 🇰🇷 한국어 |
-|:---:|:---:|:---:|:---:|:---:|
+| 🇯🇵 日本語 | 🇬🇧 English | 🇨🇳 简体中文 | 🇭🇰 繁體中文 | 🇰🇷 한국어 | 🏛️ Latina | 🌍 Esperanto |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 
-ブラウザのロケールから初期言語を自動検出します。
+ブラウザのロケールから初期言語を自動検出します。7言語に対応（日本語・英語・簡体字中国語・繁体字中国語・韓国語・ラテン語・エスペラント語）。
 
 ### プライバシー
 
@@ -187,6 +187,24 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v3.0.0 — 2026-03-24 🏞️ Model BLUEPOND
+
+**名称変更:** NDLOCR-Lite Web AI Ultra → **NDLOCR-lite Web AI: Model BLUEPOND** に改称しました。北海道美瑛町の青い池（Blue Pond）に因む名称です。
+
+**多言語対応強化（7言語）** — ラテン語・エスペラント語を新規追加。既存の中国語（簡体字/繁体字）・韓国語の翻訳を全コンポーネントで完全対応。インライン翻訳を全面的に多言語ヘルパー関数に移行し、翻訳品質を向上。
+
+**行間調整スライダー** — テキストエディタのステータスバーに行間（line-height）調整スライダーを追加。縦書き表示時の行間を1.0〜3.0の範囲で調整可能に。
+
+**ローディング画面刷新** — 青い池の背景画像上に「Model BLUEPOND」タイトルをアニメーション表示。
+
+**パフォーマンス最適化** — React.lazy/Suspenseによるモーダル類の遅延ロード（メインバンドル65%削減: 812KB→283KB）。React.memoによるHeader/Footer/ProgressBar/BottomToolbarの再レンダリング抑制。Viteチャンク分割最適化（React/PDF/TIFF/差分ライブラリの独立チャンク化）。
+
+**ツールバー改善** — 空行削除・行結合ボタンにテキストラベルを追加し、機能の視認性を向上。
+
+**ヘルプ機能** — ユーザーガイド（全機能の使い方）とAI接続ガイドを追加。ヘッダーの「?」ボタンからアクセス可能。AI未接続時のステータスクリックでAI接続方法を表示。
+
+**UI改善** — 鳥獣戯画背景パターンの改良（相撲場面）、ヘッダー/フッターの方眼パターン、言語選択の国旗アイコン化。
 
 ### v0.2.0 — 2026-03-23 ✨ Ultra
 

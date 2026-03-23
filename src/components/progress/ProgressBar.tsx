@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { L } from '../../i18n'
 import type { OCRJobState } from '../../types/ocr'
 import type { Language } from '../../i18n'
 
@@ -42,6 +43,20 @@ const MODEL_LABELS: Record<Language, { layout: string; rec30: string; rec50: str
     rec50: '인식 모델 (≤50문자)',
     rec100: '인식 모델 (≤100문자)',
     downloading: '모델 다운로드 중',
+  },
+  la: {
+    layout: 'Exemplar dispositionis',
+    rec30: 'Exemplar agnitionis (≤30 litt.)',
+    rec50: 'Exemplar agnitionis (≤50 litt.)',
+    rec100: 'Exemplar agnitionis (≤100 litt.)',
+    downloading: 'Exemplar descendens',
+  },
+  eo: {
+    layout: 'Aranĝa detekta modelo',
+    rec30: 'Signorekona modelo (≤30 signoj)',
+    rec50: 'Signorekona modelo (≤50 signoj)',
+    rec100: 'Signorekona modelo (≤100 signoj)',
+    downloading: 'Ŝarĝas modelon',
   },
 }
 
@@ -96,9 +111,15 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
     <div className={`progress-container ${isError ? 'error' : ''}`}>
       {totalFiles > 1 && (
         <div className="progress-files">
-          {lang === 'ja'
-            ? `${currentFileIndex} / ${totalFiles} ファイル`
-            : `${currentFileIndex} / ${totalFiles} files`}
+          {L(lang, {
+            ja: `${currentFileIndex} / ${totalFiles} ファイル`,
+            en: `${currentFileIndex} / ${totalFiles} files`,
+            'zh-CN': `${currentFileIndex} / ${totalFiles} 个文件`,
+            'zh-TW': `${currentFileIndex} / ${totalFiles} 個檔案`,
+            ko: `${currentFileIndex} / ${totalFiles} 파일`,
+            la: `${currentFileIndex} / ${totalFiles} fasciculi`,
+            eo: `${currentFileIndex} / ${totalFiles} dosieroj`,
+          })}
         </div>
       )}
       <div className="progress-bar-track">

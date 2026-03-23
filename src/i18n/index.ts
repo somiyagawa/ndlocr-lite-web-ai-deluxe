@@ -3,8 +3,10 @@ import { en } from './en'
 import { zhCN } from './zh-CN'
 import { zhTW } from './zh-TW'
 import { ko } from './ko'
+import { la } from './la'
+import { eo } from './eo'
 
-export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko'
+export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo'
 export type TranslationParams = Record<string, string | number>
 
 /** Display labels for the language selector */
@@ -14,10 +16,12 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   'zh-CN': '简体中文',
   'zh-TW': '繁體中文',
   ko: '한국어',
+  la: 'Latina',
+  eo: 'Esperanto',
 }
 
 /** All supported language codes, in display order */
-export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko']
+export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'la', 'eo']
 
 const translations: Record<Language, Record<string, Record<string, string>>> = {
   ja,
@@ -25,6 +29,8 @@ const translations: Record<Language, Record<string, Record<string, string>>> = {
   'zh-CN': zhCN,
   'zh-TW': zhTW,
   ko,
+  la,
+  eo,
 }
 
 function getNestedValue(obj: Record<string, unknown>, key: string): string {
@@ -62,7 +68,14 @@ export function getStoredLang(): Language {
   const browserLang = navigator.language
   if (browserLang.startsWith('ja')) return 'ja'
   if (browserLang.startsWith('ko')) return 'ko'
+  if (browserLang.startsWith('la')) return 'la'
+  if (browserLang.startsWith('eo')) return 'eo'
   if (browserLang === 'zh-TW' || browserLang === 'zh-Hant') return 'zh-TW'
   if (browserLang.startsWith('zh')) return 'zh-CN'
   return 'ja'
+}
+
+/** Helper for inline multi-language text in components that receive `lang` prop */
+export function L(lang: Language, texts: Partial<Record<Language, string>>): string {
+  return texts[lang] ?? texts.en ?? texts.ja ?? ''
 }

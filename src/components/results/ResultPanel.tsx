@@ -1,5 +1,6 @@
 import type { OCRResult, TextBlock } from '../../types/ocr'
 import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 interface ResultPanelProps {
   result: OCRResult | null
@@ -12,7 +13,7 @@ export function ResultPanel({ result, selectedBlock, selectedPageBlockText, lang
   if (!result) {
     return (
       <div className="result-panel empty">
-        <p>{lang === 'ja' ? '結果なし' : 'No results'}</p>
+        <p>{L(lang, { ja: '結果なし', en: 'No results', 'zh-CN': '无结果', 'zh-TW': '無結果', ko: '결과 없음', la: 'Nulla eventus', eo: 'Neniuj rezultoj' })}</p>
       </div>
     )
   }
@@ -23,7 +24,7 @@ export function ResultPanel({ result, selectedBlock, selectedPageBlockText, lang
         <span className="result-filename">{result.fileName}</span>
         <span className="result-stats">
           {result.textBlocks.length}
-          {lang === 'ja' ? ' 領域' : ' regions'}
+          {L(lang, { ja: ' 領域', en: ' regions', 'zh-CN': ' 区域', 'zh-TW': ' 區域', ko: ' 영역', la: ' regiones', eo: ' regionoj' })}
           {' · '}
           {(result.processingTimeMs / 1000).toFixed(1)}s
         </span>
@@ -32,14 +33,14 @@ export function ResultPanel({ result, selectedBlock, selectedPageBlockText, lang
       <div className="result-text">
         {result.textBlocks.length === 0 ? (
           <p className="no-text">
-            {lang === 'ja' ? 'テキストが検出されませんでした' : 'No text detected'}
+            {L(lang, { ja: 'テキストが検出されませんでした', en: 'No text detected', 'zh-CN': '未检测到文本', 'zh-TW': '未偵測到文字', ko: '감지된 텍스트 없음', la: 'Nulla textus detectus', eo: 'Nenia teksto detektita' })}
           </p>
         ) : selectedPageBlockText != null ? (
           <div>
             <div className="selected-text-label">
-              {lang === 'ja' ? 'ブロック内のテキスト:' : 'Block text:'}
+              {L(lang, { ja: 'ブロック内のテキスト:', en: 'Block text:', 'zh-CN': '区块内的文本:', 'zh-TW': '區塊內的文字:', ko: '블록 내 텍스트:', la: 'Textus in bloco:', eo: 'Teksto en bloko:' })}
             </div>
-            <div className="selected-text">{selectedPageBlockText || '(空)'}</div>
+            <div className="selected-text">{selectedPageBlockText || L(lang, { ja: '(空)', en: '(empty)', 'zh-CN': '(空)', 'zh-TW': '(空)', ko: '(비어있음)', la: '(vacuum)', eo: '(malplena)' })}</div>
             <hr className="divider" />
             <pre className="full-text">{result.fullText}</pre>
           </div>
@@ -47,9 +48,9 @@ export function ResultPanel({ result, selectedBlock, selectedPageBlockText, lang
           // 選択された領域のテキストをハイライト
           <div>
             <div className="selected-text-label">
-              {lang === 'ja' ? '選択領域のテキスト:' : 'Selected region:'}
+              {L(lang, { ja: '選択領域のテキスト:', en: 'Selected region:', 'zh-CN': '选定区域的文本:', 'zh-TW': '選定區域的文字:', ko: '선택한 영역의 텍스트:', la: 'Textus in regione lecta:', eo: 'Teksto en elektita regiono:' })}
             </div>
-            <div className="selected-text">{selectedBlock.text || '(空)'}</div>
+            <div className="selected-text">{selectedBlock.text || L(lang, { ja: '(空)', en: '(empty)', 'zh-CN': '(空)', 'zh-TW': '(空)', ko: '(비어있음)', la: '(vacuum)', eo: '(malplena)' })}</div>
             <hr className="divider" />
             <div className="full-text">{result.fullText}</div>
           </div>
