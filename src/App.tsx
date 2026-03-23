@@ -562,13 +562,15 @@ export default function App() {
                             </p>
                           </div>
                           {showPreprocessPanel && (
-                            <ImagePreprocessPanel
-                              lang={lang}
-                              imageDataUrl={currentResult.imageDataUrl}
-                              onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
-                              onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
-                              sidePanel
-                            />
+                            <Suspense fallback={null}>
+                              <ImagePreprocessPanel
+                                lang={lang}
+                                imageDataUrl={currentResult.imageDataUrl}
+                                onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
+                                onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
+                                sidePanel
+                              />
+                            </Suspense>
                           )}
                         </div>
                       </>
@@ -601,39 +603,41 @@ export default function App() {
 
       <Footer lang={lang} />
 
-      {showHistory && (
-        <HistoryPanel
-          runs={historyRuns}
-          onSelect={handleHistorySelect}
-          onClear={clearResults}
-          onClose={() => setShowHistory(false)}
-          lang={lang}
-        />
-      )}
-      {showSettings && (
-        <SettingsModal
-          onClose={() => setShowSettings(false)}
-          lang={lang}
-          aiSettings={aiSettings}
-          onUpdateAISettings={updateAISettings}
-          onSwitchProvider={switchProvider}
-          connectionStatus={aiConnectionStatus}
-          onTestConnection={testAndConnect}
-        />
-      )}
-      {showHelp && (
-        <HelpPage
-          lang={lang}
-          onClose={() => setShowHelp(false)}
-        />
-      )}
-      {showAIConnectHelp && (
-        <AIConnectHelp
-          lang={lang}
-          onClose={() => setShowAIConnectHelp(false)}
-          onOpenSettings={() => { setShowAIConnectHelp(false); setShowSettings(true) }}
-        />
-      )}
+      <Suspense fallback={null}>
+        {showHistory && (
+          <HistoryPanel
+            runs={historyRuns}
+            onSelect={handleHistorySelect}
+            onClear={clearResults}
+            onClose={() => setShowHistory(false)}
+            lang={lang}
+          />
+        )}
+        {showSettings && (
+          <SettingsModal
+            onClose={() => setShowSettings(false)}
+            lang={lang}
+            aiSettings={aiSettings}
+            onUpdateAISettings={updateAISettings}
+            onSwitchProvider={switchProvider}
+            connectionStatus={aiConnectionStatus}
+            onTestConnection={testAndConnect}
+          />
+        )}
+        {showHelp && (
+          <HelpPage
+            lang={lang}
+            onClose={() => setShowHelp(false)}
+          />
+        )}
+        {showAIConnectHelp && (
+          <AIConnectHelp
+            lang={lang}
+            onClose={() => setShowAIConnectHelp(false)}
+            onOpenSettings={() => { setShowAIConnectHelp(false); setShowSettings(true) }}
+          />
+        )}
+      </Suspense>
     </div>
   )
 }

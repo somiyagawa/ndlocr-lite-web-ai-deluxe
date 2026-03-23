@@ -15,12 +15,27 @@ export default defineConfig({
 
   build: {
     target: 'esnext',
+    // CSSのコード分割を有効化（遅延ロードコンポーネントのCSSも遅延に）
+    cssCodeSplit: true,
+    // ソースマップはプロダクションでは無効（ビルド高速化）
+    sourcemap: false,
+    // minify設定（esbuildが最速）
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {
-          'pdf': ['pdfjs-dist'],
+          // PDF読込（pdfjs-dist は大きいので独立）
+          'pdf-reader': ['pdfjs-dist'],
+          // PDF生成
+          'pdf-writer': ['jspdf'],
+          // HEIC変換（大きいが使用頻度低い）
           'heic': ['heic2any'],
+          // 差分表示
           'diff': ['diff-match-patch'],
+          // React本体（キャッシュ効率向上）
+          'react-vendor': ['react', 'react-dom'],
+          // TIFF処理
+          'tiff': ['utif'],
         },
       },
     },

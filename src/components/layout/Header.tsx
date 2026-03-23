@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { LANGUAGES, LANGUAGE_LABELS } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
@@ -23,7 +24,7 @@ interface HeaderProps {
   onToggleTheme: () => void
 }
 
-export function Header({
+export const Header = memo(function Header({
   lang,
   onToggleLanguage,
   onOpenSettings,
@@ -188,4 +189,4 @@ export function Header({
       </div>
     </header>
   )
-}
+})

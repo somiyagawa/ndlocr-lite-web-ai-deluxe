@@ -1,10 +1,11 @@
+import { memo } from 'react'
 import type { Language } from '../../i18n'
 
 interface FooterProps {
   lang: Language
 }
 
-export function Footer({ lang }: FooterProps) {
+export const Footer = memo(function Footer({ lang }: FooterProps) {
   return (
     <footer className="footer">
       <div className="footer-privacy">
@@ -77,10 +78,12 @@ export function Footer({ lang }: FooterProps) {
         </div>
       </div>
       <div className="footer-frog-credit">
-        {lang === 'ja'
-          ? '🐸 背景の鳥獣戯画模様は NDLOCR 開発者・青池亨先生へのオマージュです'
-          : '🐸 The Choju-giga background pattern is a tribute to Toru Aoike, developer of NDLOCR'}
+        {lang === 'ja' ? (
+          <>🐸 背景の鳥獣戯画模様は NDLOCR 開発者・<a href="https://researchmap.jp/blue0620" target="_blank" rel="noopener noreferrer">青池亨</a>先生へのオマージュです</>
+        ) : (
+          <>🐸 The Choju-giga background pattern is a tribute to <a href="https://researchmap.jp/blue0620" target="_blank" rel="noopener noreferrer">Toru Aoike</a>, developer of NDLOCR</>
+        )}
       </div>
     </footer>
   )
-}
+})
