@@ -5,6 +5,7 @@ import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import { downloadText, copyToClipboard } from '../../utils/textExport'
 import { downloadTEI } from '../../utils/exportTEI'
 import { downloadHOCR } from '../../utils/exportHOCR'
+import { downloadPDF } from '../../utils/exportPDF'
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
 
@@ -116,9 +117,14 @@ export function TextEditor({
   // Scroll sync for line numbers
   const handleTextareaScroll = useCallback(() => {
     if (gutterRef.current && textareaRef.current) {
-      gutterRef.current.scrollTop = textareaRef.current.scrollTop
+      if (isVertical) {
+        // 縦書きモード: 横スクロール同期
+        gutterRef.current.scrollLeft = textareaRef.current.scrollLeft
+      } else {
+        gutterRef.current.scrollTop = textareaRef.current.scrollTop
+      }
     }
-  }, [])
+  }, [isVertical])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -267,7 +273,7 @@ export function TextEditor({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showExportMenu])
 
-  const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr') => {
+  const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf') => {
     if (!result) return
     setShowExportMenu(false)
     if (format === 'txt') {
@@ -276,8 +282,10 @@ export function TextEditor({
       downloadTEI(result)
     } else if (format === 'hocr') {
       downloadHOCR(result)
+    } else if (format === 'pdf') {
+      downloadPDF(result, imageDataUrl)
     }
-  }, [result]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [result, imageDataUrl]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // AI校正実行
   const handleProofread = useCallback(async () => {
@@ -551,6 +559,10 @@ export function TextEditor({
                   <span className="export-dropdown-icon">hOCR</span>
                   <span>{lang === 'ja' ? 'hOCR (.hocr)' : 'hOCR (.hocr)'}</span>
                 </button>
+                <button className="export-dropdown-item" onClick={() => handleExport('pdf')}>
+                  <span className="export-dropdown-icon">PDF</span>
+                  <span>{lang === 'ja' ? 'テキスト付きPDF (.pdf)' : 'Text-embedded PDF (.pdf)'}</span>
+                </button>
               </div>
             )}
           </div>
@@ -664,26 +676,25 @@ export function TextEditor({
         </div>
       )}
 
-      {/* 選択ブロックの表示 */}
-      {selectedPageBlockText != null && (
-        <div className="text-editor-selection">
-          <div className="text-editor-selection-label">
-            {lang === 'ja' ? 'ブロック内のテキスト:' : 'Block text:'}
-          </div>
-          <div className="text-editor-selection-text">{selectedPageBlockText || '(空)'}</div>
-        </div>
-      )}
-      {selectedBlock && selectedPageBlockText == null && (
-        <div className="text-editor-selection">
-          <div className="text-editor-selection-label">
-            {lang === 'ja' ? '選択領域のテキスト:' : 'Selected region:'}
-          </div>
-          <div className="text-editor-selection-text">{selectedBlock.text || '(空)'}</div>
-        </div>
-      )}
-
       {/* メイン: テキストエリア or 差分表示 */}
       <div className="text-editor-body">
+        {/* 選択ブロックの浮動オーバーレイ表示 */}
+        {selectedPageBlockText != null && (
+          <div className="text-editor-selection-float">
+            <span className="text-editor-selection-float-label">
+              {lang === 'ja' ? 'ブロック' : 'Block'}
+            </span>
+            <span className="text-editor-selection-float-text">{selectedPageBlockText || '(空)'}</span>
+          </div>
+        )}
+        {selectedBlock && selectedPageBlockText == null && (
+          <div className="text-editor-selection-float">
+            <span className="text-editor-selection-float-label">
+              {lang === 'ja' ? '選択' : 'Selected'}
+            </span>
+            <span className="text-editor-selection-float-text">{selectedBlock.text || '(空)'}</span>
+          </div>
+        )}
         {result.textBlocks.length === 0 ? (
           <p className="text-editor-empty-text">
             {lang === 'ja' ? 'テキストが検出されませんでした' : 'No text detected'}
@@ -703,10 +714,19 @@ export function TextEditor({
           />
         ) : (
           <div className={`line-numbers-container ${isVertical ? 'text-editor-vertical' : ''}`}>
-            {showLineNumbers && (
+            {showLineNumbers && !isVertical && (
               <div className="line-numbers-gutter" ref={gutterRef}>
                 {Array.from({ length: lineCount }).map((_, i) => (
                   <span key={i} className="line-number">
+                    {i + 1}
+                  </span>
+                ))}
+              </div>
+            )}
+            {showLineNumbers && isVertical && (
+              <div className="line-numbers-gutter-vertical" ref={gutterRef}>
+                {Array.from({ length: lineCount }).map((_, i) => (
+                  <span key={i} className="line-number-vertical">
                     {i + 1}
                   </span>
                 ))}
