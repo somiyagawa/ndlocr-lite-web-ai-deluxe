@@ -477,7 +477,7 @@ export default function App() {
         )}
 
         {/* ===== 結果表示（SplitView） ===== */}
-        {(hasResults || isProcessing) && processedImages.length > 0 && (
+        {(hasResults || (isProcessing && processedImages.length > 0)) && (
           <section className="result-section result-section-split">
             {/* メインコンテンツ: SplitView */}
             <div className="result-content">
@@ -490,7 +490,7 @@ export default function App() {
 
               {/* ページナビ + 新規処理ボタン */}
               <div className="result-toolbar">
-                {renderPageNav(selectedResultIndex, setSelectedResultIndex, processedImages.length, sessionResults.length - 1)}
+                {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1)}
                 {!isProcessing && (
                   <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
                     {lang === 'ja' ? '新しいファイルを処理' : 'Process New Files'}
@@ -528,7 +528,7 @@ export default function App() {
                               selectedPageBlock={selectedPageBlock}
                               onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
                               pageIndex={selectedResultIndex}
-                              totalPages={processedImages.length}
+                              totalPages={sessionResults.length}
                             />
                             {selectedRegion && (
                               <div className="region-action-bar">

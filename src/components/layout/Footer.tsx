@@ -76,7 +76,11 @@ export function Footer({ lang }: FooterProps) {
           {lang === 'ja' ? '（筑波大学）' : ' (University of Tsukuba)'}
         </div>
       </div>
-      {/* GitHubリポジトリリンク削除済み */}
+      <div className="footer-frog-credit">
+        {lang === 'ja'
+          ? '🐸 背景の蛙模様は NDLOCR 開発者・青池亨先生へのオマージュです'
+          : '🐸 The frog background pattern is a tribute to Toru Aoike, developer of NDLOCR'}
+      </div>
     </footer>
   )
 }
