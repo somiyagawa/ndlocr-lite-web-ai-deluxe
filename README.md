@@ -126,7 +126,7 @@
 | モデル/結果キャッシュ | IndexedDB |
 | 画像前処理 | Canvas API（外部ライブラリ不要） |
 | テーマ切替 | CSS Custom Properties + localStorage |
-| デプロイ | Netlify（COOP/COEPヘッダー対応） |
+| デプロイ | Netlify / Vercel（COOP/COEPヘッダー対応） |
 
 ### 画像前処理アルゴリズム
 
@@ -179,6 +179,27 @@ netlify login
 netlify init
 npm run build
 netlify deploy --prod
+```
+
+### Vercel
+
+`vercel.json` にCOOP/COEPヘッダーとSPAフォールバック設定が含まれています。
+
+**方法A: GitHubリポジトリ連携（推奨）**
+
+1. GitHubにリポジトリをpush
+2. [vercel.com](https://vercel.com) にログイン
+3. 「Add New Project」→ GitHubリポジトリをインポート
+4. フレームワークは「Vite」を選択（自動検出される場合もあります）
+5. 「Deploy」をクリック。`vercel.json` からヘッダー設定が自動読み込みされます
+
+**方法B: Vercel CLIによる手動デプロイ**
+
+```bash
+npm install -g vercel
+vercel login
+npm run build
+vercel --prod
 ```
 
 ### その他のホスティング

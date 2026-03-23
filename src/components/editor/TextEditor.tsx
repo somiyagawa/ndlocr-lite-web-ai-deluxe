@@ -28,6 +28,11 @@ interface SearchMatch {
   end: number
 }
 
+interface UndoRedoEntry {
+  text: string
+  cursorPos?: number
+}
+
 export function TextEditor({
   result,
   selectedBlock,
@@ -50,6 +55,9 @@ export function TextEditor({
   const [replaceQuery, setReplaceQuery] = useState('')
   const [isVertical, setIsVertical] = useState(false)
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
+  const [undoStack, setUndoStack] = useState<UndoRedoEntry[]>([])
+  const [redoStack, setRedoStack] = useState<UndoRedoEntry[]>([])
+  const [saved, setSaved] = useState(true)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
@@ -82,10 +90,19 @@ export function TextEditor({
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value
+      const currentText = displayText
+
+      // Add current text to undo stack before changing
+      if (currentText !== newText) {
+        setUndoStack([...undoStack, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
+        setRedoStack([])
+        setSaved(false)
+      }
+
       setEditedText(newText)
       onTextChange?.(newText)
     },
-    [onTextChange],
+    [onTextChange, displayText, undoStack],
   )
 
   // Scroll sync for line numbers
@@ -98,16 +115,28 @@ export function TextEditor({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'f') {
+      const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+      const modifier = isMac ? e.metaKey : e.ctrlKey
+
+      if (modifier && e.key === 'f') {
         e.preventDefault()
         setShowSearchBar(!showSearchBar)
+      } else if (modifier && e.key === 's') {
+        e.preventDefault()
+        handleSave()
+      } else if (modifier && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        handleUndo()
+      } else if ((modifier && e.shiftKey && e.key === 'z') || (modifier && e.shiftKey && e.key === 'Z')) {
+        e.preventDefault()
+        handleRedo()
       } else if (e.key === 'Escape' && showSearchBar) {
         setShowSearchBar(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showSearchBar])
+  }, [showSearchBar, displayText, undoStack, redoStack])
 
   // result が変わったら編集状態・校正状態をリセット
   const [prevResultId, setPrevResultId] = useState<string | null>(null)
@@ -115,6 +144,9 @@ export function TextEditor({
     setPrevResultId(result.id)
     setEditedText(null)
     setProofreadState({ status: 'idle' })
+    setUndoStack([])
+    setRedoStack([])
+    setSaved(true)
   }
 
   const applyOptions = (text: string) =>
@@ -138,6 +170,81 @@ export function TextEditor({
       includeFileName ? `=== ${result.fileName} ===\n${text}` : text,
       result.fileName,
     )
+  }
+
+  const handleSave = () => {
+    if (!result) return
+    const text = applyOptions(editedText ?? result.fullText)
+    downloadText(
+      includeFileName ? `=== ${result.fileName} ===\n${text}` : text,
+      result.fileName,
+    )
+    setSaved(true)
+  }
+
+  const handleUndo = () => {
+    if (undoStack.length === 0) return
+    const newStack = [...undoStack]
+    const prevEntry = newStack.pop()!
+    if (!prevEntry) return
+
+    setRedoStack([...redoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
+    setUndoStack(newStack)
+    setEditedText(prevEntry.text)
+    onTextChange?.(prevEntry.text)
+
+    // Restore cursor position
+    setTimeout(() => {
+      if (textareaRef.current && prevEntry.cursorPos !== undefined) {
+        textareaRef.current.selectionStart = prevEntry.cursorPos
+        textareaRef.current.selectionEnd = prevEntry.cursorPos
+      }
+    }, 0)
+  }
+
+  const handleRedo = () => {
+    if (redoStack.length === 0) return
+    const newStack = [...redoStack]
+    const nextEntry = newStack.pop()!
+    if (!nextEntry) return
+
+    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
+    setRedoStack(newStack)
+    setEditedText(nextEntry.text)
+    onTextChange?.(nextEntry.text)
+
+    // Restore cursor position
+    setTimeout(() => {
+      if (textareaRef.current && nextEntry.cursorPos !== undefined) {
+        textareaRef.current.selectionStart = nextEntry.cursorPos
+        textareaRef.current.selectionEnd = nextEntry.cursorPos
+      }
+    }, 0)
+  }
+
+  const handleRemoveEmptyLines = () => {
+    const newText = displayText
+      .split('\n')
+      .filter((line) => line.trim().length > 0)
+      .join('\n')
+    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
+    setRedoStack([])
+    setEditedText(newText)
+    onTextChange?.(newText)
+    setSaved(false)
+  }
+
+  const handleJoinLines = () => {
+    const newText = displayText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join(' ')
+    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
+    setRedoStack([])
+    setEditedText(newText)
+    onTextChange?.(newText)
+    setSaved(false)
   }
 
   // AI校正実行
@@ -230,7 +337,10 @@ export function TextEditor({
       {/* ヘッダー: タイトル + ボタン群（AI校正 / Copy / DL） */}
       <div className="text-editor-header">
         <div className="text-editor-header-left">
-          <span className="text-editor-label">OCR result</span>
+          <span className="text-editor-label">
+            OCR result
+            {!saved && <span className="text-editor-unsaved-indicator" title={lang === 'ja' ? '保存されていません' : 'Unsaved changes'} />}
+          </span>
           <span className="text-editor-stats">
             {result.textBlocks.length}
             {lang === 'ja' ? ' 領域' : ' regions'}
@@ -242,7 +352,7 @@ export function TextEditor({
           <button
             className="btn btn-icon btn-sm"
             onClick={() => setShowSearchBar(!showSearchBar)}
-            title={lang === 'ja' ? '検索と置換' : 'Find and Replace'}
+            title={lang === 'ja' ? '検索と置換 (Ctrl+F)' : 'Find and Replace (Ctrl+F)'}
             aria-label="Search"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -259,6 +369,28 @@ export function TextEditor({
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <text x="2" y="6" fontSize="8" fill="currentColor">1</text>
               <text x="2" y="12" fontSize="8" fill="currentColor">2</text>
+            </svg>
+          </button>
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
+            title={lang === 'ja' ? '戻す (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
+            aria-label="Undo"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M3 8a5 5 0 0 1 5-5h4m-4 0l2 2m-2-2l-2 2" />
+            </svg>
+          </button>
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={handleRedo}
+            disabled={redoStack.length === 0}
+            title={lang === 'ja' ? 'やり直す (Ctrl+Shift+Z)' : 'Redo (Ctrl+Shift+Z)'}
+            aria-label="Redo"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M13 8a5 5 0 0 1-5-5H4m4 0l-2 2m2-2l2 2" />
             </svg>
           </button>
           <button
@@ -285,6 +417,18 @@ export function TextEditor({
                 <polyline points="12 3 14 5 12 7" fill="none" />
               </svg>
             )}
+          </button>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleSave}
+            title={lang === 'ja' ? '保存 (Ctrl+S)' : 'Save (Ctrl+S)'}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '4px', display: 'inline' }}>
+              <path d="M2 2v12h12V4l-2-2H2z" />
+              <line x1="6" y1="7" x2="10" y2="7" />
+              <rect x="5" y="10" width="6" height="3" />
+            </svg>
+            {lang === 'ja' ? '保存' : 'Save'}
           </button>
           <button
             className="btn btn-ai"
@@ -486,6 +630,38 @@ export function TextEditor({
             />
             {lang === 'ja' ? '改行を無視' : 'Ignore newlines'}
           </label>
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={handleRemoveEmptyLines}
+            title={lang === 'ja' ? '空行を削除' : 'Remove empty lines'}
+            aria-label="Remove empty lines"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="2" y1="4" x2="14" y2="4" />
+              <line x1="2" y1="12" x2="14" y2="12" />
+            </svg>
+          </button>
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={handleJoinLines}
+            title={lang === 'ja' ? '改行を削除して結合' : 'Join lines'}
+            aria-label="Join lines"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="2" y1="8" x2="14" y2="8" />
+              <polyline points="5 5 2 8 5 11" fill="none" />
+              <polyline points="11 5 14 8 11 11" fill="none" />
+            </svg>
+          </button>
+        </div>
+        <div className="text-editor-stats-footer">
+          <span className="text-editor-stat-item">
+            {lang === 'ja' ? '文字数:' : 'Chars:'} {displayText.length}
+          </span>
+          <span className="text-editor-stat-separator">·</span>
+          <span className="text-editor-stat-item">
+            {lang === 'ja' ? '行数:' : 'Lines:'} {lineCount}
+          </span>
         </div>
         <div className="text-editor-font-controls">
           <label className="text-editor-font-label">

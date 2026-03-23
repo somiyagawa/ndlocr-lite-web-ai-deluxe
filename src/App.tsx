@@ -71,6 +71,9 @@ export default function App() {
   // 領域選択状態
   const [selectedRegion, setSelectedRegion] = useState<BoundingBox | null>(null)
 
+  // 前処理パネル表示状態
+  const [showPreprocessPanel, setShowPreprocessPanel] = useState(false)
+
   // 画像前処理状態
   const [preprocessedUrls, setPreprocessedUrls] = useState<Record<number, string>>({})
 
@@ -421,26 +424,42 @@ export default function App() {
                       {lang === 'ja' ? '選択解除' : 'Clear Selection'}
                     </button>
                   )}
+                  <button
+                    className={`btn btn-secondary btn-preprocess-toggle${showPreprocessPanel ? ' active' : ''}`}
+                    onClick={() => setShowPreprocessPanel(!showPreprocessPanel)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
+                    </svg>
+                    {lang === 'ja' ? '画像補正' : 'Adjust'}
+                  </button>
                 </div>
-                <ImagePreprocessPanel
-                  lang={lang}
-                  imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
-                  onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
-                  onReset={() => handlePreprocessReset(pendingImageIndex)}
-                />
-                <ImageViewer
-                  imageDataUrl={preprocessedUrls[pendingImageIndex] ?? pendingDataUrls[pendingImageIndex] ?? ''}
-                  textBlocks={[]}
-                  selectedBlock={null}
-                  onBlockSelect={() => {}}
-                  onRegionSelect={handleRegionSelect}
-                  selectedRegion={selectedRegion}
-                />
-                <p className="region-select-hint">
-                  {lang === 'ja'
-                    ? 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます'
-                    : 'Drag to select a region, then click "Start OCR" to recognize'}
-                </p>
+                <div className="image-with-preprocess">
+                  <div className="image-with-preprocess-main">
+                    <ImageViewer
+                      imageDataUrl={preprocessedUrls[pendingImageIndex] ?? pendingDataUrls[pendingImageIndex] ?? ''}
+                      textBlocks={[]}
+                      selectedBlock={null}
+                      onBlockSelect={() => {}}
+                      onRegionSelect={handleRegionSelect}
+                      selectedRegion={selectedRegion}
+                    />
+                    <p className="region-select-hint">
+                      {lang === 'ja'
+                        ? 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます'
+                        : 'Drag to select a region, then click "Start OCR" to recognize'}
+                    </p>
+                  </div>
+                  {showPreprocessPanel && (
+                    <ImagePreprocessPanel
+                      lang={lang}
+                      imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
+                      onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
+                      onReset={() => handlePreprocessReset(pendingImageIndex)}
+                      sidePanel
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </section>
@@ -530,40 +549,58 @@ export default function App() {
                   <div className="split-image-panel">
                     {currentResult && (
                       <>
-                        <ImagePreprocessPanel
-                          lang={lang}
-                          imageDataUrl={currentResult.imageDataUrl}
-                          onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
-                          onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
-                        />
-                        <ImageViewer
-                          imageDataUrl={preprocessedUrls[selectedResultIndex + 10000] ?? currentResult.imageDataUrl}
-                          textBlocks={currentResult.textBlocks}
-                          selectedBlock={selectedBlock}
-                          onBlockSelect={(block) => { setSelectedBlock(block); setSelectedPageBlock(null) }}
-                          onRegionSelect={handleRegionSelect}
-                          selectedRegion={selectedRegion}
-                          pageBlocks={currentResult.pageBlocks}
-                          selectedPageBlock={selectedPageBlock}
-                          onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
-                          pageIndex={selectedResultIndex}
-                          totalPages={processedImages.length}
-                        />
-                        {selectedRegion && (
-                          <div className="region-action-bar">
-                            <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
-                              {lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region'}
-                            </button>
-                            <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
-                              {lang === 'ja' ? '選択解除' : 'Clear Selection'}
-                            </button>
+                        <div className="split-image-toolbar">
+                          <button
+                            className={`btn btn-secondary btn-sm btn-preprocess-toggle${showPreprocessPanel ? ' active' : ''}`}
+                            onClick={() => setShowPreprocessPanel(!showPreprocessPanel)}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
+                            </svg>
+                            {lang === 'ja' ? '画像補正' : 'Adjust'}
+                          </button>
+                        </div>
+                        <div className="image-with-preprocess">
+                          <div className="image-with-preprocess-main">
+                            <ImageViewer
+                              imageDataUrl={preprocessedUrls[selectedResultIndex + 10000] ?? currentResult.imageDataUrl}
+                              textBlocks={currentResult.textBlocks}
+                              selectedBlock={selectedBlock}
+                              onBlockSelect={(block) => { setSelectedBlock(block); setSelectedPageBlock(null) }}
+                              onRegionSelect={handleRegionSelect}
+                              selectedRegion={selectedRegion}
+                              pageBlocks={currentResult.pageBlocks}
+                              selectedPageBlock={selectedPageBlock}
+                              onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
+                              pageIndex={selectedResultIndex}
+                              totalPages={processedImages.length}
+                            />
+                            {selectedRegion && (
+                              <div className="region-action-bar">
+                                <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
+                                  {lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region'}
+                                </button>
+                                <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
+                                  {lang === 'ja' ? '選択解除' : 'Clear Selection'}
+                                </button>
+                              </div>
+                            )}
+                            <p className="region-select-hint">
+                              {lang === 'ja'
+                                ? 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます'
+                                : 'Drag to select a region, then click "OCR Selected Region" to re-recognize'}
+                            </p>
                           </div>
-                        )}
-                        <p className="region-select-hint">
-                          {lang === 'ja'
-                            ? 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます'
-                            : 'Drag to select a region, then click "OCR Selected Region" to re-recognize'}
-                        </p>
+                          {showPreprocessPanel && (
+                            <ImagePreprocessPanel
+                              lang={lang}
+                              imageDataUrl={currentResult.imageDataUrl}
+                              onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
+                              onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
+                              sidePanel
+                            />
+                          )}
+                        </div>
                       </>
                     )}
                   </div>

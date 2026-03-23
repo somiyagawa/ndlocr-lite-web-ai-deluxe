@@ -31,6 +31,8 @@ interface ImagePreprocessPanelProps {
   onProcessed: (dataUrl: string) => void
   onSplitPages?: (pages: string[]) => void
   onReset: () => void
+  /** Side panel mode: always open, no accordion header */
+  sidePanel?: boolean
 }
 
 type TranslationStrings = {
@@ -176,6 +178,7 @@ export function ImagePreprocessPanel({
   onProcessed,
   onSplitPages,
   onReset,
+  sidePanel = false,
 }: ImagePreprocessPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [options, setOptions] = useState<PreprocessOptions>(DEFAULT_PREPROCESS_OPTIONS)
@@ -312,20 +315,32 @@ export function ImagePreprocessPanel({
     }
   }, [])
 
-  return (
-    <div className="preprocess-panel">
-      <button
-        className="preprocess-panel-header"
-        onClick={() => setIsOpen(!isOpen)}
-        type="button"
-      >
-        <span className="preprocess-panel-header-text">{strings.imagePreprocessing}</span>
-        <span className="preprocess-panel-header-icon">
-          {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-        </span>
-      </button>
+  const showBody = sidePanel || isOpen
 
-      {isOpen && (
+  return (
+    <div className={`preprocess-panel${sidePanel ? ' preprocess-panel-side' : ''}${showBody ? ' open' : ''}`}>
+      {!sidePanel && (
+        <button
+          className="preprocess-panel-header"
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+        >
+          <span className="preprocess-panel-header-text">{strings.imagePreprocessing}</span>
+          <span className="preprocess-panel-header-icon">
+            {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+          </span>
+        </button>
+      )}
+      {sidePanel && (
+        <div className="preprocess-panel-side-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
+          </svg>
+          <span>{strings.imagePreprocessing}</span>
+        </div>
+      )}
+
+      {showBody && (
         <div className="preprocess-panel-body">
           {/* Slider Controls */}
           <div className="preprocess-controls">
