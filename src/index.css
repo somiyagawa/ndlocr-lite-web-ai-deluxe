@@ -2567,3 +2567,539 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   box-shadow: var(--shadow);
   transform: translateY(-0.5px);
 }
+
+/* =====================================================
+   MISSING CLASSES RESTORED
+   ImageViewer, PreprocessPanel, Layout Integration
+   ===================================================== */
+
+/* ── image-viewer-wrap (outer wrapper used by ImageViewer) ── */
+.image-viewer-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* Override: make .image-viewer scrollable container inside wrap */
+.image-viewer-wrap > .image-viewer {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  cursor: crosshair;
+}
+
+/* ── image-viewer-transform (zoom container) ── */
+.image-viewer-transform {
+  position: relative;
+  display: inline-block;
+  min-width: 100%;
+  transition: width 0.15s ease;
+}
+
+/* ── viewer-image ── */
+.viewer-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── viewer-overlay (positioned over the image for bbox drawing) ── */
+.viewer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* ── region-box (OCR text line overlay) ── */
+.region-box {
+  position: absolute;
+  border: 1.5px solid var(--color-region);
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.region-box:hover {
+  background: rgba(79, 70, 229, 0.08);
+  border-color: var(--color-primary);
+}
+
+.region-box.selected {
+  background: var(--color-region-selected);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* ── page-block-box (column / paragraph blocks) ── */
+.page-block-box {
+  position: absolute;
+  border: 2px dashed rgba(100, 116, 139, 0.35);
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.page-block-box:hover {
+  background: rgba(100, 116, 139, 0.06);
+  border-color: rgba(100, 116, 139, 0.6);
+}
+
+.page-block-box.selected {
+  background: rgba(100, 116, 139, 0.1);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 1px var(--color-secondary);
+}
+
+/* ── drag-selection (user dragging a region) ── */
+.drag-selection {
+  position: absolute;
+  border: 2px solid var(--color-warning);
+  background: rgba(245, 158, 11, 0.12);
+  pointer-events: none;
+}
+
+/* ── region-selected-highlight (confirmed selection) ── */
+.region-selected-highlight {
+  position: absolute;
+  border: 2.5px solid var(--color-warning);
+  background: rgba(245, 158, 11, 0.08);
+  pointer-events: none;
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── btn-zoom / zoom-level ── */
+.btn-zoom {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-zoom:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.btn-zoom-reset {
+  width: auto;
+  padding: 0 0.5rem;
+  font-size: 0.7rem;
+}
+
+.zoom-level {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-width: 3rem;
+  justify-content: center;
+}
+
+/* =====================================================
+   PREPROCESS PANEL
+   ===================================================== */
+
+.preprocess-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.preprocess-panel-side {
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-radius: 0;
+  width: 240px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* ── Accordion header (non-side mode) ── */
+.preprocess-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: var(--color-bg);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+
+.preprocess-panel-header:hover {
+  background: var(--color-primary-light);
+}
+
+.preprocess-panel-header-text {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.preprocess-panel-header-icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
+/* ── Side panel header ── */
+.preprocess-panel-side-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.preprocess-panel-side-header svg {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Body ── */
+.preprocess-panel-body {
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* ── Controls group ── */
+.preprocess-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.preprocess-controls-group-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.1rem;
+}
+
+/* ── Slider ── */
+.preprocess-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.preprocess-slider label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--color-text);
+}
+
+.preprocess-slider-value {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.preprocess-slider input[type="range"] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.preprocess-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+.preprocess-slider input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+/* ── Toggles ── */
+.preprocess-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.6rem;
+}
+
+.preprocess-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.preprocess-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ── Action buttons ── */
+.preprocess-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.preprocess-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.preprocess-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preprocess-btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.preprocess-btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.preprocess-btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.preprocess-btn-secondary:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-preprocess-toggle {
+  font-size: 0.78rem;
+}
+
+.btn-preprocess-toggle.active {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* =====================================================
+   LAYOUT INTEGRATION CLASSES (App.tsx)
+   ===================================================== */
+
+/* ── pending-viewer (pre-OCR state) ── */
+.pending-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.pending-viewer-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0 0.25rem;
+}
+
+/* ── image-with-preprocess (image + side panel layout) ── */
+.image-with-preprocess {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.image-with-preprocess-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── split-image-panel (left panel in SplitView results) ── */
+.split-image-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.split-image-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── region selection hint & action bar ── */
+.region-select-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  padding: 0.3rem 0.5rem;
+  text-align: center;
+}
+
+.region-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--color-warning-light);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.region-action-bar .btn {
+  font-size: 0.78rem;
+}
+
+/* ── result-section-split (SplitView wrapper) ── */
+.result-section-split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+/* =====================================================
+   FONT FAMILY CLASSES (for TextEditor)
+   ===================================================== */
+
+.text-editor-textarea.font-mono {
+  font-family: 'Noto Sans Mono', 'Courier New', monospace;
+}
+
+.text-editor-textarea.font-serif {
+  font-family: 'Noto Serif JP', 'Yu Mincho', '游明朝', 'Hiragino Mincho ProN', serif;
+}
+
+.text-editor-textarea.font-sans {
+  font-family: 'Noto Sans JP', 'Yu Gothic', '游ゴシック', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+/* ── Font select dropdown in status bar ── */
+.text-editor-font-select {
+  padding: 0.15rem 0.35rem;
+  font-size: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  outline: none;
+  max-width: 110px;
+}
+
+.text-editor-font-select:focus {
+  border-color: var(--color-primary);
+}
+
+/* =====================================================
+   IMPROVED VERTICAL TEXT EDITING
+   ===================================================== */
+
+.text-editor-vertical {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.text-editor-vertical .text-editor-textarea {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  min-height: auto;
+  min-width: 100%;
+  height: 100%;
+  line-height: 2.2;
+  letter-spacing: 0.05em;
+  padding: 1rem 0.75rem;
+  text-align: justify;
+}
+
+/* Vertical text: hide line numbers (not meaningful in vertical mode) */
+.text-editor-vertical .line-numbers-gutter {
+  display: none;
+}
+
+/* Vertical text: adjust body to horizontal scroll */
+.text-editor-vertical {
+  flex-direction: row;
+}

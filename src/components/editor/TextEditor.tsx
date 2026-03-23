@@ -51,6 +51,7 @@ export function TextEditor({
   const [ignoreNewlines, setIgnoreNewlines] = useState(false)
   const [proofreadState, setProofreadState] = useState<ProofreadState>({ status: 'idle' })
   const [fontSize, setFontSize] = useState(14)
+  const [fontFamily, setFontFamily] = useState<string>('mono')
   const [showLineNumbers, setShowLineNumbers] = useState(false)
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -713,7 +714,7 @@ export function TextEditor({
             )}
             <textarea
               ref={textareaRef}
-              className="text-editor-textarea"
+              className={`text-editor-textarea font-${fontFamily}`}
               value={displayText}
               onChange={handleTextChange}
               onScroll={handleTextareaScroll}
@@ -764,12 +765,22 @@ export function TextEditor({
           </label>
           <span className="text-editor-stat-sep" />
           <div className="text-editor-font-controls-compact">
+            <select
+              className="text-editor-font-select"
+              value={fontFamily}
+              onChange={(e) => setFontFamily(e.target.value)}
+              title={lang === 'ja' ? 'フォント' : 'Font'}
+            >
+              <option value="mono">Monospace</option>
+              <option value="serif">Serif (明朝)</option>
+              <option value="sans">Sans (ゴシック)</option>
+            </select>
             <span className="text-editor-font-value-compact">{fontSize}px</span>
             <input
               type="range"
               className="text-editor-font-slider-compact"
               min="10"
-              max="24"
+              max="28"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               title={`${fontSize}px`}

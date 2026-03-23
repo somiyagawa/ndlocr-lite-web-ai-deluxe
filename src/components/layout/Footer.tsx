@@ -67,7 +67,7 @@ export function Footer({ lang, githubUrl = 'https://github.com/ogwata/ndlocr-lit
           {lang === 'ja' ? '小形克宏（一般社団法人ビブリオスタイル）' : 'Katsuhiro Ogata (Bibliostyle)'}
         </div>
         <div className="footer-credit-line">
-          {lang === 'ja' ? 'Deluxe機能（ダークモード、デザイン修正、画像補正・前処理）: ' : 'Deluxe features (dark mode, design, image preprocessing): '}
+          {lang === 'ja' ? 'Ultra機能（ダークモード、デザイン修正、画像補正・前処理）: ' : 'Ultra features (dark mode, design, image preprocessing): '}
           <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">
             {lang === 'ja' ? '宮川創' : 'So Miyagawa'}
           </a>

@@ -72,8 +72,8 @@ export function Header({
           </svg>
         </div>
         <div className="header-title-text">
-          <span className="header-title-main">NDLOCR-Lite</span>
-          <span className="header-title-accent">Web AI Deluxe</span>
+          <span className="header-title-main">NDL-OCR Lite</span>
+          <span className="header-title-accent">AI Ultra</span>
         </div>
         <span className="header-version header-version-pulse">v0.1.0</span>
       </button>

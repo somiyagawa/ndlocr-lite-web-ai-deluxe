@@ -1,5 +1,5 @@
 /**
- * Image Preprocessing Module for NDLOCR-Lite Web AI Deluxe
+ * Image Preprocessing Module for NDL-OCR Lite AI Ultra
  * Provides comprehensive image manipulation using Canvas API
  * Optimized for historical Japanese document OCR
  */
