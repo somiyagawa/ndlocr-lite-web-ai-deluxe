@@ -12,7 +12,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: '概要',
         body:
-          'NDL-OCR Lite AI Ultra は、国立国会図書館の NDLOCR-Lite をベースにしたブラウザ完結型の OCR（光学文字認識）Web アプリです。画像内の文字をテキストに変換します。画像はサーバーに送信されず、すべてブラウザ内で処理されます。',
+          'NDLOCR-lite Web AI: Model BLUEPOND は、国立国会図書館の NDLOCR-Lite をベースにしたブラウザ完結型の OCR（光学文字認識）Web アプリです。画像内の文字をテキストに変換します。画像はサーバーに送信されず、すべてブラウザ内で処理されます。',
       },
       {
         heading: '画像の読み込み',
@@ -102,7 +102,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: 'Overview',
         body:
-          'NDL-OCR Lite AI Ultra is a browser-based OCR (Optical Character Recognition) web application based on the National Diet Library\'s NDLOCR-Lite. It converts text within images into editable text. All processing happens in your browser — no images are sent to a server.',
+          'NDLOCR-lite Web AI: Model BLUEPOND is a browser-based OCR (Optical Character Recognition) web application based on the National Diet Library\'s NDLOCR-Lite. It converts text within images into editable text. All processing happens in your browser — no images are sent to a server.',
       },
       {
         heading: 'Loading Images',
