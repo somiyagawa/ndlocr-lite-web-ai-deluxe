@@ -168,7 +168,7 @@ export function TextEditor({
     setSaved(true)
   }
 
-  // ブロック選択時のハイライト＆スクロール
+  // ブロック選択時のハイライト＆中央スクロール
   useEffect(() => {
     const ta = textareaRef.current
     if (!ta || !displayText) return
@@ -187,10 +187,8 @@ export function TextEditor({
     }
 
     // displayText 内でターゲットテキストの位置を探す
-    // 完全一致を試み、なければ各行の最初の一致を探す
     let start = displayText.indexOf(targetText)
     if (start === -1) {
-      // 複数行テキストの場合、最初の行で検索
       const firstLine = targetText.split('\n')[0].trim()
       if (firstLine) {
         start = displayText.indexOf(firstLine)
@@ -207,11 +205,31 @@ export function TextEditor({
     // ハイライト範囲を設定
     setHighlightRange({ start, end })
 
-    // textarea にフォーカスして選択範囲を設定（スクロールが自動で起こる）
+    // textarea にフォーカスして選択範囲を設定
     ta.focus()
     ta.setSelectionRange(start, end)
 
-    // 自動消去タイマーをリセット
+    // 対象箇所がビューポート中央に来るようスクロール
+    // テキストの行番号を計算し、その行が中央に来るようにする
+    const textBefore = displayText.slice(0, start)
+    const lineIndex = textBefore.split('\n').length - 1
+    const computedStyle = window.getComputedStyle(ta)
+    const lineHeight = parseFloat(computedStyle.lineHeight) || (parseFloat(computedStyle.fontSize) * 1.9)
+
+    if (isVertical) {
+      // 縦書き: 横スクロールで中央に寄せる
+      // 行は右→左に並ぶので、scrollLeft を調整
+      const colOffset = lineIndex * lineHeight
+      const targetScrollLeft = ta.scrollWidth - colOffset - ta.clientWidth / 2
+      ta.scrollLeft = Math.max(0, targetScrollLeft)
+    } else {
+      // 横書き: 縦スクロールで中央に寄せる
+      const targetY = lineIndex * lineHeight
+      const centerOffset = ta.clientHeight / 2
+      ta.scrollTop = Math.max(0, targetY - centerOffset)
+    }
+
+    // 自動消去タイマー
     if (highlightTimerRef.current) {
       clearTimeout(highlightTimerRef.current)
     }
@@ -753,23 +771,6 @@ export function TextEditor({
 
       {/* メイン: テキストエリア or 差分表示 */}
       <div className="text-editor-body">
-        {/* 選択ブロックの浮動オーバーレイ表示 */}
-        {selectedPageBlockText != null && (
-          <div className="text-editor-selection-float">
-            <span className="text-editor-selection-float-label">
-              {lang === 'ja' ? 'ブロック' : 'Block'}
-            </span>
-            <span className="text-editor-selection-float-text">{selectedPageBlockText || '(空)'}</span>
-          </div>
-        )}
-        {selectedBlock && selectedPageBlockText == null && (
-          <div className="text-editor-selection-float">
-            <span className="text-editor-selection-float-label">
-              {lang === 'ja' ? '選択' : 'Selected'}
-            </span>
-            <span className="text-editor-selection-float-text">{selectedBlock.text || '(空)'}</span>
-          </div>
-        )}
         {result.textBlocks.length === 0 ? (
           <p className="text-editor-empty-text">
             {lang === 'ja' ? 'テキストが検出されませんでした' : 'No text detected'}
