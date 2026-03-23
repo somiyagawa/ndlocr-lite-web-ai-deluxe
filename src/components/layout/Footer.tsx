@@ -63,7 +63,10 @@ export function Footer({ lang }: FooterProps) {
         </div>
         <div className="footer-credit-line">
           {lang === 'ja' ? 'AI校正機能: ' : 'AI proofreading: '}
-          {lang === 'ja' ? '小形克宏（一般社団法人ビブリオスタイル）' : 'Katsuhiro Ogata (Bibliostyle)'}
+          <a href="https://github.com/ogwata/ndlocr-lite-web-ai" target="_blank" rel="noopener noreferrer">
+            {lang === 'ja' ? '小形克宏' : 'Katsuhiro Ogata'}
+          </a>
+          {lang === 'ja' ? '（一般社団法人ビブリオスタイル）' : ' (Bibliostyle)'}
         </div>
         <div className="footer-credit-line">
           {lang === 'ja' ? 'Ultra機能（ダークモード、UIデザイン改修、画像前処理、縦書き表示、多言語UI、エクスポート拡張、処理履歴等）: ' : 'Ultra features (dark mode, UI design, image preprocessing, vertical text, i18n, export, history, etc.): '}
