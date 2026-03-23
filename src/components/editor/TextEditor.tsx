@@ -98,14 +98,17 @@ export function TextEditor({
   // Character count
   const charCount = displayText.length
 
+  const prevDisplayTextRef = useRef(displayText)
+  prevDisplayTextRef.current = displayText
+
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value
-      const currentText = displayText
+      const currentText = prevDisplayTextRef.current
 
       // Add current text to undo stack before changing
       if (currentText !== newText) {
-        setUndoStack([...undoStack, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
+        setUndoStack(prev => [...prev, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
         setRedoStack([])
         setSaved(false)
       }
@@ -113,7 +116,7 @@ export function TextEditor({
       setEditedText(newText)
       onTextChange?.(newText)
     },
-    [onTextChange, displayText, undoStack],
+    [onTextChange],
   )
 
   // Scroll sync for line numbers
@@ -256,70 +259,82 @@ export function TextEditor({
     setSaved(true)
   }
 
-  const handleUndo = () => {
-    if (undoStack.length === 0) return
-    const newStack = [...undoStack]
-    const prevEntry = newStack.pop()!
-    if (!prevEntry) return
+  const handleUndo = useCallback(() => {
+    setUndoStack(prev => {
+      if (prev.length === 0) return prev
+      const newStack = [...prev]
+      const prevEntry = newStack.pop()!
 
-    setRedoStack([...redoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
-    setUndoStack(newStack)
-    setEditedText(prevEntry.text)
-    onTextChange?.(prevEntry.text)
+      // 現在のテキストを redo に保存
+      const currentText = textareaRef.current?.value ?? ''
+      setRedoStack(r => [...r, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
+      setEditedText(prevEntry.text)
+      onTextChange?.(prevEntry.text)
+      setSaved(false)
 
-    // Restore cursor position
-    setTimeout(() => {
-      if (textareaRef.current && prevEntry.cursorPos !== undefined) {
-        textareaRef.current.selectionStart = prevEntry.cursorPos
-        textareaRef.current.selectionEnd = prevEntry.cursorPos
-      }
-    }, 0)
-  }
+      setTimeout(() => {
+        if (textareaRef.current && prevEntry.cursorPos !== undefined) {
+          textareaRef.current.selectionStart = prevEntry.cursorPos
+          textareaRef.current.selectionEnd = prevEntry.cursorPos
+        }
+      }, 0)
 
-  const handleRedo = () => {
-    if (redoStack.length === 0) return
-    const newStack = [...redoStack]
-    const nextEntry = newStack.pop()!
-    if (!nextEntry) return
+      return newStack
+    })
+  }, [onTextChange])
 
-    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
-    setRedoStack(newStack)
-    setEditedText(nextEntry.text)
-    onTextChange?.(nextEntry.text)
+  const handleRedo = useCallback(() => {
+    setRedoStack(prev => {
+      if (prev.length === 0) return prev
+      const newStack = [...prev]
+      const nextEntry = newStack.pop()!
 
-    // Restore cursor position
-    setTimeout(() => {
-      if (textareaRef.current && nextEntry.cursorPos !== undefined) {
-        textareaRef.current.selectionStart = nextEntry.cursorPos
-        textareaRef.current.selectionEnd = nextEntry.cursorPos
-      }
-    }, 0)
-  }
+      const currentText = textareaRef.current?.value ?? ''
+      setUndoStack(u => [...u, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
+      setEditedText(nextEntry.text)
+      onTextChange?.(nextEntry.text)
+      setSaved(false)
 
-  const handleRemoveEmptyLines = () => {
-    const newText = displayText
-      .split('\n')
-      .filter((line) => line.trim().length > 0)
-      .join('\n')
-    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
+      setTimeout(() => {
+        if (textareaRef.current && nextEntry.cursorPos !== undefined) {
+          textareaRef.current.selectionStart = nextEntry.cursorPos
+          textareaRef.current.selectionEnd = nextEntry.cursorPos
+        }
+      }, 0)
+
+      return newStack
+    })
+  }, [onTextChange])
+
+  // テキスト変換ヘルパー（undo stack に保存してから変換を適用）
+  const applyTextTransform = useCallback((transform: (text: string) => string) => {
+    const currentText = textareaRef.current?.value ?? displayText
+    const newText = transform(currentText)
+    if (newText === currentText) return
+    setUndoStack(prev => [...prev, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
     setRedoStack([])
     setEditedText(newText)
     onTextChange?.(newText)
     setSaved(false)
-  }
+  }, [displayText, onTextChange])
 
-  const handleJoinLines = () => {
-    const newText = displayText
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .join(' ')
-    setUndoStack([...undoStack, { text: displayText, cursorPos: textareaRef.current?.selectionStart }])
-    setRedoStack([])
-    setEditedText(newText)
-    onTextChange?.(newText)
-    setSaved(false)
-  }
+  const handleRemoveEmptyLines = useCallback(() => {
+    applyTextTransform(text =>
+      text.split('\n').filter(line => line.trim().length > 0).join('\n')
+    )
+  }, [applyTextTransform])
+
+  const handleJoinLines = useCallback(() => {
+    applyTextTransform(text =>
+      text.split('\n').map(line => line.trim()).filter(line => line.length > 0).join(' ')
+    )
+  }, [applyTextTransform])
+
+  const handleRestoreNewlines = useCallback(() => {
+    // スペース区切りの結合テキストを、句読点・段落構造を手がかりに改行を復元
+    // 簡易的に実装：直前の undo 操作（元に戻す）で対応
+    handleUndo()
+  }, [handleUndo])
 
   // Export menu: close on click outside
   useEffect(() => {
@@ -566,6 +581,20 @@ export function TextEditor({
               <polyline points="5 5 2 8 5 11" fill="none" />
               <polyline points="11 5 14 8 11 11" fill="none" />
             </svg>
+          </button>
+
+          <button
+            className="btn btn-sm btn-text-toggle"
+            onClick={handleRestoreNewlines}
+            disabled={undoStack.length === 0}
+            title={lang === 'ja' ? '直前の操作を元に戻す（改行の復元等）' : 'Undo last operation (restore newlines, etc.)'}
+            aria-label="Restore"
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
+              <path d="M4 7h6a3 3 0 0 1 0 6H8" />
+              <polyline points="7 4 4 7 7 10" fill="none" />
+            </svg>
+            {lang === 'ja' ? '元に戻す' : 'Undo'}
           </button>
         </div>
 
