@@ -53,7 +53,7 @@ export const Header = memo(function Header({
     ja: '\u{1F1EF}\u{1F1F5}',      // 🇯🇵
     en: '\u{1F1EC}\u{1F1E7}',      // 🇬🇧
     'zh-CN': '\u{1F1E8}\u{1F1F3}', // 🇨🇳
-    'zh-TW': '\u{1F1ED}\u{1F1FA}', // 🇭🇰
+    'zh-TW': '\u{1F1ED}\u{1F1F0}', // 🇭🇰
     ko: '\u{1F1F0}\u{1F1F7}',      // 🇰🇷
     la: '\u{1F3DB}\uFE0F',          // 🏛️
     eo: '\u{1F30D}',                // 🌍
