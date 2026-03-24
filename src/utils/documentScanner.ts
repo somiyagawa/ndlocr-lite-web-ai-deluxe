@@ -443,184 +443,313 @@ function invertHomography(H: number[]): number[] {
 // ============================================================================
 
 /**
- * Improved curved page dewarping.
+ * Curved page dewarping — unified approach for horizontal & vertical text.
+ *
+ * Book page curvature causes Y-displacement that varies across X (distance
+ * from spine). This function detects and corrects that curvature.
  *
  * Strategy:
- * 1. Detect horizontal text lines via row projection peaks
- * 2. Track each text line's y-position across horizontal segments
- * 3. Compute the curvature shift per column by averaging deviations
- * 4. Remap pixels to straighten the curve
- *
- * This handles moderate page curvature (e.g. book pages photographed from above).
+ * 1. Compute Otsu threshold on central region (avoids edge/shadow bias)
+ * 2. Detect text orientation (vertical vs horizontal) via projection variance
+ * 3. Divide page into N vertical strips
+ * 4. For horizontal text: track text-line Y-positions across strips
+ *    For vertical text: track text-band top/bottom edges across strips
+ * 5. Compute, smooth, and cap per-strip Y-shifts
+ * 6. Remap pixels with bilinear interpolation
  */
 export function dewarpPage(imageData: ImageData): ImageData {
   const { data, width, height } = imageData
   const gray = toGrayscale(imageData)
 
-  // 1. Adaptive threshold: compute Otsu's threshold
+  // 1. Otsu threshold on central 60% region
+  const marginX = Math.round(width * 0.2)
+  const marginY = Math.round(height * 0.2)
   const histogram = new Int32Array(256)
-  for (let i = 0; i < gray.length; i++) histogram[gray[i]]++
-  const total = gray.length
+  let centralPixelCount = 0
+  for (let y = marginY; y < height - marginY; y++) {
+    for (let x = marginX; x < width - marginX; x++) {
+      histogram[Math.round(gray[y * width + x])]++
+      centralPixelCount++
+    }
+  }
   let sumAll = 0
   for (let i = 0; i < 256; i++) sumAll += i * histogram[i]
   let sumBg = 0, wBg = 0, maxVariance = 0, threshold = 128
   for (let i = 0; i < 256; i++) {
     wBg += histogram[i]
     if (wBg === 0) continue
-    const wFg = total - wBg
+    const wFg = centralPixelCount - wBg
     if (wFg === 0) break
     sumBg += i * histogram[i]
     const meanBg = sumBg / wBg
     const meanFg = (sumAll - sumBg) / wFg
-    const variance = wBg * wFg * (meanBg - meanFg) * (meanBg - meanFg)
-    if (variance > maxVariance) {
-      maxVariance = variance
-      threshold = i
+    const v = wBg * wFg * (meanBg - meanFg) ** 2
+    if (v > maxVariance) { maxVariance = v; threshold = i }
+  }
+  threshold = Math.min(threshold, 180)
+
+  // 2. Detect text orientation
+  const cxStart = Math.round(width * 0.15)
+  const cxEnd = Math.round(width * 0.85)
+  const cyStart = Math.round(height * 0.15)
+  const cyEnd = Math.round(height * 0.85)
+  const cw = cxEnd - cxStart
+  const ch = cyEnd - cyStart
+
+  const rowProj = new Float32Array(ch)
+  for (let y = 0; y < ch; y++) {
+    let cnt = 0
+    for (let x = 0; x < cw; x++) {
+      if (gray[(y + cyStart) * width + (x + cxStart)] < threshold) cnt++
     }
+    rowProj[y] = cnt / cw
   }
-
-  // 2. Compute row-wise dark pixel density to find text lines
-  const rowDensity = new Float32Array(height)
-  for (let y = 0; y < height; y++) {
-    let darkCount = 0
-    for (let x = 0; x < width; x++) {
-      if (gray[y * width + x] < threshold) darkCount++
+  const colProj = new Float32Array(cw)
+  for (let x = 0; x < cw; x++) {
+    let cnt = 0
+    for (let y = 0; y < ch; y++) {
+      if (gray[(y + cyStart) * width + (x + cxStart)] < threshold) cnt++
     }
-    rowDensity[y] = darkCount / width
+    colProj[x] = cnt / ch
   }
 
-  // 3. Find text line positions as peaks in row density
-  // Smooth row density first
-  const smoothedDensity = new Float32Array(height)
-  const smoothRadius = Math.max(2, Math.round(height / 200))
-  for (let y = 0; y < height; y++) {
-    let sum = 0, count = 0
-    for (let k = Math.max(0, y - smoothRadius); k <= Math.min(height - 1, y + smoothRadius); k++) {
-      sum += rowDensity[k]
-      count++
-    }
-    smoothedDensity[y] = sum / count
+  const projVariance = (arr: Float32Array) => {
+    let s = 0, sq = 0
+    for (let i = 0; i < arr.length; i++) { s += arr[i]; sq += arr[i] * arr[i] }
+    const m = s / arr.length
+    return sq / arr.length - m * m
   }
+  const rowVar = projVariance(rowProj)
+  const colVar = projVariance(colProj)
+  const isVerticalText = colVar > rowVar * 1.2
 
-  // Detect peaks: find rows where density is a local maximum and above average
-  let avgDensity = 0
-  for (let y = 0; y < height; y++) avgDensity += smoothedDensity[y]
-  avgDensity /= height
-  const peakThreshold = avgDensity * 0.5
-
-  const textLineYs: number[] = []
-  const minLineGap = Math.max(5, Math.round(height / 80))
-  for (let y = minLineGap; y < height - minLineGap; y++) {
-    if (smoothedDensity[y] > peakThreshold &&
-        smoothedDensity[y] >= smoothedDensity[y - 1] &&
-        smoothedDensity[y] >= smoothedDensity[y + 1]) {
-      if (textLineYs.length === 0 || y - textLineYs[textLineYs.length - 1] >= minLineGap) {
-        textLineYs.push(y)
-      }
-    }
-  }
-
-  // If too few lines detected, return original
-  if (textLineYs.length < 3) {
-    return imageData
-  }
-
-  // 4. For each text line, track its y-position across horizontal segments
+  // 3–4. Compute per-strip Y-shifts
+  //   For BOTH orientations, curvature causes Y-shift that varies by X.
+  //   We divide into vertical strips and measure curvature in each strip.
   const numSegments = 24
   const segWidth = Math.floor(width / numSegments)
-  // shiftPerSegment[seg] accumulates deviations from each line's mean
   const shiftSum = new Float32Array(numSegments)
   const shiftCount = new Int32Array(numSegments)
 
-  for (const lineY of textLineYs) {
-    // Search window around the global line position
-    const searchHalf = Math.max(10, Math.round(height / 40))
-    const yMin = Math.max(0, lineY - searchHalf)
-    const yMax = Math.min(height - 1, lineY + searchHalf)
+  if (!isVerticalText) {
+    // Horizontal text: detect text lines, track Y-position across X-strips
+    const smoothedRow = new Float32Array(ch)
+    const rowSmooth = Math.max(2, Math.round(ch / 150))
+    for (let y = 0; y < ch; y++) {
+      let s = 0, c = 0
+      for (let k = Math.max(0, y - rowSmooth); k <= Math.min(ch - 1, y + rowSmooth); k++) {
+        s += rowProj[k]; c++
+      }
+      smoothedRow[y] = s / c
+    }
 
-    // Find the local peak y in each segment
-    const localYs = new Float32Array(numSegments)
-    const localValid = new Uint8Array(numSegments)
+    let avgRowDensity = 0
+    for (let y = 0; y < ch; y++) avgRowDensity += smoothedRow[y]
+    avgRowDensity /= ch
+    const peakThresh = avgRowDensity * 1.2
+
+    const textLineYs: number[] = []
+    const minLineGap = Math.max(8, Math.round(ch / 40))
+    for (let y = 2; y < ch - 2; y++) {
+      if (smoothedRow[y] > peakThresh &&
+          smoothedRow[y] >= smoothedRow[y - 1] &&
+          smoothedRow[y] >= smoothedRow[y + 1]) {
+        if (textLineYs.length === 0 || y - textLineYs[textLineYs.length - 1] >= minLineGap) {
+          textLineYs.push(y + cyStart)
+        }
+      }
+    }
+
+    if (textLineYs.length < 3) return imageData
+
+    for (const lineY of textLineYs) {
+      const searchHalf = Math.max(8, Math.round(height / 50))
+      const yMin = Math.max(0, lineY - searchHalf)
+      const yMax = Math.min(height - 1, lineY + searchHalf)
+
+      const localYs = new Float32Array(numSegments)
+      const localValid = new Uint8Array(numSegments)
+
+      for (let s = 0; s < numSegments; s++) {
+        const x0 = s * segWidth
+        const x1 = Math.min(x0 + segWidth, width)
+        let bestY = lineY, bestDensity = 0
+
+        for (let y = yMin; y <= yMax; y++) {
+          let darkCnt = 0
+          for (let x = x0; x < x1; x++) {
+            if (gray[y * width + x] < threshold) darkCnt++
+          }
+          if (darkCnt > bestDensity) { bestDensity = darkCnt; bestY = y }
+        }
+
+        if (bestDensity > (x1 - x0) * 0.03) {
+          localYs[s] = bestY
+          localValid[s] = 1
+        }
+      }
+
+      let meanY = 0, validCnt = 0
+      for (let s = 0; s < numSegments; s++) {
+        if (localValid[s]) { meanY += localYs[s]; validCnt++ }
+      }
+      if (validCnt < numSegments * 0.3) continue
+      meanY /= validCnt
+
+      for (let s = 0; s < numSegments; s++) {
+        if (localValid[s]) {
+          shiftSum[s] += localYs[s] - meanY
+          shiftCount[s]++
+        }
+      }
+    }
+  } else {
+    // Vertical text: track text-band edges across vertical strips.
+    // For each strip, find the topmost and bottommost rows with significant
+    // dark pixel density. The midpoint of (top, bottom) reveals page curvature.
+    const minDarkRatio = 0.02
+
+    const stripMidYs = new Float32Array(numSegments)
+    const stripValid = new Uint8Array(numSegments)
 
     for (let s = 0; s < numSegments; s++) {
       const x0 = s * segWidth
       const x1 = Math.min(x0 + segWidth, width)
-      let bestY = lineY
-      let bestDensity = 0
+      const sw = x1 - x0
+      if (sw < 4) continue
 
-      for (let y = yMin; y <= yMax; y++) {
-        let darkCount = 0
+      // Row-wise dark pixel density within this strip
+      let topEdge = -1, bottomEdge = -1
+      for (let y = 0; y < height; y++) {
+        let darkCnt = 0
         for (let x = x0; x < x1; x++) {
-          if (gray[y * width + x] < threshold) darkCount++
+          if (gray[y * width + x] < threshold) darkCnt++
         }
-        if (darkCount > bestDensity) {
-          bestDensity = darkCount
-          bestY = y
+        if (darkCnt / sw > minDarkRatio) {
+          if (topEdge < 0) topEdge = y
+          bottomEdge = y
         }
       }
 
-      // Only use if there's enough signal
-      if (bestDensity > (x1 - x0) * 0.02) {
-        localYs[s] = bestY
-        localValid[s] = 1
+      if (topEdge >= 0 && bottomEdge > topEdge + height * 0.1) {
+        stripMidYs[s] = (topEdge + bottomEdge) / 2
+        stripValid[s] = 1
       }
     }
 
-    // Compute the mean y for this line across valid segments
-    let meanY = 0, validCount = 0
+    // Compute mean midpoint across valid strips
+    let meanMid = 0, validCnt = 0
     for (let s = 0; s < numSegments; s++) {
-      if (localValid[s]) {
-        meanY += localYs[s]
-        validCount++
+      if (stripValid[s]) { meanMid += stripMidYs[s]; validCnt++ }
+    }
+    if (validCnt < numSegments * 0.3) return imageData
+    meanMid /= validCnt
+
+    // The midpoint deviation IS the curvature signal
+    for (let s = 0; s < numSegments; s++) {
+      if (stripValid[s]) {
+        shiftSum[s] = stripMidYs[s] - meanMid
+        shiftCount[s] = 1
       }
     }
-    if (validCount < numSegments * 0.4) continue
-    meanY /= validCount
 
-    // Accumulate deviation from line mean into shift arrays
+    // Also cross-validate with Y-centroid of dark pixels per strip
+    // (complementary signal — robust for pages where text area is uniform)
+    const stripCentroidYs = new Float32Array(numSegments)
+    const centroidValid = new Uint8Array(numSegments)
     for (let s = 0; s < numSegments; s++) {
-      if (localValid[s]) {
-        shiftSum[s] += localYs[s] - meanY
-        shiftCount[s]++
+      const x0 = s * segWidth
+      const x1 = Math.min(x0 + segWidth, width)
+      let sumY = 0, sumW = 0
+      for (let y = Math.round(height * 0.1); y < Math.round(height * 0.9); y++) {
+        let darkCnt = 0
+        for (let x = x0; x < x1; x++) {
+          if (gray[y * width + x] < threshold) darkCnt++
+        }
+        sumY += y * darkCnt
+        sumW += darkCnt
+      }
+      if (sumW > 0) {
+        stripCentroidYs[s] = sumY / sumW
+        centroidValid[s] = 1
+      }
+    }
+
+    let meanCentroid = 0
+    let centroidCnt = 0
+    for (let s = 0; s < numSegments; s++) {
+      if (centroidValid[s]) { meanCentroid += stripCentroidYs[s]; centroidCnt++ }
+    }
+    if (centroidCnt > numSegments * 0.3) {
+      meanCentroid /= centroidCnt
+      // Average with the edge-based signal for robustness
+      for (let s = 0; s < numSegments; s++) {
+        if (centroidValid[s]) {
+          const centroidShift = stripCentroidYs[s] - meanCentroid
+          if (shiftCount[s] > 0) {
+            shiftSum[s] = (shiftSum[s] + centroidShift) / 2
+          } else {
+            shiftSum[s] = centroidShift
+            shiftCount[s] = 1
+          }
+        }
       }
     }
   }
 
-  // 5. Average the shifts across all text lines
+  // 5. Smooth shifts (kernel width 5 for smoother curve)
   const rawShifts = new Float32Array(numSegments)
   for (let s = 0; s < numSegments; s++) {
     rawShifts[s] = shiftCount[s] > 0 ? shiftSum[s] / shiftCount[s] : 0
   }
 
-  // Smooth the shift curve with a wider kernel
-  const smoothShifts = new Float32Array(numSegments)
+  // Fill gaps (interpolate from neighbors)
   for (let s = 0; s < numSegments; s++) {
-    let sum = 0, count = 0
-    for (let k = Math.max(0, s - 3); k <= Math.min(numSegments - 1, s + 3); k++) {
-      sum += rawShifts[k]
-      count++
+    if (shiftCount[s] === 0) {
+      let left = -1, right = -1
+      for (let k = s - 1; k >= 0; k--) { if (shiftCount[k] > 0) { left = k; break } }
+      for (let k = s + 1; k < numSegments; k++) { if (shiftCount[k] > 0) { right = k; break } }
+      if (left >= 0 && right >= 0) {
+        const t = (s - left) / (right - left)
+        rawShifts[s] = rawShifts[left] * (1 - t) + rawShifts[right] * t
+      } else if (left >= 0) {
+        rawShifts[s] = rawShifts[left]
+      } else if (right >= 0) {
+        rawShifts[s] = rawShifts[right]
+      }
     }
-    smoothShifts[s] = sum / count
   }
 
-  // Check if the max shift is significant enough to warrant dewarping
+  const smoothShifts = new Float32Array(numSegments)
+  const smoothKernel = 4
+  for (let s = 0; s < numSegments; s++) {
+    let sum = 0, cnt = 0
+    for (let k = Math.max(0, s - smoothKernel); k <= Math.min(numSegments - 1, s + smoothKernel); k++) {
+      sum += rawShifts[k]; cnt++
+    }
+    smoothShifts[s] = sum / cnt
+  }
+
+  // Check significance
   let maxShift = 0
   for (let s = 0; s < numSegments; s++) {
     maxShift = Math.max(maxShift, Math.abs(smoothShifts[s]))
   }
-  if (maxShift < 2) {
-    // Negligible curvature, return original
-    return imageData
+  if (maxShift < 1.5) return imageData
+
+  // Cap to reasonable range
+  const maxAllowedShift = Math.min(height * 0.05, 40)
+  for (let s = 0; s < numSegments; s++) {
+    smoothShifts[s] = Math.max(-maxAllowedShift, Math.min(maxAllowedShift, smoothShifts[s]))
   }
 
-  // 6. Remap pixels
+  // 6. Remap pixels — Y-shift always varies by X-position (for both orientations)
   const { ctx } = createCanvas(width, height)
   const outImageData = ctx.createImageData(width, height)
   const outData = outImageData.data
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      // Interpolate shift for this x position
       const segF = (x / width) * (numSegments - 1)
       const s0 = Math.floor(segF)
       const s1 = Math.min(s0 + 1, numSegments - 1)
@@ -632,23 +761,16 @@ export function dewarpPage(imageData: ImageData): ImageData {
       const frac = srcY - srcYi
 
       if (srcYi < 0 || srcYi >= height - 1) {
-        // Out of bounds → white
         const di = (y * width + x) * 4
-        outData[di] = 255
-        outData[di + 1] = 255
-        outData[di + 2] = 255
-        outData[di + 3] = 255
+        outData[di] = 255; outData[di + 1] = 255; outData[di + 2] = 255; outData[di + 3] = 255
         continue
       }
 
       const di = (y * width + x) * 4
       const si0 = (srcYi * width + x) * 4
       const si1 = ((srcYi + 1) * width + x) * 4
-
-      for (let ch = 0; ch < 4; ch++) {
-        outData[di + ch] = Math.round(
-          data[si0 + ch] * (1 - frac) + data[si1 + ch] * frac
-        )
+      for (let c = 0; c < 4; c++) {
+        outData[di + c] = Math.round(data[si0 + c] * (1 - frac) + data[si1 + c] * frac)
       }
     }
   }
