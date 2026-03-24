@@ -3064,7 +3064,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Mobile (max-width: 480px) ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   /* ── Header Compression ── */
   .header {
     flex-wrap: wrap;
@@ -4304,7 +4304,7 @@ button.ai-status-clickable .ai-status-text {
   height: 24px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .header-hamburger {
     display: flex;
   }
@@ -4339,7 +4339,7 @@ button.ai-status-clickable .ai-status-text {
   display: none;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .drawer-label {
     display: inline;
     font-size: 0.9rem;
@@ -4493,7 +4493,7 @@ button.ai-status-clickable .ai-status-text {
   height: 24px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .fab {
     display: flex;
   }
@@ -4504,7 +4504,7 @@ button.ai-status-clickable .ai-status-text {
   display: none;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .split-view-tabs {
     display: flex;
     gap: 0;
@@ -4542,7 +4542,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── History Panel Bottom Sheet (Mobile) ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .history-panel-container {
     position: fixed;
     bottom: 0;
@@ -4596,7 +4596,7 @@ button.ai-status-clickable .ai-status-text {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .modal {
     padding: 0;
   }
@@ -4639,7 +4639,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Form Inputs for Mobile ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   input[type="text"],
   input[type="password"],
   input[type="email"],
@@ -4666,7 +4666,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Status Bar Vertical Stack (Mobile) ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .status-bar {
     flex-direction: column;
     gap: 0.5rem;
@@ -4680,7 +4680,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Diff View Optimizations ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .diff-view {
     font-size: 0.85rem;
   }
@@ -4703,7 +4703,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Dropdown/Select Improvements ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .dropdown-menu {
     position: fixed;
     max-width: 90vw;
@@ -4719,7 +4719,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Scrollbar Customization (if needed) ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -4740,7 +4740,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 /* ── Spacer/Layout Utilities ── */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .spacer-mobile-only {
     display: block;
   }
