@@ -64,7 +64,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       <div className="splash-content">
         <div className="splash-title">Model BLUEPOND</div>
         <div className="splash-subtitle">NDLOCR-lite Web AI</div>
-        <div className="splash-description">国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの</div>
+        <div className="splash-description">国立国会図書館の縦書きに強い自動書き起こしOCRソフト</div>
         <div className="splash-line" />
       </div>
     </div>
@@ -494,7 +494,7 @@ export default function App() {
               <h1 className="landing-title-main">Model BLUEPOND</h1>
               <p className="landing-title-sub">NDLOCR-lite Web AI</p>
               <p className="landing-title-desc">{L(lang, {
-                ja: '国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの',
+                ja: '国立国会図書館の縦書きに強い自動書き起こしOCRソフト',
                 en: 'A user-friendly adaptation of the National Diet Library\'s Japanese automatic transcription software',
                 'zh-CN': '基于日本国立国会图书馆日语自动转录软件的易用版本',
                 'zh-TW': '基於日本國立國會圖書館日語自動轉錄軟體的易用版本',
@@ -631,7 +631,7 @@ export default function App() {
             <div className="processing-bluepond-title">
               <span className="processing-bluepond-main">Model BLUEPOND</span>
               <span className="processing-bluepond-sub">NDLOCR-lite Web AI</span>
-              <span className="processing-bluepond-desc">国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの</span>
+              <span className="processing-bluepond-desc">国立国会図書館の縦書きに強い自動書き起こしOCRソフト</span>
             </div>
             {isLoadingFiles && fileLoadingState && (
               <div className="file-loading-status">
