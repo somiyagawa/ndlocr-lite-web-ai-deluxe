@@ -487,10 +487,16 @@ export function ImageViewer({
                   title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
                 >
                   {showReadingOrder && (
-                    <span className="region-reading-order">{block.readingOrder + 1}</span>
+                    <span className="region-reading-order">{block.readingOrder}</span>
                   )}
                   {showTextOverlay && (
-                    <span className="region-text-label">{block.text}</span>
+                    <span
+                      className="region-text-label"
+                      style={{
+                        writingMode: block.height > block.width * 1.3 ? 'vertical-rl' : 'horizontal-tb',
+                        textOrientation: block.height > block.width * 1.3 ? 'mixed' : undefined,
+                      }}
+                    >{block.text}</span>
                   )}
                 </div>
               )

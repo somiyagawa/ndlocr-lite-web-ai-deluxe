@@ -4110,8 +4110,7 @@ button.ai-status-clickable .ai-status-text {
   overflow: hidden;
   word-break: break-all;
   text-shadow: 0 0 2px rgba(0,0,0,0.8);
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  /* writing-mode set dynamically via inline style based on block aspect ratio */
   pointer-events: none;
 }
 
