@@ -2185,6 +2185,19 @@ button.ai-status-clickable .ai-status-text {
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
 }
+.export-dropdown-separator {
+  height: 1px;
+  background: var(--color-border-light);
+  margin: 0.3rem 0;
+}
+.export-dropdown-section-label {
+  padding: 0.3rem 0.75rem 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* ── Search bar ── */
 .text-editor-search-bar {
@@ -3708,8 +3721,45 @@ button.ai-status-clickable .ai-status-text {
 
 /* ===== RESULT PROGRESS INLINE ===== */
 .result-progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   padding: 0.5rem 0;
   margin-bottom: 0.75rem;
+}
+.result-progress-inline > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  background: var(--color-danger, #dc3545);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+.btn-stop:hover {
+  background: var(--color-danger-hover, #c82333);
+}
+@media (max-width: 768px) {
+  .btn-stop {
+    padding: 0.3rem 0.6rem;
+    font-size: 0;
+  }
+  .btn-stop svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 /* ===== MODEL LOADING NOTE ===== */

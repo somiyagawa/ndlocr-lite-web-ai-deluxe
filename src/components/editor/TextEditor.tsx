@@ -13,6 +13,7 @@ import { L } from '../../i18n'
 
 interface TextEditorProps {
   result: OCRResult | null
+  allResults?: OCRResult[]
   selectedBlock: TextBlock | null
   selectedPageBlockText: string | null
   lang: Language
@@ -40,6 +41,7 @@ interface UndoRedoEntry {
 
 export function TextEditor({
   result,
+  allResults = [],
   selectedBlock,
   selectedPageBlockText,
   lang,
@@ -386,6 +388,43 @@ export function TextEditor({
     setSaved(true)
   }, [result, editedText, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 全ページ一括エクスポート
+  const handleBatchExport = useCallback((format: 'txt' | 'docx') => {
+    if (allResults.length === 0) return
+    setShowExportMenu(false)
+    if (format === 'txt') {
+      const combined = allResults.map((r, i) => {
+        const text = r.fullText
+        return includeFileName
+          ? `=== [${i + 1}] ${r.fileName} ===\n${ignoreNewlines ? text.replace(/\n/g, '') : text}`
+          : (ignoreNewlines ? text.replace(/\n/g, '') : text)
+      }).join('\n\n')
+      const blob = new Blob([combined], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'ocr_all_pages.txt'
+      a.click()
+      URL.revokeObjectURL(url)
+    } else if (format === 'docx') {
+      // 全ページを1つのDOCXに結合
+      const combined: OCRResult = {
+        id: 'batch',
+        fileName: 'all_pages',
+        imageDataUrl: '',
+        textBlocks: allResults.flatMap(r => r.textBlocks),
+        fullText: allResults.map((r, i) => {
+          const header = includeFileName ? `=== [${i + 1}] ${r.fileName} ===\n` : ''
+          return header + r.fullText
+        }).join('\n\n'),
+        processingTimeMs: 0,
+        createdAt: Date.now(),
+      }
+      downloadDOCX(combined, { includeFileName: false, ignoreNewlines })
+    }
+    setSaved(true)
+  }, [allResults, includeFileName, ignoreNewlines])
+
   // AI校正実行
   const handleProofread = useCallback(async () => {
     if (!aiConnector || !result) return
@@ -682,6 +721,22 @@ export function TextEditor({
                   <span className="export-dropdown-icon">DOCX</span>
                   <span>{L(lang, { ja: 'Word文書 (.docx)', en: 'Word Document (.docx)', 'zh-CN': 'Word文档 (.docx)', 'zh-TW': 'Word文件 (.docx)', ko: 'Word 문서 (.docx)', la: 'Documentum Word (.docx)', eo: 'Word-dokumento (.docx)', es: 'Documento Word (.docx)', de: 'Word-Dokument (.docx)', ar: 'مستند Word (.docx)', hi: 'Word दस्तावेज़ (.docx)' })}</span>
                 </button>
+                {allResults.length > 1 && (
+                  <>
+                    <div className="export-dropdown-separator" />
+                    <div className="export-dropdown-section-label">
+                      {L(lang, { ja: `全${allResults.length}ページ一括`, en: `All ${allResults.length} pages`, 'zh-CN': `全部${allResults.length}页`, 'zh-TW': `全部${allResults.length}頁`, ko: `전체 ${allResults.length}페이지`, la: `Omnes ${allResults.length} paginae`, eo: `Ĉiuj ${allResults.length} paĝoj`, es: `Todas ${allResults.length} páginas`, de: `Alle ${allResults.length} Seiten`, ar: `جميع ${allResults.length} صفحات`, hi: `सभी ${allResults.length} पृष्ठ` })}
+                    </div>
+                    <button className="export-dropdown-item" onClick={() => handleBatchExport('txt')}>
+                      <span className="export-dropdown-icon">TXT</span>
+                      <span>{L(lang, { ja: '全ページ結合 (.txt)', en: 'All pages combined (.txt)', 'zh-CN': '全部页面合并 (.txt)', 'zh-TW': '全部頁面合併 (.txt)', ko: '전체 페이지 결합 (.txt)', la: 'Omnes paginae coniunctae (.txt)', eo: 'Ĉiuj paĝoj kunigitaj (.txt)', es: 'Todas las páginas combinadas (.txt)', de: 'Alle Seiten zusammen (.txt)', ar: 'جميع الصفحات مجتمعة (.txt)', hi: 'सभी पृष्ठ संयुक्त (.txt)' })}</span>
+                    </button>
+                    <button className="export-dropdown-item" onClick={() => handleBatchExport('docx')}>
+                      <span className="export-dropdown-icon">DOCX</span>
+                      <span>{L(lang, { ja: '全ページ結合 (.docx)', en: 'All pages combined (.docx)', 'zh-CN': '全部页面合并 (.docx)', 'zh-TW': '全部頁面合併 (.docx)', ko: '전체 페이지 결합 (.docx)', la: 'Omnes paginae coniunctae (.docx)', eo: 'Ĉiuj paĝoj kunigitaj (.docx)', es: 'Todas las páginas combinadas (.docx)', de: 'Alle Seiten zusammen (.docx)', ar: 'جميع الصفحات مجتمعة (.docx)', hi: 'सभी पृष्ठ संयुक्त (.docx)' })}</span>
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

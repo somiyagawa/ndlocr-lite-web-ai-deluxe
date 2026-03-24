@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react'
 import type { OCRResult, TextBlock, BoundingBox, PageBlock } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { useI18n } from './hooks/useI18n'
@@ -98,6 +98,7 @@ export default function App() {
   const [showAIConnectHelp, setShowAIConnectHelp] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
+  const cancelRef = useRef(false)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
 
   // 領域選択状態
@@ -238,6 +239,7 @@ export default function App() {
       }
 
       // 全体OCR
+      cancelRef.current = false
       setSessionResults([])
       setSelectedResultIndex(0)
       resetState()
@@ -248,6 +250,7 @@ export default function App() {
       const sessionResultsAccum: OCRResult[] = []
 
       for (let i = 0; i < processedImages.length; i++) {
+        if (cancelRef.current) break
         const image = processedImages[i]
         try {
           const result = await processImage(image, i, processedImages.length)
@@ -284,10 +287,15 @@ export default function App() {
 
       setIsProcessing(false)
       setIsReadyToProcess(false)
+      cancelRef.current = false
     }
 
     runOCR()
   }, [isReadyToProcess]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStopProcessing = useCallback(() => {
+    cancelRef.current = true
+  }, [])
 
   const handleClear = () => {
     if (sessionResults.length > 0) {
@@ -656,6 +664,12 @@ export default function App() {
               {isProcessing && (
                 <div className="result-progress-inline">
                   <ProgressBar jobState={jobState} lang={lang} />
+                  <button className="btn btn-stop" onClick={handleStopProcessing} title={L(lang, { ja: '処理を中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें' })}>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <rect x="3" y="3" width="10" height="10" rx="1.5" />
+                    </svg>
+                    {L(lang, { ja: '中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें' })}
+                  </button>
                 </div>
               )}
 
@@ -747,6 +761,7 @@ export default function App() {
                 right={
                   <TextEditor
                     result={currentResult}
+                    allResults={sessionResults}
                     selectedBlock={selectedBlock}
                     selectedPageBlockText={selectedPageBlockText}
                     lang={lang}
