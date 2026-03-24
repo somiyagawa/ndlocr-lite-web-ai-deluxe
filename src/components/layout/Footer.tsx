@@ -52,10 +52,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: 'OCR 엔진: ',
             la: 'Machina OCR: ',
             eo: 'OCR-motoro: ',
-          es: 'Motor OCR: ',
-          de: 'OCR-Engine: ',
-          ar: 'محرك OCR: ',
-          hi: 'OCR इंजन: '
+            es: 'Motor OCR: ',
+            de: 'OCR-Engine: ',
+            ar: 'محرك OCR: ',
+            hi: 'OCR इंजन: ',
+            ru: 'OCR движок: ',
+            el: 'Μηχανή OCR: ',
+            syc: 'ܡܛܪܪܐ OCR: '
           })}
           <a href="https://github.com/ndl-lab/ndlocr-lite" target="_blank" rel="noopener noreferrer">
             NDLOCR-Lite
@@ -68,10 +71,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: ' (일본 국립국회도서관)',
             la: ' (Bibliotheca Nationalis Diaetae Iaponiae)',
             eo: ' (Nacia Dieta Biblioteko de Japanio)',
-          es: ' (Biblioteca Nacional de la Dieta de Japón)',
-          de: ' (Nationalbibliothek des japanischen Parlaments)',
-          ar: ' (المكتبة الوطنية للبرلمان الياباني)',
-          hi: ' (जापान की राष्ट्रीय संसद पुस्तकालय)'
+            es: ' (Biblioteca Nacional de la Dieta de Japón)',
+            de: ' (Nationalbibliothek des japanischen Parlaments)',
+            ar: ' (المكتبة الوطنية للبرلمان الياباني)',
+            hi: ' (जापान की राष्ट्रीय संसद पुस्तकालय)',
+            ru: ' (Национальная библиотека парламента Японии)',
+            el: ' (Εθνική Βιβλιοθήκη του Κοινοβουλίου της Ιαπωνίας)',
+            syc: ' (ܦܪܓܡ̈ܢܐ ܕܐܘܡܬܐ ܕܡܠܟܐ ܕܐܦܢܐ)'
           })}
         </div>
         <div className="footer-credit-line">
@@ -83,10 +89,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: 'Web 포팅: ',
             la: 'Translatio ad Rete: ',
             eo: 'Reta versio: ',
-          es: 'Versión web: ',
-          de: 'Web-Portierung: ',
-          ar: 'إصدار الويب: ',
-          hi: 'वेब पोर्ट: '
+            es: 'Versión web: ',
+            de: 'Web-Portierung: ',
+            ar: 'إصدار الويب: ',
+            hi: 'वेब पोर्ट: ',
+            ru: 'Веб-портал: ',
+            el: 'Έκδοση ιστού: ',
+            syc: 'ܦܪܓܘܡܐ Web: '
           })}
           <a href="https://github.com/yuta1984/ndlocrlite-web" target="_blank" rel="noopener noreferrer">
             {L(lang, {
@@ -97,10 +106,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
               ko: '하시모토 유타',
               la: 'Yuta Hashimoto',
               eo: 'Yuta Hashimoto',
-            es: 'Yuta Hashimoto',
-            de: 'Yuta Hashimoto',
-            ar: 'يوتا هاشيموتو',
-            hi: 'युता हाशिमोतो'
+              es: 'Yuta Hashimoto',
+              de: 'Yuta Hashimoto',
+              ar: 'يوتا هاشيموتو',
+              hi: 'युता हाशिमोतो',
+              ru: 'Юта Хашимото',
+              el: 'Yuta Hashimoto',
+              syc: 'Yuta Hashimoto'
             })}
           </a>
           {L(lang, {
@@ -111,10 +123,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: ' (국립역사민속박물관)',
             la: ' (Museum Nationale Historiae Iaponiae)',
             eo: ' (Nacia Muzeo de Japana Historio)',
-          es: ' (Museo Nacional de Historia de Japón)',
-          de: ' (Nationalmuseum für japanische Geschichte)',
-          ar: ' (المتحف الوطني للتاريخ الياباني)',
-          hi: ' (जापानी इतिहास का राष्ट्रीय संग्रहालय)'
+            es: ' (Museo Nacional de Historia de Japón)',
+            de: ' (Nationalmuseum für japanische Geschichte)',
+            ar: ' (المتحف الوطني للتاريخ الياباني)',
+            hi: ' (जापानी इतिहास का राष्ट्रीय संग्रहालय)',
+            ru: ' (Национальный музей истории Японии)',
+            el: ' (Εθνικό Μουσείο Ιστορίας της Ιαπωνίας)',
+            syc: ' (ܡܘܣܐ ܐܘܡܬܢܐ ܕܬܪܓܡ ܐܦܢܐ)'
           })}
         </div>
         <div className="footer-credit-line">
@@ -126,10 +141,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: 'AI 교정 기능: ',
             la: 'Correctio AI: ',
             eo: 'AI-korektado: ',
-          es: 'Corrección AI: ',
-          de: 'KI-Korrektur: ',
-          ar: 'تصحيح AI: ',
-          hi: 'AI प्रूफ़रीडिंग: '
+            es: 'Corrección AI: ',
+            de: 'KI-Korrektur: ',
+            ar: 'تصحيح AI: ',
+            hi: 'AI प्रूफ़रीडिंग: ',
+            ru: 'Корректура AI: ',
+            el: 'Διόρθωση AI: ',
+            syc: 'ܬܘܪܨܐ AI: '
           })}
           <a href="https://github.com/ogwata/ndlocr-lite-web-ai" target="_blank" rel="noopener noreferrer">
             {L(lang, {
@@ -140,10 +158,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
               ko: '오가타 가쓰히로',
               la: 'Katsuhiro Ogata',
               eo: 'Katsuhiro Ogata',
-            es: 'Katsuhiro Ogata',
-            de: 'Katsuhiro Ogata',
-            ar: 'كاتسوهيرو أوغاتا',
-            hi: 'कात्सुहिरो ओगाटा'
+              es: 'Katsuhiro Ogata',
+              de: 'Katsuhiro Ogata',
+              ar: 'كاتسوهيرو أوغاتا',
+              hi: 'कात्सुहिरो ओगाटा',
+              ru: 'Кацухиро Огата',
+              el: 'Katsuhiro Ogata',
+              syc: 'Katsuhiro Ogata'
             })}
           </a>
           {L(lang, {
@@ -154,10 +175,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: ' (Bibliostyle)',
             la: ' (Bibliostyle)',
             eo: ' (Bibliostyle)',
-          es: ' (Bibliostyle)',
-          de: ' (Bibliostyle)',
-          ar: ' (Bibliostyle)',
-          hi: ' (Bibliostyle)'
+            es: ' (Bibliostyle)',
+            de: ' (Bibliostyle)',
+            ar: ' (Bibliostyle)',
+            hi: ' (Bibliostyle)',
+            ru: ' (Bibliostyle)',
+            el: ' (Bibliostyle)',
+            syc: ' (Bibliostyle)'
           })}
         </div>
         <div className="footer-credit-line">
@@ -169,10 +193,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: '기타 부가 기능 (다크모드, UI 디자인 개선, 이미지 전처리, 세로쓰기, 다국어 UI, 내보내기 확장, 처리 기록 등): ',
             la: 'Alia additamenta (modus obscurus, designatio UI, praeparatio imaginum, textus verticalis, UI multilingue, exportatio, historia, etc.): ',
             eo: 'Aliaj aldonaĵoj (malluma reĝimo, UI-dezajno, bildpretigo, vertikala teksto, plurlingva UI, eksporto, historio, ktp.): ',
-          es: 'Otras funciones adicionales (modo oscuro, diseño UI, preprocesamiento de imágenes, texto vertical, i18n, exportación, historial, etc.): ',
-          de: 'Weitere Funktionen (Dunkelmodus, UI-Design, Bildvorverarbeitung, vertikaler Text, i18n, Export, Verlauf, usw.): ',
-          ar: 'ميزات إضافية أخرى (الوضع الداكن، تصميم الواجهة، معالجة الصور، النص العمودي، تعدد اللغات، التصدير، السجل، إلخ): ',
-          hi: 'अन्य अतिरिक्त सुविधाएँ (डार्क मोड, UI डिज़ाइन, इमेज प्रीप्रोसेसिंग, वर्टिकल टेक्स्ट, i18n, एक्सपोर्ट, इतिहास, आदि): '
+            es: 'Otras funciones adicionales (modo oscuro, diseño UI, preprocesamiento de imágenes, texto vertical, i18n, exportación, historial, etc.): ',
+            de: 'Weitere Funktionen (Dunkelmodus, UI-Design, Bildvorverarbeitung, vertikaler Text, i18n, Export, Verlauf, usw.): ',
+            ar: 'ميزات إضافية أخرى (الوضع الداكن، تصميم الواجهة، معالجة الصور، النص العمودي، تعدد اللغات، التصدير، السجل، إلخ): ',
+            hi: 'अन्य अतिरिक्त सुविधाएँ (डार्क मोड, UI डिज़ाइन, इमेज प्रीप्रोसेसिंग, वर्टिकल टेक्स्ट, i18n, एक्सपोर्ट, इतिहास, आदि): ',
+            ru: 'Прочие дополнительные функции (темный режим, дизайн UI, предварительная обработка изображений, вертикальный текст, i18n, экспорт, история и т.д.): ',
+            el: 'Άλλα έξτρα (σκοτεινή λειτουργία, σχεδιασμό UI, προ-επεξεργασία εικόνας, κάθετο κείμενο, i18n, εξαγωγή, ιστορικό, κλπ.): ',
+            syc: 'ܦܪܘܛܐ ܕܝܬܪܐ (ܓܢܒܐ ܡܠܝܪܐ, ܥܘܠܐ UI, ܩܕܡܦ̈ܘܠܚܐ ܕܨܘܪܐ, ܟܬܒܐ ܪܡܝܐ, i18n, ܦܚܘܪܐ, ܬܫܥܘܬܐ, ܘܐܦ ܠܐ): '
           })}
           <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">
             {L(lang, {
@@ -183,10 +210,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
               ko: '미야가와 소',
               la: 'So Miyagawa',
               eo: 'So Miyagawa',
-            es: 'So Miyagawa',
-            de: 'So Miyagawa',
-            ar: 'سو مياغاوا',
-            hi: 'सो मियागावा'
+              es: 'So Miyagawa',
+              de: 'So Miyagawa',
+              ar: 'سو مياغاوا',
+              hi: 'सो मियागावा',
+              ru: 'Со Мияагава',
+              el: 'So Miyagawa',
+              syc: 'So Miyagawa'
             })}
           </a>
           {L(lang, {
@@ -197,10 +227,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: ' (쓰쿠바 대학)',
             la: ' (Universitas Tsukubensis)',
             eo: ' (Universitato de Tsukuba)',
-          es: ' (Universidad de Tsukuba)',
-          de: ' (Universität Tsukuba)',
-          ar: ' (جامعة تسوكوبا)',
-          hi: ' (त्सुकुबा विश्वविद्यालय)'
+            es: ' (Universidad de Tsukuba)',
+            de: ' (Universität Tsukuba)',
+            ar: ' (جامعة تسوكوبا)',
+            hi: ' (त्सुकुबा विश्वविद्यालय)',
+            ru: ' (Университет Цукуба)',
+            el: ' (Πανεπιστήμιο Tsukuba)',
+            syc: ' (ܓܒ ܕܛܣܟܘܒܐ)'
           })}
         </div>
       </div>
@@ -214,10 +247,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             ko: '아오이케 토오루',
             la: 'Tōru Aoike',
             eo: 'Tōru Aoike',
-          es: 'Toru Aoike',
-          de: 'Toru Aoike',
-          ar: 'تورو أويكي',
-          hi: 'तोरु आओइके'
+            es: 'Toru Aoike',
+            de: 'Toru Aoike',
+            ar: 'تورو أويكي',
+            hi: 'तोरु आओइके',
+            ru: 'Тору Аойке',
+            el: 'Toru Aoike',
+            syc: 'Toru Aoike'
           })}</a>
           if (lang === 'ja') return <>🐸 背景の鳥獣戯画模様は NDLOCR 開発者・{link}先生へのオマージュです</>
           if (lang === 'zh-CN') return <>🐸 背景的鸟兽戏画图案是向NDLOCR开发者{link}先生致敬</>

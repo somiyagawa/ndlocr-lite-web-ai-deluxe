@@ -47,10 +47,13 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           ko: '여기에 파일을 드래그 앤 드롭하거나 클릭하여 선택',
           la: 'Fasciculos hic trahe vel preme ut eligas',
           eo: 'Trenu kaj demetu dosierojn ĉi tien aŭ alklaku por elekti',
-        es: 'Arrastra y suelta archivos aquí, o haz clic para seleccionar',
-        de: 'Dateien hierher ziehen oder klicken zum Auswählen',
-        ar: 'اسحب الملفات وأفلتها هنا، أو انقر للاختيار',
-        hi: 'फ़ाइलें यहाँ खींचें और छोड़ें, या चुनने के लिए क्लिक करें'
+          es: 'Arrastra y suelta archivos aquí, o haz clic para seleccionar',
+          de: 'Dateien hierher ziehen oder klicken zum Auswählen',
+          ar: 'اسحب الملفات وأفلتها هنا، أو انقر للاختيار',
+          hi: 'फ़ाइलें यहाँ खींचें और छोड़ें, या चुनने के लिए क्लिक करें',
+          ru: 'Перетащите файлы сюда или нажмите для выбора',
+          el: 'Σύρετε αρχεία εδώ ή κάντε κλικ για επιλογή',
+          syc: 'ܓܪܘܪ ܩ̈ܛܝܡܐ ܠܗܪܟܐ ܐܘ ܕܘܨ ܠܓܒܝܬܐ'
         })}
       </p>
       <p className="dropzone-text dropzone-text-mobile">
@@ -62,10 +65,13 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           ko: '탭하여 파일 선택',
           la: 'Preme ut fasciculos eligas',
           eo: 'Alpremu por elekti dosierojn',
-        es: 'Toca para seleccionar archivos',
-        de: 'Tippen zum Auswählen',
-        ar: 'اضغط لاختيار الملفات',
-        hi: 'फ़ाइलें चुनने के लिए टैप करें'
+          es: 'Toca para seleccionar archivos',
+          de: 'Tippen zum Auswählen',
+          ar: 'اضغط لاختيار الملفات',
+          hi: 'फ़ाइलें चुनने के लिए टैप करें',
+          ru: 'Нажмите для выбора файлов',
+          el: 'Πατήστε για επιλογή αρχείων',
+          syc: 'ܕܘܨ ܠܓܒܝ ܩ̈ܛܝܡܐ'
         })}
       </p>
       <p className="dropzone-formats dropzone-formats-desktop">
@@ -77,10 +83,13 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           ko: '지원 형식: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V 붙여넣기',
           la: 'Formae acceptae: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V colle',
           eo: 'Subtenataj formatoj: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V alkroĉu',
-        es: 'Formatos: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V para pegar',
-        de: 'Unterstützt: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V zum Einfügen',
-        ar: 'الصيغ المدعومة: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V للصق',
-        hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V पेस्ट करें'
+          es: 'Formatos: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V para pegar',
+          de: 'Unterstützt: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V zum Einfügen',
+          ar: 'الصيغ المدعومة: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V للصق',
+          hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V पेस्ट करें',
+          ru: 'Форматы: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V для вставки',
+          el: 'Υποστηριζόμενα: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V για επικόλληση',
+          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V ܠܐܠܨ̈ܩ'
         })}
       </p>
       <p className="dropzone-formats dropzone-formats-mobile">
@@ -92,10 +101,13 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           ko: '지원 형식: JPG, PNG, TIFF, HEIC, PDF',
           la: 'Formae acceptae: JPG, PNG, TIFF, HEIC, PDF',
           eo: 'Subtenataj formatoj: JPG, PNG, TIFF, HEIC, PDF',
-        es: 'Formatos: JPG, PNG, TIFF, HEIC, PDF',
-        de: 'Unterstützt: JPG, PNG, TIFF, HEIC, PDF',
-        ar: 'الصيغ المدعومة: JPG, PNG, TIFF, HEIC, PDF',
-        hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF'
+          es: 'Formatos: JPG, PNG, TIFF, HEIC, PDF',
+          de: 'Unterstützt: JPG, PNG, TIFF, HEIC, PDF',
+          ar: 'الصيغ المدعومة: JPG, PNG, TIFF, HEIC, PDF',
+          hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF',
+          ru: 'Форматы: JPG, PNG, TIFF, HEIC, PDF',
+          el: 'Υποστηριζόμενα: JPG, PNG, TIFF, HEIC, PDF',
+          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF'
         })}
       </p>
       <input

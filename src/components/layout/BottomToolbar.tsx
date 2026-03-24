@@ -68,10 +68,13 @@ export const BottomToolbar = memo(function BottomToolbar({
               ko: '건 교정',
               la: 'correctiones',
               eo: 'korektoj',
-            es: 'correcciones',
-            de: 'Korrekturen',
-            ar: 'تصحيحات',
-            hi: 'सुधार'
+              es: 'correcciones',
+              de: 'Korrekturen',
+              ar: 'تصحيحات',
+              hi: 'सुधार',
+              ru: 'исправлений',
+              el: 'διορθώσεις',
+              syc: 'ܬܘ̈ܪ̈ܨ̈ܐ'
             })}
           </span>
         )}

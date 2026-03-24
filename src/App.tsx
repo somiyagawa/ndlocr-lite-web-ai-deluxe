@@ -311,7 +311,10 @@ export default function App() {
       es: 'Los resultados OCR actuales se descartarán. ¿Continuar?',
       de: 'Aktuelle OCR-Ergebnisse werden verworfen. Fortfahren?',
       ar: 'سيتم تجاهل نتائج OCR الحالية. هل تريد المتابعة؟',
-      hi: 'वर्तमान OCR परिणाम हटा दिए जाएँगे। जारी रखें?'
+      hi: 'वर्तमान OCR परिणाम हटा दिए जाएँगे। जारी रखें?',
+      ru: 'Текущие результаты OCR будут удалены. Продолжить?',
+      el: 'Τα τρέχοντα αποτελέσματα OCR θα διαγραφούν. Συνέχεια;',
+      syc: 'ܦܠ̈ܛܐ ܕ OCR ܗܠܝܢ ܢܬܫܕܘܢ. ܬܫܪ؟'
       })
       if (!window.confirm(msg)) return
     }
@@ -433,7 +436,7 @@ export default function App() {
           className="btn-page-arrow"
           onClick={() => goTo(index - 1)}
           disabled={index === 0}
-          title={L(lang, { ja: '前のファイル', en: 'Previous', 'zh-CN': '上一个', 'zh-TW': '上一個', ko: '이전', la: 'Prior', eo: 'Antaŭa', es: 'Anterior', de: 'Zurück', ar: 'السابق', hi: 'पिछला' })}
+          title={L(lang, { ja: '前のファイル', en: 'Previous', 'zh-CN': '上一个', 'zh-TW': '上一個', ko: '이전', la: 'Prior', eo: 'Antaŭa', es: 'Anterior', de: 'Zurück', ar: 'السابق', hi: 'पिछला', ru: 'Назад', el: 'Προηγούμενο', syc: 'ܕܩܕܡ' })}
         >‹</button>
         <div className="page-numbers">
           {getPageNumbers().map((p, i) =>
@@ -455,7 +458,7 @@ export default function App() {
           className="btn-page-arrow"
           onClick={() => goTo(index + 1)}
           disabled={index >= maxIndex}
-          title={L(lang, { ja: '次のファイル', en: 'Next', 'zh-CN': '下一个', 'zh-TW': '下一個', ko: '다음', la: 'Proximus', eo: 'Sekva', es: 'Siguiente', de: 'Weiter', ar: 'التالي', hi: 'अगला' })}
+          title={L(lang, { ja: '次のファイル', en: 'Next', 'zh-CN': '下一个', 'zh-TW': '下一個', ko: '다음', la: 'Proximus', eo: 'Sekva', es: 'Siguiente', de: 'Weiter', ar: 'التالي', hi: 'अगला', ru: 'Далее', el: 'Επόμενο', syc: 'ܕܒܬܪ' })}
         >›</button>
         {total > 1 && (
           <span className="page-current-label" title={currentLabel}>
@@ -501,7 +504,10 @@ export default function App() {
                 es: 'Una versión más accesible del software de transcripción automática japonesa de la Biblioteca Nacional de la Dieta',
                 de: 'Eine benutzerfreundliche Anpassung der automatischen japanischen Transkriptionssoftware der Nationalen Parlamentsbibliothek',
                 ar: 'نسخة سهلة الاستخدام من برنامج النسخ التلقائي الياباني لمكتبة البرلمان الوطني',
-                hi: 'राष्ट्रीय डाइट पुस्तकालय के जापानी स्वचालित प्रतिलेखन सॉफ़्टवेयर का उपयोग में आसान संस्करण'
+                hi: 'राष्ट्रीय डाइट पुस्तकालय के जापानी स्वचालित प्रतिलेखन सॉफ़्टवेयर का उपयोग में आसान संस्करण',
+                ru: 'Удобная версия ПО автоматической транскрипции японского языка Национальной парламентской библиотеки',
+                el: 'Μια εύχρηστη έκδοση του λογισμικού αυτόματης μεταγραφής ιαπωνικών της Εθνικής Κοινοβουλευτικής Βιβλιοθήκης',
+                syc: 'ܛܘܦܣ ܦܫܝܩ ܕܬܘܩܢ ܟܬܒ̈ܬ ܝܦܘ̈ܢܝܬܐ ܐܘ̈ܛܘ̈ܡܛܝܬܐ ܕܒܝܬ ܟ̈ܬܒܐ ܕܟܢܘܫܬ ܐܘ̈ܡܬܐ'
               })}</p>
             </div>
             <FileDropZone onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
@@ -513,10 +519,10 @@ export default function App() {
                 disabled={isWorking}
               />
               <button className="btn btn-secondary" onClick={handlePasteFromClipboard} disabled={isWorking}>
-                {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें' })}
+                {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें', ru: 'Вставить из буфера обмена', el: 'Επικόλληση από πρόχειρο', syc: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ' })}
               </button>
               <button className="btn btn-secondary" onClick={handleSampleLoad} disabled={isWorking}>
-                {L(lang, { ja: 'サンプルを試す', en: 'Try Sample', 'zh-CN': '试用示例', 'zh-TW': '試用範例', ko: '샘플 사용해보기', la: 'Exemplum temptare', eo: 'Provi ekzemplon', es: 'Probar ejemplo', de: 'Beispiel ausprobieren', ar: 'تجربة عينة', hi: 'नमूना आज़माएँ' })}
+                {L(lang, { ja: 'サンプルを試す', en: 'Try Sample', 'zh-CN': '试用示例', 'zh-TW': '試用範例', ko: '샘플 사용해보기', la: 'Exemplum temptare', eo: 'Provi ekzemplon', es: 'Probar ejemplo', de: 'Beispiel ausprobieren', ar: 'تجربة عينة', hi: 'नमूना आज़माएँ', ru: 'Попробовать пример', el: 'Δοκιμή δείγματος', syc: 'ܢܣܝ ܕܘ̈ܓܡܐ' })}
               </button>
             </div>
             <span className="bluepond-credit">
@@ -531,7 +537,10 @@ export default function App() {
               es: 'Fondo: Estanque Azul, Biei — MaedaAkihiko, CC BY-SA 4.0',
               de: 'Hintergrund: Blauer Teich, Biei — MaedaAkihiko, CC BY-SA 4.0',
               ar: 'الخلفية: البركة الزرقاء، بيئي — MaedaAkihiko, CC BY-SA 4.0',
-              hi: 'पृष्ठभूमि: ब्लू पॉन्ड, बिएई — MaedaAkihiko, CC BY-SA 4.0'
+              hi: 'पृष्ठभूमि: ब्लू पॉन्ड, बिएई — MaedaAkihiko, CC BY-SA 4.0',
+              ru: 'Фон: Голубой пруд, Биэй — MaedaAkihiko, CC BY-SA 4.0',
+              el: 'Φόντο: Μπλε Λίμνη, Μπιέι — MaedaAkihiko, CC BY-SA 4.0',
+              syc: 'ܨܘܪܬ ܐܦ̈ܐ: ܝܡܬ ܙܪ̈ܩܬܐ، ܒܝܐܝ — MaedaAkihiko, CC BY-SA 4.0'
               })}
             </span>
           </section>
@@ -550,12 +559,12 @@ export default function App() {
                 <div className="pending-viewer-buttons">
                   <button className="btn btn-primary" onClick={() => setIsReadyToProcess(true)}>
                     {selectedRegion
-                      ? L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR' })
-                      : L(lang, { ja: 'OCRを開始', en: 'Start OCR', 'zh-CN': '开始OCR', 'zh-TW': '開始OCR', ko: 'OCR 시작', la: 'OCR incipere', eo: 'Komenci OCR', es: 'Iniciar OCR', de: 'OCR starten', ar: 'بدء OCR', hi: 'OCR शुरू करें' })}
+                      ? L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })
+                      : L(lang, { ja: 'OCRを開始', en: 'Start OCR', 'zh-CN': '开始OCR', 'zh-TW': '開始OCR', ko: 'OCR 시작', la: 'OCR incipere', eo: 'Komenci OCR', es: 'Iniciar OCR', de: 'OCR starten', ar: 'بدء OCR', hi: 'OCR शुरू करें', ru: 'Начать OCR', el: 'Έναρξη OCR', syc: 'ܫܪܝ OCR' })}
                   </button>
                   {selectedRegion && (
                     <button className="btn btn-secondary" onClick={handleClearRegion}>
-                      {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें' })}
+                      {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें', ru: 'Снять выделение', el: 'Εκκαθάριση επιλογής', syc: 'ܫܪܝ ܓܒܝܬܐ' })}
                     </button>
                   )}
                   <button
@@ -565,7 +574,7 @@ export default function App() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
                     </svg>
-                    {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन' })}
+                    {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                   </button>
                 </div>
                 <div className="image-with-preprocess">
@@ -590,7 +599,10 @@ export default function App() {
                         es: 'Arrastra para seleccionar una región, luego haz clic en "Iniciar OCR"',
                         de: 'Ziehen Sie, um einen Bereich auszuwählen, dann klicken Sie auf "OCR starten"',
                         ar: 'اسحب لتحديد منطقة، ثم انقر على "بدء OCR" للتعرف',
-                        hi: 'क्षेत्र चुनने के लिए खींचें, फिर "OCR शुरू करें" पर क्लिक करें'
+                        hi: 'क्षेत्र चुनने के लिए खींचें, फिर "OCR शुरू करें" पर क्लिक करें',
+                        ru: 'Перетащите мышь для выбора области, затем нажмите «Начать OCR»',
+                        el: 'Σύρετε για να επιλέξετε μια περιοχή, μετά κάντε κλικ στο «Έναρξη OCR»',
+                        syc: 'ܓܪܘܪ ܠܓܒܝ ܐܬܪ، ܘܕܘܨ «ܫܪܝ OCR»'
                       })}
                     </p>
                   </div>
@@ -635,7 +647,10 @@ export default function App() {
                         es: `Renderizando ${fileLoadingState.fileName}... (página ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
                         de: `Rendere ${fileLoadingState.fileName}... (Seite ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
                         ar: `جارٍ عرض ${fileLoadingState.fileName}... (صفحة ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
-                        hi: `${fileLoadingState.fileName} रेंडर हो रहा है... (पृष्ठ ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`
+                        hi: `${fileLoadingState.fileName} रेंडर हो रहा है... (पृष्ठ ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
+                        ru: `Рендеринг ${fileLoadingState.fileName}... (стр. ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
+                        el: `Απόδοση ${fileLoadingState.fileName}... (σελ. ${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`,
+                        syc: `ܡܣܪܛ ${fileLoadingState.fileName}... (${fileLoadingState.currentPage} / ${fileLoadingState.totalPages})`
                       })
                     : L(lang, {
                         ja: `${fileLoadingState.fileName} を読み込み中...`,
@@ -648,7 +663,10 @@ export default function App() {
                         es: `Cargando ${fileLoadingState.fileName}...`,
                         de: `Lade ${fileLoadingState.fileName}...`,
                         ar: `جارٍ تحميل ${fileLoadingState.fileName}...`,
-                        hi: `${fileLoadingState.fileName} लोड हो रहा है...`
+                        hi: `${fileLoadingState.fileName} लोड हो रहा है...`,
+                        ru: `Загрузка ${fileLoadingState.fileName}...`,
+                        el: `Φόρτωση ${fileLoadingState.fileName}...`,
+                        syc: `ܛܥܢ ${fileLoadingState.fileName}...`
                       })}
                 </span>
               </div>
@@ -667,7 +685,10 @@ export default function App() {
                 es: 'La primera ejecución requiere descargar el modelo (puede tardar unos minutos). Las siguientes ejecuciones usarán el modelo en caché.',
                 de: 'Beim ersten Start wird das Modell heruntergeladen (kann einige Minuten dauern). Nachfolgende Starts verwenden das zwischengespeicherte Modell.',
                 ar: 'يتطلب التشغيل الأول تنزيل النموذج (قد يستغرق بضع دقائق). ستستخدم عمليات التشغيل اللاحقة النموذج المخزن.',
-                hi: 'पहले रन में मॉडल डाउनलोड करना होगा (कुछ मिनट लग सकते हैं)। बाद के रन कैश्ड मॉडल का उपयोग करेंगे।'
+                hi: 'पहले रन में मॉडल डाउनलोड करना होगा (कुछ मिनट लग सकते हैं)। बाद के रन कैश्ड मॉडल का उपयोग करेंगे।',
+                ru: 'При первом запуске требуется загрузка модели (может занять несколько минут). Последующие запуски будут использовать кэшированную модель.',
+                el: 'Το πρώτο τρέξιμο απαιτεί λήψη μοντέλου (μπορεί να διαρκέσει μερικά λεπτά). Τα επόμενα τρεξίματα θα χρησιμοποιούν το μοντέλο στην κρυφή μνήμη.',
+                syc: 'ܩܛܢܐ ܚܕܬܐ ܢܬܠܚܡ ܡܢܦܘܩܐ ܕܢܡܘܣܐ (ܡܢܦܘܩܐ ܩܠܝܠܐ). ܩܛܢܐ ܒܬܪܐ ܬܫܬܡܫ ܠܠܘ̈ܚܐ ܕܪܡܐ.'
                 })}
               </p>
             )}
@@ -683,11 +704,11 @@ export default function App() {
               {isProcessing && (
                 <div className="result-progress-inline">
                   <ProgressBar jobState={jobState} lang={lang} />
-                  <button className="btn btn-stop" onClick={handleStopProcessing} title={L(lang, { ja: '処理を中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें' })}>
+                  <button className="btn btn-stop" onClick={handleStopProcessing} title={L(lang, { ja: '処理を中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें', ru: 'Стоп', el: 'Διακοπή', syc: 'ܟܠܝ' })}>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
                       <rect x="3" y="3" width="10" height="10" rx="1.5" />
                     </svg>
-                    {L(lang, { ja: '中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें' })}
+                    {L(lang, { ja: '中止', en: 'Stop', 'zh-CN': '停止', 'zh-TW': '停止', ko: '중지', la: 'Sistere', eo: 'Halti', es: 'Detener', de: 'Stopp', ar: 'إيقاف', hi: 'रोकें', ru: 'Стоп', el: 'Διακοπή', syc: 'ܟܠܝ' })}
                   </button>
                 </div>
               )}
@@ -697,7 +718,7 @@ export default function App() {
                 {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1)}
                 {!isProcessing && (
                   <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
-                    {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें' })}
+                    {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
                   </button>
                 )}
               </div>
@@ -717,7 +738,7 @@ export default function App() {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
                             </svg>
-                            {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन' })}
+                            {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                           </button>
                         </div>
                         <div className="image-with-preprocess">
@@ -738,10 +759,10 @@ export default function App() {
                             {selectedRegion && (
                               <div className="region-action-bar">
                                 <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
-                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR' })}
+                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })}
                                 </button>
                                 <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
-                                  {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें' })}
+                                  {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें', ru: 'Снять выделение', el: 'Εκκαθάριση επιλογής', syc: 'ܫܪܝ ܓܒܝܬܐ' })}
                                 </button>
                               </div>
                             )}
@@ -757,7 +778,10 @@ export default function App() {
                                 es: 'Arrastra para seleccionar una región, luego haz clic en "OCR de región seleccionada"',
                                 de: 'Ziehen Sie, um einen Bereich auszuwählen, dann klicken Sie auf "OCR des ausgewählten Bereichs"',
                                 ar: 'اسحب لتحديد منطقة، ثم انقر على "OCR للمنطقة المحددة" لإعادة التعرف',
-                                hi: 'क्षेत्र चुनने के लिए खींचें, फिर "चयनित क्षेत्र का OCR" पर क्लिक करें'
+                                hi: 'क्षेत्र चुनने के लिए खींचें, फिर "चयनित क्षेत्र का OCR" पर क्लिक करें',
+                                ru: 'Перетащите мышь для выбора области, затем нажмите «OCR выделенной области» для переопознания',
+                                el: 'Σύρετε για να επιλέξετε μια περιοχή, μετά κάντε κλικ στο «OCR επιλεγμένης περιοχής» για επανα-αναγνώριση',
+                                syc: 'ܓܪܘܪ ܠܓܒܝ ܐܬܪ، ܘܕܘܨ «OCR ܕܐܬܪ ܓܒܝܐ» ܠܡܓܒܝܬܐ ܓܒܝܬܐ'
                               })}
                             </p>
                           </div>
@@ -819,7 +843,8 @@ export default function App() {
               'zh-CN': '上传新文件', 'zh-TW': '上傳新檔案',
               ko: '새 파일 업로드', la: 'Fasciculos novos imponere',
               eo: 'Alŝuti novajn dosierojn', es: 'Subir nuevos archivos',
-              de: 'Neue Dateien hochladen', ar: 'رفع ملفات جديدة', hi: 'नई फ़ाइलें अपलोड करें'
+              de: 'Neue Dateien hochladen', ar: 'رفع ملفات جديدة', hi: 'नई फ़ाइलें अपलोड करें',
+              ru: 'Загрузить новые файлы', el: 'Ανέβασμα νέων αρχείων', syc: 'ܡܫܠܓ ܩܛܝܡܐ ܚܕ̈ܬܐ'
             })}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

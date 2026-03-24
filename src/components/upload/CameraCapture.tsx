@@ -33,6 +33,9 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
           de: 'Kamera wird in diesem Browser nicht unterstützt',
           ar: 'الكاميرا غير مدعومة في هذا المتصفح',
           hi: 'इस ब्राउज़र में कैमरा समर्थित नहीं है',
+          ru: 'Камера не поддерживается в этом браузере',
+          el: 'Η κάμερα δεν υποστηρίζεται σε αυτό το πρόγραμμα περιήγησης',
+          syc: 'ܡܨܠܡܢܐ ܠܐ ܡܫܬܡܥ ܒܦܦܐ ܗܕܐ',
         }))
         return
       }
@@ -69,6 +72,9 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
           de: 'Kamerazugriff verweigert. Bitte erlauben Sie den Zugriff in den Browsereinstellungen',
           ar: 'تم رفض الوصول إلى الكاميرا. يرجى السماح بالوصول في إعدادات المتصفح',
           hi: 'कैमरा एक्सेस अस्वीकृत। कृपया ब्राउज़र सेटिंग्स में कैमरा एक्सेस की अनुमति दें',
+          ru: 'Доступ к камере запрещён. Разрешите использование камеры в настройках браузера',
+          el: 'Η πρόσβαση στην κάμερα απορρίφθηκε. Ενεργοποιήστε την κάμερα στις ρυθμίσεις του προγράμματος περιήγησης',
+          syc: 'ܐܬܟܠܝ ܡܡܛܝ ܠܡܨܠ̈ܡܢ. ܦܣ ܐܣܘ̈ܪ ܡܨܠ̈ܡܢ ܒܛܘ̈ܟܣ ܡܨܦ̈ܝܢ',
         }))
       } else {
         setError(L(lang, {
@@ -83,6 +89,9 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
           de: 'Kamera konnte nicht gestartet werden',
           ar: 'فشل في تشغيل الكاميرا',
           hi: 'कैमरा शुरू करने में विफल',
+          ru: 'Ошибка запуска камеры',
+          el: 'Αποτυχία εκκίνησης κάμερας',
+          syc: 'ܐܬܟܠܝ ܦܬܝܚܬ ܡܨܠܡܢܐ',
         }))
       }
     }
@@ -154,6 +163,9 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
             de: 'Foto aufnehmen',
             ar: 'التقاط صورة',
             hi: 'फ़ोटो लें',
+            ru: 'Сфотографировать',
+            el: 'Λήψη φωτογραφίας',
+            syc: 'ܨܘܪ ܒܡܨܠܡܢܐ',
           })}
         </button>
         {error && <p className="camera-error">{error}</p>}

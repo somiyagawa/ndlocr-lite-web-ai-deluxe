@@ -4500,6 +4500,10 @@ button.ai-status-clickable .ai-status-text {
   font-family: 'Noto Sans JP', 'Yu Gothic', '游ゴシック', 'Hiragino Kaku Gothic ProN', sans-serif;
 }
 
+.text-editor-textarea.font-ud-kyokasho {
+  font-family: 'UD Digi Kyokasho NK-R', 'UD Digi Kyokasho NP-R', 'UD デジタル 教科書体 NK-R', 'UD デジタル 教科書体 NP-R', 'Noto Sans JP', sans-serif;
+}
+
 /* ── Font select dropdown in status bar ── */
 .text-editor-font-select {
   padding: 0.15rem 0.35rem;

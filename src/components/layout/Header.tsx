@@ -42,11 +42,11 @@ export const Header = memo(function Header({
     ?? ''
 
   const THEME_LABELS: Record<string, Record<string, string>> = {
-    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड' },
-    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड' },
-    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास' },
-    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स' },
-    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका' },
+    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड', ru: 'Перейти в светлый режим', el: 'Αλλαγή σε λαμπερή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܢܘܗܪܐ' },
+    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड', ru: 'Перейти в темный режим', el: 'Αλλαγή σε σκοτεινή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܚܫܡܐ' },
+    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास', ru: 'История', el: 'Ιστορικό', syc: 'ܬ̈ܫ̈ܥ̈ܝ̈ܬ' },
+    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स', ru: 'Параметры', el: 'Ρυθμίσεις', syc: 'ܛ̈ܘ̈ܟ̈ܣ̈ܐ' },
+    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका', ru: 'Руководство пользователя', el: 'Οδηγός χρήστη', syc: 'ܡܠܦܢܬܐ ܕܦܠܓܐ' },
   }
 
   const FLAG_EMOJI: Record<string, string> = {
@@ -217,7 +217,8 @@ export const Header = memo(function Header({
           {/* Language section label */}
           <div className="drawer-lang-label">{L(lang, {
             ja: '言語', en: 'Language', 'zh-CN': '语言', 'zh-TW': '語言', ko: '언어',
-            la: 'Lingua', eo: 'Lingvo', es: 'Idioma', de: 'Sprache', ar: 'اللغة', hi: 'भाषा'
+            la: 'Lingua', eo: 'Lingvo', es: 'Idioma', de: 'Sprache', ar: 'اللغة', hi: 'भाषा',
+            ru: 'Язык', el: 'Γλώσσα', syc: 'ܠܫܢܐ'
           })}</div>
 
           <div className="lang-flags" role="radiogroup" aria-label="Language">

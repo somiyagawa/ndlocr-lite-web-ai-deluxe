@@ -35,10 +35,13 @@ export function DirectoryPicker({ onFilesSelected, lang, disabled = false }: Dir
           ko: '폴더 선택',
           la: 'Involucrum eligere',
           eo: 'Elekti dosierujon',
-        es: 'Seleccionar carpeta',
-        de: 'Ordner auswählen',
-        ar: 'اختر مجلداً',
-        hi: 'फ़ोल्डर चुनें'
+          es: 'Seleccionar carpeta',
+          de: 'Ordner auswählen',
+          ar: 'اختر مجلداً',
+          hi: 'फ़ोल्डर चुनें',
+          ru: 'Выбрать папку',
+          el: 'Επιλογή φακέλου',
+          syc: 'ܓܒܝ ܣܕܪ'
         })}
       </button>
       <input

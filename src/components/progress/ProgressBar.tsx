@@ -86,6 +86,27 @@ const MODEL_LABELS: Record<Language, { layout: string; rec30: string; rec50: str
     rec100: 'पहचान मॉडल (≤100 अक्षर)',
     downloading: 'मॉडल डाउनलोड हो रहा है',
   },
+  ru: {
+    layout: 'Модель обнаружения макета',
+    rec30: 'Модель распознавания (≤30 символов)',
+    rec50: 'Модель распознавания (≤50 символов)',
+    rec100: 'Модель распознавания (≤100 символов)',
+    downloading: 'Загрузка модели',
+  },
+  el: {
+    layout: 'Μοντέλο ανίχνευσης διάταξης',
+    rec30: 'Μοντέλο αναγνώρισης (≤30 χαρακτήρες)',
+    rec50: 'Μοντέλο αναγνώρισης (≤50 χαρακτήρες)',
+    rec100: 'Μοντέλο αναγνώρισης (≤100 χαρακτήρες)',
+    downloading: 'Λήψη μοντέλου',
+  },
+  syc: {
+    layout: 'ܡܕܝܪܬܐ ܕܫܟܢܐ',
+    rec30: 'ܡܕܝܪܬܐ ܕܝܕܥܬܐ (≤30 ܐܬܘܬܐ)',
+    rec50: 'ܡܕܝܪܬܐ ܕܝܕܥܬܐ (≤50 ܐܬܘܬܐ)',
+    rec100: 'ܡܕܝܪܬܐ ܕܝܕܥܬܐ (≤100 ܐܬܘܬܐ)',
+    downloading: 'ܐܚܬܝܬ ܡܕܝܪܬܐ',
+  },
 }
 
 export const ProgressBar = memo(function ProgressBar({ jobState, lang }: ProgressBarProps) {
@@ -151,6 +172,9 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
             de: `${currentFileIndex} / ${totalFiles} Dateien`,
             ar: `${currentFileIndex} / ${totalFiles} ملفات`,
             hi: `${currentFileIndex} / ${totalFiles} फ़ाइलें`,
+            ru: `${currentFileIndex} / ${totalFiles} файлов`,
+            el: `${currentFileIndex} / ${totalFiles} αρχεία`,
+            syc: `${currentFileIndex} / ${totalFiles} ܩ̈ܛܝܡܐ`,
           })}
         </div>
       )}
