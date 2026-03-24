@@ -107,6 +107,20 @@ const MODEL_LABELS: Record<Language, { layout: string; rec30: string; rec50: str
     rec100: 'ܡܕܝܪܬܐ ܕܝܕܥܬܐ (≤100 ܐܬܘܬܐ)',
     downloading: 'ܐܚܬܝܬ ܡܕܝܪܬܐ',
   },
+  cop: {
+    layout: 'ⲙⲟⲇⲉⲗ ⲛⲧⲉ ⲙⲁⲧⲁⲓⲁ',
+    rec30: 'ⲙⲟⲇⲉⲗ ⲛⲧⲉ ⲙⲟⲕϩ (≤30 ⲛⲏⲣⲛ)',
+    rec50: 'ⲙⲟⲇⲉⲗ ⲛⲧⲉ ⲙⲟⲕϩ (≤50 ⲛⲏⲣⲛ)',
+    rec100: 'ⲙⲟⲇⲉⲗ ⲛⲧⲉ ⲙⲟⲕϩ (≤100 ⲛⲏⲣⲛ)',
+    downloading: 'ⲧⲁⲗⲟ ⲛⲧⲉ ⲙⲟⲇⲉⲗ',
+  },
+  sa: {
+    layout: 'पंक्ति-पहचान-नमूनम्',
+    rec30: 'स्वीकृति-नमूनम् (≤30 आक्षराणि)',
+    rec50: 'स्वीकृति-नमूनम् (≤50 आक्षराणि)',
+    rec100: 'स्वीकृति-नमूनम् (≤100 आक्षराणि)',
+    downloading: 'नमूनम् अवतारणम्',
+  },
 }
 
 export const ProgressBar = memo(function ProgressBar({ jobState, lang }: ProgressBarProps) {
@@ -175,6 +189,8 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
             ru: `${currentFileIndex} / ${totalFiles} файлов`,
             el: `${currentFileIndex} / ${totalFiles} αρχεία`,
             syc: `${currentFileIndex} / ${totalFiles} ܩ̈ܛܝܡܐ`,
+            cop: `${currentFileIndex} / ${totalFiles} ϫⲱⲙⲉ`,
+            sa: `${currentFileIndex} / ${totalFiles} फलकानि`,
           })}
         </div>
       )}

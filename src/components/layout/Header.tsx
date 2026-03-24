@@ -42,11 +42,11 @@ export const Header = memo(function Header({
     ?? ''
 
   const THEME_LABELS: Record<string, Record<string, string>> = {
-    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड', ru: 'Перейти в светлый режим', el: 'Αλλαγή σε λαμπερή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܢܘܗܪܐ' },
-    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड', ru: 'Перейти в темный режим', el: 'Αλλαγή σε σκοτεινή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܚܫܡܐ' },
-    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास', ru: 'История', el: 'Ιστορικό', syc: 'ܬ̈ܫ̈ܥ̈ܝ̈ܬ' },
-    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स', ru: 'Параметры', el: 'Ρυθμίσεις', syc: 'ܛ̈ܘ̈ܟ̈ܣ̈ܐ' },
-    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका', ru: 'Руководство пользователя', el: 'Οδηγός χρήστη', syc: 'ܡܠܦܢܬܐ ܕܦܠܓܐ' },
+    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड', ru: 'Перейти в светлый режим', el: 'Αλλαγή σε λαμπερή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܢܘܗܪܐ', cop: 'ⲙⲉⲧⲟⲩⲟⲣⲱⲧ ⲉⲡⲟⲩⲟⲓ', sa: 'ज्योतिर्मोड-प्रवेशम्' },
+    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड', ru: 'Перейти в темный режим', el: 'Αλλαγή σε σκοτεινή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܚܫܡܐ', cop: 'ⲙⲉⲧⲟⲩⲟⲣⲱⲧ ⲉⲡܚܫܡܐ', sa: 'तामस-मोड-प्रवेशम्' },
+    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास', ru: 'История', el: 'Ιστορικό', syc: 'ܬ̈ܫ̈ܥ̈ܝ̈ܬ', cop: 'ⲧⲁⲓⲟ', sa: 'चरितम्' },
+    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स', ru: 'Параметры', el: 'Ρυθμίσεις', syc: 'ܛ̈ܘ̈ܟ̈ܣ̈ܐ', cop: 'ⲛⲓⲥⲉⲧⲧⲓⲛⲅⲥ', sa: 'विन्यासाः' },
+    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका', ru: 'Руководство пользователя', el: 'Οδηγός χρήστη', syc: 'ܡܠܦܢܬܐ ܕܦܠܓܐ', cop: 'ⲡⲙⲁⲧⲟⲉ', sa: 'उपयोगकर्ता-मार्गदर्शनम्' },
   }
 
   const FLAG_EMOJI: Record<string, string> = {
@@ -59,6 +59,11 @@ export const Header = memo(function Header({
     de: '\u{1F1E9}\u{1F1EA}',      // 🇩🇪
     ar: '\u{1F1F8}\u{1F1E6}',      // 🇸🇦
     hi: '\u{1F1EE}\u{1F1F3}',      // 🇮🇳
+    ru: '\u{1F1F7}\u{1F1FA}',      // 🇷🇺
+    el: '\u{1F1EC}\u{1F1F7}',      // 🇬🇷
+    sa: '\u{1F549}\uFE0F',          // 🕉️ (Sanskrit/India)
+    syc: '\u{2670}',                // ☰ (Syriac cross)
+    cop: '\u{2625}\uFE0F',          // ☥ (Ankh / Coptic)
     la: '\u{1F3DB}\uFE0F',          // 🏛️
     eo: '\u{1F30D}',                // 🌍
   }
@@ -218,7 +223,7 @@ export const Header = memo(function Header({
           <div className="drawer-lang-label">{L(lang, {
             ja: '言語', en: 'Language', 'zh-CN': '语言', 'zh-TW': '語言', ko: '언어',
             la: 'Lingua', eo: 'Lingvo', es: 'Idioma', de: 'Sprache', ar: 'اللغة', hi: 'भाषा',
-            ru: 'Язык', el: 'Γλώσσα', syc: 'ܠܫܢܐ'
+            ru: 'Язык', el: 'Γλώσσα', syc: 'ܠܫܢܐ', cop: 'ⲁⲥⲡⲓ', sa: 'भाषा'
           })}</div>
 
           <div className="lang-flags" role="radiogroup" aria-label="Language">

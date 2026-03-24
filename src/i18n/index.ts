@@ -12,8 +12,10 @@ import { hi } from './hi'
 import { ru } from './ru'
 import { el } from './el'
 import { syc } from './syc'
+import { cop } from './cop'
+import { sa } from './sa'
 
-export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo' | 'es' | 'de' | 'ar' | 'hi' | 'ru' | 'el' | 'syc'
+export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo' | 'es' | 'de' | 'ar' | 'hi' | 'ru' | 'el' | 'syc' | 'cop' | 'sa'
 export type TranslationParams = Record<string, string | number>
 
 /** Display labels for the language selector */
@@ -32,10 +34,12 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   ru: 'Русский',
   el: 'Ελληνικά',
   syc: 'ܣܘܪܝܝܐ',
+  cop: 'ⲙⲉⲧⲣⲉⲙⲛⲕⲏⲙⲉ',
+  sa: 'संस्कृतम्',
 }
 
 /** All supported language codes, in display order */
-export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'de', 'ru', 'el', 'ar', 'hi', 'syc', 'la', 'eo']
+export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'de', 'ru', 'el', 'ar', 'hi', 'sa', 'syc', 'cop', 'la', 'eo']
 
 const translations: Record<Language, Record<string, Record<string, string>>> = {
   ja,
@@ -52,6 +56,8 @@ const translations: Record<Language, Record<string, Record<string, string>>> = {
   ru,
   el,
   syc,
+  cop,
+  sa,
 }
 
 function getNestedValue(obj: Record<string, unknown>, key: string): string {
@@ -95,6 +101,7 @@ export function getStoredLang(): Language {
   if (browserLang.startsWith('hi')) return 'hi'
   if (browserLang.startsWith('ru')) return 'ru'
   if (browserLang.startsWith('el')) return 'el'
+  if (browserLang.startsWith('sa')) return 'sa'
   if (browserLang.startsWith('la')) return 'la'
   if (browserLang.startsWith('eo')) return 'eo'
   if (browserLang === 'zh-TW' || browserLang === 'zh-Hant') return 'zh-TW'

@@ -23,219 +23,102 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
           if (lang === 'de') return <span>Dieses System nutzt {onnxLink} und läuft vollständig in Ihrem Browser. Ausgewählte Bilder und OCR-Ergebnisse werden niemals an einen externen Server gesendet.</span>
           if (lang === 'ar') return <span>يستخدم هذا النظام تقنية {onnxLink} ويعمل بالكامل في متصفحك. لا يتم إرسال الصور المحددة ونتائج OCR إلى أي خادم خارجي.</span>
           if (lang === 'hi') return <span>यह सिस्टम {onnxLink} तकनीक का उपयोग करता है और पूरी तरह आपके ब्राउज़र में चलता है। चयनित छवियाँ और OCR परिणाम कभी किसी बाहरी सर्वर पर नहीं भेजे जाते।</span>
+          if (lang === 'ru') return <span>Эта система использует {onnxLink} и работает полностью в вашем браузере. Выбранные изображения и результаты OCR никогда не отправляются на внешний сервер.</span>
+          if (lang === 'el') return <span>Αυτό το σύστημα χρησιμοποιεί {onnxLink} και λειτουργεί εξ ολοκλήρου στο πρόγραμμα περιήγησής σας. Οι επιλεγμένες εικόνες και τα αποτελέσματα OCR δεν αποστέλλονται ποτέ σε εξωτερικό διακομιστή.</span>
+          if (lang === 'syc') return <span>ܗܢ ܫܘ̈ܠܛ̈ܢ {onnxLink} ܢ̇ܦ̈ܩ ܘ̇ܟ̈ܠ̈ܗ ܒ̈ܡ̈ܕ̈ܒ̈ܪ̈ܢ̈ܐ ܕ̈ܝ̈ܠ̈ܟ ܦ̈ܥ̈ܠ. ܨ̈ܘ̈ܪ̈ܬ̈ܐ ܘ̈ܦ̈ܠ̈ܛ̈ܐ ܕ OCR ܠ̈ܒ̈ܪ ܡ̈ܢ ܡ̈ܚ̈ܫ̈ܒ̈ܬ̈ܟ ܠ̈ܐ ܡ̈ܫ̈ܬ̈ܕ̈ܪ̈ܝ̈ܢ.</span>
+          if (lang === 'cop') return <span>ⲡⲁⲓⲥⲩⲥⲧⲏⲙⲁ ⲉϥⲭⲣⲱ ⲙ {onnxLink} ⲟⲩⲟϩ ⲉϥⲉⲣϩⲱⲃ ⲧⲏⲣϥ ϧⲉⲛ ⲡⲉⲕⲃⲣⲁⲩⲥⲉⲣ. ⲛⲓⲉⲓⲕⲱⲛ ⲛⲉⲙ ⲛⲓⲡⲟⲗⲏ ⲛⲧⲉ OCR ⲛⲁⲩⲟⲩⲟⲣⲡⲟⲩ ⲉⲃⲟⲗ ⲁⲛ.</span>
+          if (lang === 'sa') return <span>एतत् प्रणालिका {onnxLink} प्रौद्योगिकीं प्रयुङ्क्ते, सम्पूर्णतया भवतः ब्राउज़रे चलति। चित्राणि OCR-फलानि च बाह्यसेवकाय न प्रेष्यन्ते।</span>
           return <span>This system uses {onnxLink} and runs entirely in your browser. Selected images and OCR results are never sent to any external server.</span>
         })()}
       </div>
       <div className="footer-attribution">
         {(() => {
           const ndlocrLink = <a href="https://github.com/ndl-lab/ndlocr-lite" target="_blank" rel="noopener noreferrer">NDLOCR-Lite</a>
-          if (lang === 'ja') return <span className="footer-attribution-text">本ツールは国立国会図書館（NDL Lab）が開発した {ndlocrLink} のWebブラウザ版です。OCRモデルはNDLOCR-Liteのものを使用しています。</span>
-          if (lang === 'zh-CN') return <span className="footer-attribution-text">本工具是日本国立国会图书馆（NDL Lab）开发的 {ndlocrLink} 的Web浏览器版本。OCR模型来自NDLOCR-Lite。</span>
-          if (lang === 'zh-TW') return <span className="footer-attribution-text">本工具是日本國立國會圖書館（NDL Lab）開發的 {ndlocrLink} 的Web瀏覽器版本。OCR模型來自NDLOCR-Lite。</span>
-          if (lang === 'ko') return <span className="footer-attribution-text">이 도구는 일본 국립국회도서관(NDL Lab)이 개발한 {ndlocrLink}의 웹 브라우저 버전입니다. OCR 모델은 NDLOCR-Lite에서 가져왔습니다.</span>
-          if (lang === 'la') return <span className="footer-attribution-text">Hoc instrumentum est versio navigatri interretialis {ndlocrLink} a Bibliotheca Nationali Diaetae Iaponiae (NDL Lab) elaborata.</span>
-          if (lang === 'eo') return <span className="footer-attribution-text">Ĉi tiu ilo estas retumila versio de {ndlocrLink} evoluigita de la Nacia Dieta Biblioteko de Japanio (NDL Lab). OCR-modeloj estas de NDLOCR-Lite.</span>
-          if (lang === 'es') return <span className="footer-attribution-text">Esta herramienta es una versión web de {ndlocrLink} desarrollada por la Biblioteca Nacional de la Dieta de Japón (NDL Lab). Los modelos OCR son de NDLOCR-Lite.</span>
-          if (lang === 'de') return <span className="footer-attribution-text">Dieses Tool ist eine Webbrowser-Version von {ndlocrLink}, entwickelt von der Nationalbibliothek des japanischen Parlaments (NDL Lab). Die OCR-Modelle stammen von NDLOCR-Lite.</span>
-          if (lang === 'ar') return <span className="footer-attribution-text">هذه الأداة هي نسخة متصفح ويب من {ndlocrLink} طورتها المكتبة الوطنية للبرلمان الياباني (NDL Lab). نماذج OCR من NDLOCR-Lite.</span>
-          if (lang === 'hi') return <span className="footer-attribution-text">यह टूल जापान की राष्ट्रीय संसद पुस्तकालय (NDL Lab) द्वारा विकसित {ndlocrLink} का वेब ब्राउज़र संस्करण है। OCR मॉडल NDLOCR-Lite से हैं।</span>
-          return <span className="footer-attribution-text">This tool is a web browser port of {ndlocrLink} developed by the National Diet Library of Japan (NDL Lab). OCR models are from NDLOCR-Lite.</span>
+          const hashimotoLink = <a href="https://github.com/yuta1984/ndlocrlite-web" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '橋本雄太', en: 'Yuta Hashimoto', 'zh-CN': '桥本雄太', 'zh-TW': '橋本雄太', ko: '하시모토 유타', la: 'Yuta Hashimoto', eo: 'Yuta Hashimoto', es: 'Yuta Hashimoto', de: 'Yuta Hashimoto', ar: 'يوتا هاشيموتو', hi: 'युता हाशिमोतो', ru: 'Юта Хашимото', el: 'Yuta Hashimoto', syc: 'Yuta Hashimoto', cop: 'Yuta Hashimoto', sa: 'Yuta Hashimoto' })}</a>
+          const ogataLink = <a href="https://github.com/ogwata/ndlocr-lite-web-ai" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '小形克宏', en: 'Katsuhiro Ogata', 'zh-CN': '小形克宏', 'zh-TW': '小形克宏', ko: '오가타 가쓰히로', la: 'Katsuhiro Ogata', eo: 'Katsuhiro Ogata', es: 'Katsuhiro Ogata', de: 'Katsuhiro Ogata', ar: 'كاتسوهيرو أوغاتا', hi: 'कात्सुहिरो ओगाटा', ru: 'Кацухиро Огата', el: 'Katsuhiro Ogata', syc: 'Katsuhiro Ogata', cop: 'Katsuhiro Ogata', sa: 'Katsuhiro Ogata' })}</a>
+          const miyagawaLink = <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '宮川創', en: 'So Miyagawa', 'zh-CN': '宫川创', 'zh-TW': '宮川創', ko: '미야가와 소', la: 'So Miyagawa', eo: 'So Miyagawa', es: 'So Miyagawa', de: 'So Miyagawa', ar: 'سو مياغاوا', hi: 'सो मियागावा', ru: 'Со Миягава', el: 'So Miyagawa', syc: 'So Miyagawa', cop: 'So Miyagawa', sa: 'So Miyagawa' })}</a>
+
+          if (lang === 'ja') return (
+            <span className="footer-attribution-text">
+              本ツールは、国立国会図書館（NDL Lab）が開発した {ndlocrLink} を{hashimotoLink}氏がWebブラウザ版にし、{ogataLink}氏がAI校正機能を付け、{miyagawaLink}がカメラ機能や画像補正機能、奇妙なデザインなど様々な蛇足な機能を施したものです。
+            </span>
+          )
+          if (lang === 'zh-CN') return (
+            <span className="footer-attribution-text">
+              本工具基于日本国立国会图书馆（NDL Lab）开发的 {ndlocrLink}，由{hashimotoLink}制作Web浏览器版本，{ogataLink}添加了AI校正功能，{miyagawaLink}添加了相机功能、图像校正以及各种多余的功能。
+            </span>
+          )
+          if (lang === 'zh-TW') return (
+            <span className="footer-attribution-text">
+              本工具基於日本國立國會圖書館（NDL Lab）開發的 {ndlocrLink}，由{hashimotoLink}製作Web瀏覽器版本，{ogataLink}添加了AI校正功能，{miyagawaLink}添加了相機功能、影像校正以及各種多餘的功能。
+            </span>
+          )
+          if (lang === 'ko') return (
+            <span className="footer-attribution-text">
+              이 도구는 일본 국립국회도서관(NDL Lab)이 개발한 {ndlocrLink}을 {hashimotoLink}이 웹 브라우저 버전으로 만들고, {ogataLink}이 AI 교정 기능을 추가하고, {miyagawaLink}이 카메라 기능, 이미지 보정, 기묘한 디자인 등 다양한 사족 기능을 추가한 것입니다.
+            </span>
+          )
+          if (lang === 'la') return (
+            <span className="footer-attribution-text">
+              Hoc instrumentum in {ndlocrLink} a Bibliotheca Nationali Diaetae Iaponiae (NDL Lab) elaborata fundatur. {hashimotoLink} versionem navigatri interretialis fecit, {ogataLink} correctionem AI addidit, et {miyagawaLink} functionem camerae, correctionem imaginum aliaque varia additamenta superflua adiecit.
+            </span>
+          )
+          if (lang === 'eo') return (
+            <span className="footer-attribution-text">
+              Ĉi tiu ilo baziĝas sur {ndlocrLink} evoluigita de la Nacia Dieta Biblioteko de Japanio (NDL Lab). {hashimotoLink} faris la retumilan version, {ogataLink} aldonis AI-korektadon, kaj {miyagawaLink} aldonis kameran funkcion, bildkorekton kaj diversajn superfluajn funkciojn.
+            </span>
+          )
+          if (lang === 'es') return (
+            <span className="footer-attribution-text">
+              Esta herramienta se basa en {ndlocrLink} desarrollado por la Biblioteca Nacional de la Dieta de Japón (NDL Lab). {hashimotoLink} creó la versión web, {ogataLink} añadió la corrección con IA, y {miyagawaLink} añadió la función de cámara, la corrección de imágenes y diversas funciones superfluas.
+            </span>
+          )
+          if (lang === 'de') return (
+            <span className="footer-attribution-text">
+              Dieses Tool basiert auf {ndlocrLink}, entwickelt von der Nationalbibliothek des japanischen Parlaments (NDL Lab). {hashimotoLink} erstellte die Webbrowser-Version, {ogataLink} fügte die KI-Korrektur hinzu, und {miyagawaLink} fügte die Kamerafunktion, Bildkorrektur und diverse überflüssige Funktionen hinzu.
+            </span>
+          )
+          if (lang === 'ar') return (
+            <span className="footer-attribution-text">
+              تستند هذه الأداة إلى {ndlocrLink} التي طورتها المكتبة الوطنية للبرلمان الياباني (NDL Lab). قام {hashimotoLink} بإنشاء نسخة متصفح الويب، وأضاف {ogataLink} وظيفة التصحيح بالذكاء الاصطناعي، وأضاف {miyagawaLink} وظيفة الكاميرا وتصحيح الصور ومختلف الوظائف الزائدة.
+            </span>
+          )
+          if (lang === 'hi') return (
+            <span className="footer-attribution-text">
+              यह टूल जापान की राष्ट्रीय संसद पुस्तकालय (NDL Lab) द्वारा विकसित {ndlocrLink} पर आधारित है। {hashimotoLink} ने वेब ब्राउज़र संस्करण बनाया, {ogataLink} ने AI प्रूफ़रीडिंग जोड़ी, और {miyagawaLink} ने कैमरा फ़ंक्शन, छवि सुधार और विभिन्न अतिरिक्त कार्यक्षमताएँ जोड़ीं।
+            </span>
+          )
+          if (lang === 'ru') return (
+            <span className="footer-attribution-text">
+              Этот инструмент основан на {ndlocrLink}, разработанном Национальной библиотекой парламента Японии (NDL Lab). {hashimotoLink} создал версию для веб-браузера, {ogataLink} добавил функцию корректуры с ИИ, а {miyagawaLink} добавил функцию камеры, коррекцию изображений и различные излишние функции.
+            </span>
+          )
+          if (lang === 'el') return (
+            <span className="footer-attribution-text">
+              Αυτό το εργαλείο βασίζεται στο {ndlocrLink} που αναπτύχθηκε από την Εθνική Βιβλιοθήκη του Κοινοβουλίου της Ιαπωνίας (NDL Lab). Ο {hashimotoLink} δημιούργησε την έκδοση για πρόγραμμα περιήγησης, ο {ogataLink} πρόσθεσε τη διόρθωση AI, και ο {miyagawaLink} πρόσθεσε τη λειτουργία κάμερας, τη διόρθωση εικόνας και διάφορες περιττές λειτουργίες.
+            </span>
+          )
+          if (lang === 'syc') return (
+            <span className="footer-attribution-text">
+              ܗܢ ܡܐܢ ܥܠ {ndlocrLink} ܕ̇ܣ̈ܝ̈ܡ ܡ̈ܢ ܒ̈ܝ̈ܬ ܐ̈ܪ̈ܟ̈ܐ ܐ̈ܘ̈ܡ̈ܬ̈ܢ̈ܝ̈ܐ ܕ̈ܦ̈ܪ̈ܠ̈ܡ̈ܢ ܕ̈ܝ̈ܦ̈ܘ̈ܢ (NDL Lab). {hashimotoLink} ܣ̈ܡ ܙ̈ܢ̈ܐ ܕ̈ܡ̈ܕ̈ܒ̈ܪ̈ܢ̈ܐ، {ogataLink} ܐ̈ܘ̈ܣ̈ܦ ܬ̈ܘ̈ܪ̈ܨ̈ܐ ܕ AI، ܘ {miyagawaLink} ܐ̈ܘ̈ܣ̈ܦ ܥ̈ܒ̈ܕ̈ܐ ܕ̈ܟ̈ܡ̈ܝ̈ܪ̈ܐ ܘ̈ܬ̈ܘ̈ܪ̈ܨ̈ ܨ̈ܘ̈ܪ̈ܬ̈ܐ ܘ̈ܫ̈ܪ̈ܟ̈ܐ.
+            </span>
+          )
+          if (lang === 'cop') return (
+            <span className="footer-attribution-text">
+              ⲡⲁⲓⲉⲣⲅⲁⲗⲓⲟⲛ ⲉϥⲕⲏⲧ ⲉϫⲉⲛ {ndlocrLink} ⲉⲧⲁⲩⲑⲁⲙⲓⲟϥ ⲉⲃⲟⲗ ϩⲓⲧⲉⲛ NDL Lab. {hashimotoLink} ⲁϥⲑⲁⲙⲓⲟ ⲙⲡⲓⲃⲣⲁⲩⲥⲉⲣ, {ogataLink} ⲁϥⲟⲩⲱϩ ⲙⲡⲓⲥⲟⲩⲧⲉⲛ ⲛⲧⲉ AI, ⲟⲩⲟϩ {miyagawaLink} ⲁϥⲟⲩⲱϩ ⲙⲡⲓⲕⲁⲙⲉⲣⲁ ⲛⲉⲙ ⲡⲓⲥⲟⲩⲧⲉⲛ ⲛⲛⲓⲉⲓⲕⲱⲛ ⲛⲉⲙ ϩⲁⲛⲕⲉⲟⲩⲁⲓ ⲉⲩⲟⲓ.
+            </span>
+          )
+          if (lang === 'sa') return (
+            <span className="footer-attribution-text">
+              एतत् उपकरणं जापान-राष्ट्रीय-संसद्-पुस्तकालयेन (NDL Lab) विकसितस्य {ndlocrLink} आधारितम्। {hashimotoLink} वेब-ब्राउज़र-संस्करणम् अकरोत्, {ogataLink} AI-संशोधनं योजयामास, {miyagawaLink} च छायाग्रहण-क्रियां चित्र-संशोधनं विविधानि अतिरिक्तानि कार्याणि च योजयामास।
+            </span>
+          )
+          return (
+            <span className="footer-attribution-text">
+              This tool is based on {ndlocrLink} developed by the National Diet Library of Japan (NDL Lab). {hashimotoLink} created the web browser version, {ogataLink} added AI proofreading, and {miyagawaLink} added camera functionality, image correction, and various other superfluous features.
+            </span>
+          )
         })()}
-      </div>
-      <div className="footer-credits">
-        <div className="footer-credit-line">
-          {L(lang, {
-            ja: 'OCRエンジン: ',
-            en: 'OCR engine: ',
-            'zh-CN': 'OCR引擎：',
-            'zh-TW': 'OCR引擎：',
-            ko: 'OCR 엔진: ',
-            la: 'Machina OCR: ',
-            eo: 'OCR-motoro: ',
-            es: 'Motor OCR: ',
-            de: 'OCR-Engine: ',
-            ar: 'محرك OCR: ',
-            hi: 'OCR इंजन: ',
-            ru: 'OCR движок: ',
-            el: 'Μηχανή OCR: ',
-            syc: 'ܡܛܪܪܐ OCR: '
-          })}
-          <a href="https://github.com/ndl-lab/ndlocr-lite" target="_blank" rel="noopener noreferrer">
-            NDLOCR-Lite
-          </a>
-          {L(lang, {
-            ja: '（国立国会図書館）',
-            en: ' (National Diet Library of Japan)',
-            'zh-CN': '（日本国立国会图书馆）',
-            'zh-TW': '（日本國立國會圖書館）',
-            ko: ' (일본 국립국회도서관)',
-            la: ' (Bibliotheca Nationalis Diaetae Iaponiae)',
-            eo: ' (Nacia Dieta Biblioteko de Japanio)',
-            es: ' (Biblioteca Nacional de la Dieta de Japón)',
-            de: ' (Nationalbibliothek des japanischen Parlaments)',
-            ar: ' (المكتبة الوطنية للبرلمان الياباني)',
-            hi: ' (जापान की राष्ट्रीय संसद पुस्तकालय)',
-            ru: ' (Национальная библиотека парламента Японии)',
-            el: ' (Εθνική Βιβλιοθήκη του Κοινοβουλίου της Ιαπωνίας)',
-            syc: ' (ܦܪܓܡ̈ܢܐ ܕܐܘܡܬܐ ܕܡܠܟܐ ܕܐܦܢܐ)'
-          })}
-        </div>
-        <div className="footer-credit-line">
-          {L(lang, {
-            ja: 'Web移植: ',
-            en: 'Web port: ',
-            'zh-CN': 'Web移植：',
-            'zh-TW': 'Web移植：',
-            ko: 'Web 포팅: ',
-            la: 'Translatio ad Rete: ',
-            eo: 'Reta versio: ',
-            es: 'Versión web: ',
-            de: 'Web-Portierung: ',
-            ar: 'إصدار الويب: ',
-            hi: 'वेब पोर्ट: ',
-            ru: 'Веб-портал: ',
-            el: 'Έκδοση ιστού: ',
-            syc: 'ܦܪܓܘܡܐ Web: '
-          })}
-          <a href="https://github.com/yuta1984/ndlocrlite-web" target="_blank" rel="noopener noreferrer">
-            {L(lang, {
-              ja: '橋本雄太',
-              en: 'Yuta Hashimoto',
-              'zh-CN': '桥本雄太',
-              'zh-TW': '橋本雄太',
-              ko: '하시모토 유타',
-              la: 'Yuta Hashimoto',
-              eo: 'Yuta Hashimoto',
-              es: 'Yuta Hashimoto',
-              de: 'Yuta Hashimoto',
-              ar: 'يوتا هاشيموتو',
-              hi: 'युता हाशिमोतो',
-              ru: 'Юта Хашимото',
-              el: 'Yuta Hashimoto',
-              syc: 'Yuta Hashimoto'
-            })}
-          </a>
-          {L(lang, {
-            ja: '（国立歴史民俗博物館）',
-            en: ' (National Museum of Japanese History)',
-            'zh-CN': '（国立历史民俗博物馆）',
-            'zh-TW': '（國立歷史民俗博物館）',
-            ko: ' (국립역사민속박물관)',
-            la: ' (Museum Nationale Historiae Iaponiae)',
-            eo: ' (Nacia Muzeo de Japana Historio)',
-            es: ' (Museo Nacional de Historia de Japón)',
-            de: ' (Nationalmuseum für japanische Geschichte)',
-            ar: ' (المتحف الوطني للتاريخ الياباني)',
-            hi: ' (जापानी इतिहास का राष्ट्रीय संग्रहालय)',
-            ru: ' (Национальный музей истории Японии)',
-            el: ' (Εθνικό Μουσείο Ιστορίας της Ιαπωνίας)',
-            syc: ' (ܡܘܣܐ ܐܘܡܬܢܐ ܕܬܪܓܡ ܐܦܢܐ)'
-          })}
-        </div>
-        <div className="footer-credit-line">
-          {L(lang, {
-            ja: 'AI校正機能: ',
-            en: 'AI proofreading: ',
-            'zh-CN': 'AI校正功能：',
-            'zh-TW': 'AI校正功能：',
-            ko: 'AI 교정 기능: ',
-            la: 'Correctio AI: ',
-            eo: 'AI-korektado: ',
-            es: 'Corrección AI: ',
-            de: 'KI-Korrektur: ',
-            ar: 'تصحيح AI: ',
-            hi: 'AI प्रूफ़रीडिंग: ',
-            ru: 'Корректура AI: ',
-            el: 'Διόρθωση AI: ',
-            syc: 'ܬܘܪܨܐ AI: '
-          })}
-          <a href="https://github.com/ogwata/ndlocr-lite-web-ai" target="_blank" rel="noopener noreferrer">
-            {L(lang, {
-              ja: '小形克宏',
-              en: 'Katsuhiro Ogata',
-              'zh-CN': '小形克宏',
-              'zh-TW': '小形克宏',
-              ko: '오가타 가쓰히로',
-              la: 'Katsuhiro Ogata',
-              eo: 'Katsuhiro Ogata',
-              es: 'Katsuhiro Ogata',
-              de: 'Katsuhiro Ogata',
-              ar: 'كاتسوهيرو أوغاتا',
-              hi: 'कात्सुहिरो ओगाटा',
-              ru: 'Кацухиро Огата',
-              el: 'Katsuhiro Ogata',
-              syc: 'Katsuhiro Ogata'
-            })}
-          </a>
-          {L(lang, {
-            ja: '（一般社団法人ビブリオスタイル）',
-            en: ' (Bibliostyle)',
-            'zh-CN': '（Bibliostyle）',
-            'zh-TW': '（Bibliostyle）',
-            ko: ' (Bibliostyle)',
-            la: ' (Bibliostyle)',
-            eo: ' (Bibliostyle)',
-            es: ' (Bibliostyle)',
-            de: ' (Bibliostyle)',
-            ar: ' (Bibliostyle)',
-            hi: ' (Bibliostyle)',
-            ru: ' (Bibliostyle)',
-            el: ' (Bibliostyle)',
-            syc: ' (Bibliostyle)'
-          })}
-        </div>
-        <div className="footer-credit-line">
-          {L(lang, {
-            ja: 'その他蛇足機能（ダークモード、UIデザイン改修、画像前処理、縦書き表示、多言語UI、エクスポート拡張、処理履歴等）: ',
-            en: 'Other bells & whistles (dark mode, UI design, image preprocessing, vertical text, i18n, export, history, etc.): ',
-            'zh-CN': '其他锦上添花功能（深色模式、UI设计改进、图像预处理、竖排文字、多语言UI、导出扩展、处理历史等）：',
-            'zh-TW': '其他錦上添花功能（深色模式、UI設計改進、影像前處理、直書顯示、多語言UI、匯出擴充、處理紀錄等）：',
-            ko: '기타 부가 기능 (다크모드, UI 디자인 개선, 이미지 전처리, 세로쓰기, 다국어 UI, 내보내기 확장, 처리 기록 등): ',
-            la: 'Alia additamenta (modus obscurus, designatio UI, praeparatio imaginum, textus verticalis, UI multilingue, exportatio, historia, etc.): ',
-            eo: 'Aliaj aldonaĵoj (malluma reĝimo, UI-dezajno, bildpretigo, vertikala teksto, plurlingva UI, eksporto, historio, ktp.): ',
-            es: 'Otras funciones adicionales (modo oscuro, diseño UI, preprocesamiento de imágenes, texto vertical, i18n, exportación, historial, etc.): ',
-            de: 'Weitere Funktionen (Dunkelmodus, UI-Design, Bildvorverarbeitung, vertikaler Text, i18n, Export, Verlauf, usw.): ',
-            ar: 'ميزات إضافية أخرى (الوضع الداكن، تصميم الواجهة، معالجة الصور، النص العمودي، تعدد اللغات، التصدير، السجل، إلخ): ',
-            hi: 'अन्य अतिरिक्त सुविधाएँ (डार्क मोड, UI डिज़ाइन, इमेज प्रीप्रोसेसिंग, वर्टिकल टेक्स्ट, i18n, एक्सपोर्ट, इतिहास, आदि): ',
-            ru: 'Прочие дополнительные функции (темный режим, дизайн UI, предварительная обработка изображений, вертикальный текст, i18n, экспорт, история и т.д.): ',
-            el: 'Άλλα έξτρα (σκοτεινή λειτουργία, σχεδιασμό UI, προ-επεξεργασία εικόνας, κάθετο κείμενο, i18n, εξαγωγή, ιστορικό, κλπ.): ',
-            syc: 'ܦܪܘܛܐ ܕܝܬܪܐ (ܓܢܒܐ ܡܠܝܪܐ, ܥܘܠܐ UI, ܩܕܡܦ̈ܘܠܚܐ ܕܨܘܪܐ, ܟܬܒܐ ܪܡܝܐ, i18n, ܦܚܘܪܐ, ܬܫܥܘܬܐ, ܘܐܦ ܠܐ): '
-          })}
-          <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">
-            {L(lang, {
-              ja: '宮川創',
-              en: 'So Miyagawa',
-              'zh-CN': '宫川创',
-              'zh-TW': '宮川創',
-              ko: '미야가와 소',
-              la: 'So Miyagawa',
-              eo: 'So Miyagawa',
-              es: 'So Miyagawa',
-              de: 'So Miyagawa',
-              ar: 'سو مياغاوا',
-              hi: 'सो मियागावा',
-              ru: 'Со Мияагава',
-              el: 'So Miyagawa',
-              syc: 'So Miyagawa'
-            })}
-          </a>
-          {L(lang, {
-            ja: '（筑波大学）',
-            en: ' (University of Tsukuba)',
-            'zh-CN': '（筑波大学）',
-            'zh-TW': '（筑波大學）',
-            ko: ' (쓰쿠바 대학)',
-            la: ' (Universitas Tsukubensis)',
-            eo: ' (Universitato de Tsukuba)',
-            es: ' (Universidad de Tsukuba)',
-            de: ' (Universität Tsukuba)',
-            ar: ' (جامعة تسوكوبا)',
-            hi: ' (त्सुकुबा विश्वविद्यालय)',
-            ru: ' (Университет Цукуба)',
-            el: ' (Πανεπιστήμιο Tsukuba)',
-            syc: ' (ܓܒ ܕܛܣܟܘܒܐ)'
-          })}
-        </div>
       </div>
       <div className="footer-frog-credit">
         {(() => {
@@ -253,7 +136,9 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
             hi: 'तोरु आओइके',
             ru: 'Тору Аойке',
             el: 'Toru Aoike',
-            syc: 'Toru Aoike'
+            syc: 'Toru Aoike',
+            cop: 'Toru Aoike',
+            sa: 'Toru Aoike'
           })}</a>
           if (lang === 'ja') return <>🐸 背景の鳥獣戯画模様は NDLOCR 開発者・{link}先生へのオマージュです</>
           if (lang === 'zh-CN') return <>🐸 背景的鸟兽戏画图案是向NDLOCR开发者{link}先生致敬</>
@@ -265,6 +150,11 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
           if (lang === 'de') return <>🐸 Das Choju-giga-Hintergrundmuster ist eine Hommage an {link}, Entwickler von NDLOCR</>
           if (lang === 'ar') return <>🐸 نمط خلفية Choju-giga هو تكريم لـ {link}، مطور NDLOCR</>
           if (lang === 'hi') return <>🐸 Choju-giga पृष्ठभूमि पैटर्न {link}, NDLOCR के डेवलपर को श्रद्धांजलि है</>
+          if (lang === 'ru') return <>🐸 Узор Choju-giga на фоне — это дань уважения {link}, разработчику NDLOCR</>
+          if (lang === 'el') return <>🐸 Το μοτίβο Choju-giga στο φόντο αποτελεί φόρο τιμής στον {link}, δημιουργό του NDLOCR</>
+          if (lang === 'syc') return <>🐸 ܨܘ̈ܪ̈ܬ Choju-giga ܒ̈ܦ̈ܢ̈ܝ̈ܬ̈ܐ ܐ̈ܝ̈ܩ̈ܪ̈ ܠ {link}، ܒ̈ܪ̈ܘ̈ܝ̈ NDLOCR</>
+          if (lang === 'cop') return <>🐸 ⲡⲓⲥⲭⲏⲙⲁ ⲛⲧⲉ Choju-giga ϧⲉⲛ ⲡⲓⲕⲁϩⲓ ⲟⲩⲧⲁⲓⲟ ⲛ {link}, ⲫⲏ ⲉⲧⲁϥⲑⲁⲙⲓⲟ ⲙ NDLOCR</>
+          if (lang === 'sa') return <>🐸 पृष्ठभूमौ Choju-giga प्रतिरूपं {link} NDLOCR विकासकस्य सम्मानार्थम् अस्ति</>
           return <>🐸 The Choju-giga background pattern is a tribute to {link}, developer of NDLOCR</>
         })()}
       </div>

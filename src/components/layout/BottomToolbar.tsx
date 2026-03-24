@@ -74,7 +74,9 @@ export const BottomToolbar = memo(function BottomToolbar({
               hi: 'सुधार',
               ru: 'исправлений',
               el: 'διορθώσεις',
-              syc: 'ܬܘ̈ܪ̈ܨ̈ܐ'
+              syc: 'ܬܘ̈ܪ̈ܨ̈ܐ',
+              cop: 'ⲧⲩⲣⲟⲩⲟⲛ',
+              sa: 'संशोधनानि'
             })}
           </span>
         )}

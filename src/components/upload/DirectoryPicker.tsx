@@ -41,7 +41,9 @@ export function DirectoryPicker({ onFilesSelected, lang, disabled = false }: Dir
           hi: 'फ़ोल्डर चुनें',
           ru: 'Выбрать папку',
           el: 'Επιλογή φακέλου',
-          syc: 'ܓܒܝ ܣܕܪ'
+          syc: 'ܓܒܝ ܣܕܪ',
+          cop: 'ⲥⲱⲧⲡ ⲛⲧⲉ ⲡⲇⲓⲣⲉⲕⲧⲟⲣⲓ',
+          sa: 'फलकसूचीं चिनुत'
         })}
       </button>
       <input

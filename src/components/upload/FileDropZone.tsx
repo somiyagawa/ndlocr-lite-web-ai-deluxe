@@ -53,7 +53,9 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           hi: 'फ़ाइलें यहाँ खींचें और छोड़ें, या चुनने के लिए क्लिक करें',
           ru: 'Перетащите файлы сюда или нажмите для выбора',
           el: 'Σύρετε αρχεία εδώ ή κάντε κλικ για επιλογή',
-          syc: 'ܓܪܘܪ ܩ̈ܛܝܡܐ ܠܗܪܟܐ ܐܘ ܕܘܨ ܠܓܒܝܬܐ'
+          syc: 'ܓܪܘܪ ܩ̈ܛܝܡܐ ܠܗܪܟܐ ܐܘ ܕܘܨ ܠܓܒܝܬܐ',
+          cop: 'ⲡⲉϩⲣⲁⲧ ⲛⲓϫⲱⲙⲉ ⲡⲁⲓⲙⲁ, ⲏⲣⲉ ⲗⲁⲗⲁⲧ ϩⲓⲛⲁ ⲛⲧⲁⲕ',
+          sa: 'यहाँ फलकान् ग्राहयतु या क्लिक्कु करोतु संस्कृतये'
         })}
       </p>
       <p className="dropzone-text dropzone-text-mobile">
@@ -71,7 +73,9 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           hi: 'फ़ाइलें चुनने के लिए टैप करें',
           ru: 'Нажмите для выбора файлов',
           el: 'Πατήστε για επιλογή αρχείων',
-          syc: 'ܕܘܨ ܠܓܒܝ ܩ̈ܛܝܡܐ'
+          syc: 'ܕܘܨ ܠܓܒܝ ܩ̈ܛܝܡܐ',
+          cop: 'ⲗⲁⲗⲁⲧ ϩⲓⲛⲁ ⲛⲧⲁⲕ ⲛⲓϫⲱⲙⲉ',
+          sa: 'अੰ टैप करोतु फलकान् ग्रहणाय'
         })}
       </p>
       <p className="dropzone-formats dropzone-formats-desktop">
@@ -89,7 +93,9 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V पेस्ट करें',
           ru: 'Форматы: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V для вставки',
           el: 'Υποστηριζόμενα: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V για επικόλληση',
-          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V ܠܐܠܨ̈ܩ'
+          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V ܠܐܠܨ̈ܩ',
+          cop: 'ⲛⲓⲧⲩⲡⲟⲥ ⲛⲉⲕⲟⲡⲓ: JPG, PNG, TIFF, HEIC, PDF · Ctrl+V ⲛϩⲁⲓ',
+          sa: 'समर्थितः JPG, PNG, TIFF, HEIC, PDF · Ctrl+V सामग्रीपेऽनयतु'
         })}
       </p>
       <p className="dropzone-formats dropzone-formats-mobile">
@@ -107,7 +113,9 @@ export function FileDropZone({ onFilesSelected, lang, disabled = false }: FileDr
           hi: 'समर्थित: JPG, PNG, TIFF, HEIC, PDF',
           ru: 'Форматы: JPG, PNG, TIFF, HEIC, PDF',
           el: 'Υποστηριζόμενα: JPG, PNG, TIFF, HEIC, PDF',
-          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF'
+          syc: 'ܛܘ̈ܦܣ ܡܩ̈ܒܠܐ: JPG, PNG, TIFF, HEIC, PDF',
+          cop: 'ⲛⲓⲧⲩⲡⲟⲥ ⲛⲉⲕⲟⲡⲓ: JPG, PNG, TIFF, HEIC, PDF',
+          sa: 'समर्थितः JPG, PNG, TIFF, HEIC, PDF'
         })}
       </p>
       <input
