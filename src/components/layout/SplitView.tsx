@@ -30,8 +30,8 @@ export function SplitView({
   useEffect(() => {
     const updateMode = () => {
       const w = window.innerWidth
-      if (w <= 480) setViewMode('mobile')
-      else if (w <= 768) setViewMode('tablet')
+      if (w <= 768) setViewMode('mobile')
+      else if (w <= 1024) setViewMode('tablet')
       else setViewMode('desktop')
     }
     updateMode()
