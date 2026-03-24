@@ -160,7 +160,7 @@ export function TextEditor({
         setShowSearchBar(!showSearchBar)
       } else if (modifier && e.key === 's') {
         e.preventDefault()
-        handleSave()
+        setShowExportMenu(prev => !prev)
       } else if (modifier && e.key === 'z' && !e.shiftKey) {
         e.preventDefault()
         handleUndo()
@@ -276,25 +276,6 @@ export function TextEditor({
     }
   }
 
-  const handleDownload = () => {
-    if (!result) return
-    const text = applyOptions(editedText ?? result.fullText)
-    downloadText(
-      includeFileName ? `=== ${result.fileName} ===\n${text}` : text,
-      result.fileName,
-    )
-  }
-
-  const handleSave = () => {
-    if (!result) return
-    const text = applyOptions(editedText ?? result.fullText)
-    downloadText(
-      includeFileName ? `=== ${result.fileName} ===\n${text}` : text,
-      result.fileName,
-    )
-    setSaved(true)
-  }
-
   const handleUndo = useCallback(() => {
     setUndoStack(prev => {
       if (prev.length === 0) return prev
@@ -387,8 +368,12 @@ export function TextEditor({
   const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf' | 'docx') => {
     if (!result) return
     setShowExportMenu(false)
+    const text = applyOptions(editedText ?? result.fullText)
     if (format === 'txt') {
-      handleDownload()
+      downloadText(
+        includeFileName ? `=== ${result.fileName} ===\n${text}` : text,
+        result.fileName,
+      )
     } else if (format === 'tei') {
       downloadTEI(result)
     } else if (format === 'hocr') {
@@ -398,7 +383,8 @@ export function TextEditor({
     } else if (format === 'docx') {
       downloadDOCX(result, { includeFileName, ignoreNewlines })
     }
-  }, [result, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
+    setSaved(true)
+  }, [result, editedText, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // AI校正実行
   const handleProofread = useCallback(async () => {
@@ -663,12 +649,13 @@ export function TextEditor({
               : L(lang, { ja: 'コピー', en: 'Copy', 'zh-CN': '复制', 'zh-TW': '複製', ko: '복사', la: 'Transcribere', eo: 'Kopii', es: 'Copiar', de: 'Kopieren', ar: 'نسخ', hi: 'कॉपी' })}
           </button>
           <div className="export-dropdown-wrapper" ref={exportMenuRef}>
-            <button className="btn btn-secondary btn-sm" onClick={() => setShowExportMenu(!showExportMenu)}>
+            <button className="btn btn-primary btn-sm" onClick={() => setShowExportMenu(!showExportMenu)} title="Ctrl+S">
               <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '3px' }}>
-                <path d="M8 2v9M4 8l4 4 4-4" />
-                <path d="M2 12v2h12v-2" />
+                <path d="M2 2v12h12V5l-3-3H2z" />
+                <path d="M5 2v4h5V2" />
+                <rect x="4" y="9" width="8" height="5" rx="0.5" />
               </svg>
-              {L(lang, { ja: 'DL', en: 'DL', 'zh-CN': '下载', 'zh-TW': '下載', ko: '다운로드', la: 'Devehere', eo: 'Elŝuti', es: 'Descargar', de: 'DL', ar: 'تحميل', hi: 'डाउनलोड' })}
+              {L(lang, { ja: '保存', en: 'Save', 'zh-CN': '保存', 'zh-TW': '儲存', ko: '저장', la: 'Servare', eo: 'Konservi', es: 'Guardar', de: 'Speichern', ar: 'حفظ', hi: 'सहेजें' })}
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '2px' }}>
                 <path d="M4 6l4 4 4-4" />
               </svg>
@@ -698,14 +685,6 @@ export function TextEditor({
               </div>
             )}
           </div>
-          <button className="btn btn-primary btn-sm" onClick={handleSave} title="Ctrl+S">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '3px' }}>
-              <path d="M2 2v12h12V5l-3-3H2z" />
-              <path d="M5 2v4h5V2" />
-              <rect x="4" y="9" width="8" height="5" rx="0.5" />
-            </svg>
-            {L(lang, { ja: '保存', en: 'Save', 'zh-CN': '保存', 'zh-TW': '儲存', ko: '저장', la: 'Servare', eo: 'Konservi', es: 'Guardar', de: 'Speichern', ar: 'حفظ', hi: 'सहेजें' })}
-          </button>
         </div>
       </div>
 
