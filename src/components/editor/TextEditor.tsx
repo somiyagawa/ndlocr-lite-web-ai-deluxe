@@ -6,6 +6,7 @@ import { downloadText, copyToClipboard } from '../../utils/textExport'
 import { downloadTEI } from '../../utils/exportTEI'
 import { downloadHOCR } from '../../utils/exportHOCR'
 import { downloadPDF } from '../../utils/exportPDF'
+import { downloadDOCX } from '../../utils/exportDOCX'
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
 import { L } from '../../i18n'
@@ -383,7 +384,7 @@ export function TextEditor({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showExportMenu])
 
-  const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf') => {
+  const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf' | 'docx') => {
     if (!result) return
     setShowExportMenu(false)
     if (format === 'txt') {
@@ -394,8 +395,10 @@ export function TextEditor({
       downloadHOCR(result)
     } else if (format === 'pdf') {
       downloadPDF(result, imageDataUrl)
+    } else if (format === 'docx') {
+      downloadDOCX(result, { includeFileName, ignoreNewlines })
     }
-  }, [result, imageDataUrl]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [result, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // AI校正実行
   const handleProofread = useCallback(async () => {
@@ -687,6 +690,10 @@ export function TextEditor({
                 <button className="export-dropdown-item" onClick={() => handleExport('pdf')}>
                   <span className="export-dropdown-icon">PDF</span>
                   <span>{L(lang, { ja: 'テキスト付きPDF (.pdf)', en: 'Text-embedded PDF (.pdf)', 'zh-CN': '带文字图层的PDF (.pdf)', 'zh-TW': '含文字圖層的PDF (.pdf)', ko: '텍스트 오버레이 PDF (.pdf)', la: 'PDF cum textu (.pdf)', eo: 'PDF kun teksto (.pdf)', es: 'PDF con texto (.pdf)', de: 'PDF mit Text (.pdf)', ar: 'PDF مع نص (.pdf)', hi: 'टेक्स्ट-एम्बेडेड PDF (.pdf)' })}</span>
+                </button>
+                <button className="export-dropdown-item" onClick={() => handleExport('docx')}>
+                  <span className="export-dropdown-icon">DOCX</span>
+                  <span>{L(lang, { ja: 'Word文書 (.docx)', en: 'Word Document (.docx)', 'zh-CN': 'Word文档 (.docx)', 'zh-TW': 'Word文件 (.docx)', ko: 'Word 문서 (.docx)', la: 'Documentum Word (.docx)', eo: 'Word-dokumento (.docx)', es: 'Documento Word (.docx)', de: 'Word-Dokument (.docx)', ar: 'مستند Word (.docx)', hi: 'Word दस्तावेज़ (.docx)' })}</span>
                 </button>
               </div>
             )}
