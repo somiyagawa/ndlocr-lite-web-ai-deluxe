@@ -1,5 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
-import { L } from '../../i18n'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import type { Language } from '../../i18n'
 
 interface SplitViewProps {
@@ -17,14 +16,12 @@ export function SplitView({
   defaultRatio = 0.5,
   minLeftPx = 200,
   minRightPx = 200,
-  lang = 'ja',
+  lang: _lang = 'ja',
 }: SplitViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [ratio, setRatio] = useState(defaultRatio)
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
-  const [activeTab, setActiveTab] = useState<'left' | 'right'>('left')
   const dragging = useRef(false)
-  const swipeStartX = useRef(0)
 
   // Viewport detection
   useEffect(() => {
@@ -53,23 +50,6 @@ export function SplitView({
     const cursorStyle = viewMode === 'tablet' ? 'row-resize' : 'col-resize'
     document.body.style.cursor = cursorStyle
   }, [viewMode])
-
-  const handleSwipeStart = useCallback((e: React.TouchEvent) => {
-    swipeStartX.current = e.touches[0].clientX
-  }, [])
-
-  const handleSwipeEnd = useCallback((e: React.TouchEvent) => {
-    if (viewMode !== 'mobile') return
-    const swipeEndX = e.changedTouches[0].clientX
-    const diff = swipeStartX.current - swipeEndX
-    if (Math.abs(diff) > 50) {
-      if (diff > 0 && activeTab === 'left') {
-        setActiveTab('right')
-      } else if (diff < 0 && activeTab === 'right') {
-        setActiveTab('left')
-      }
-    }
-  }, [viewMode, activeTab])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -137,63 +117,15 @@ export function SplitView({
     }
   }, [viewMode, minLeftPx, minRightPx])
 
-  const leftLabel = L(lang, {
-    ja: '画像',
-    en: 'Image',
-    'zh-CN': '图像',
-    'zh-TW': '圖像',
-    ko: '이미지',
-    la: 'Imago',
-    eo: 'Bildo',
-    es: 'Imagen',
-    de: 'Bild',
-    ar: 'صورة',
-    hi: 'छवि',
-  })
-
-  const rightLabel = L(lang, {
-    ja: 'テキスト',
-    en: 'Text',
-    'zh-CN': '文本',
-    'zh-TW': '文字',
-    ko: '텍스트',
-    la: 'Textus',
-    eo: 'Teksto',
-    es: 'Texto',
-    de: 'Text',
-    ar: 'نص',
-    hi: 'पाठ',
-  })
-
-  // Mobile layout with tabs
+  // Mobile layout: stacked vertically (editor on top, image below)
   if (viewMode === 'mobile') {
     return (
       <div className="split-view split-view-mobile" ref={containerRef}>
-        <div className="split-view-tabs">
-          <button
-            className={`split-view-tab${activeTab === 'left' ? ' active' : ''}`}
-            onClick={() => setActiveTab('left')}
-          >
-            📷 {leftLabel}
-          </button>
-          <button
-            className={`split-view-tab${activeTab === 'right' ? ' active' : ''}`}
-            onClick={() => setActiveTab('right')}
-          >
-            📝 {rightLabel}
-          </button>
+        <div className="split-pane split-pane-right split-pane-active split-pane-mobile-top">
+          {right}
         </div>
-        <div className="split-view-swipe" onTouchStart={handleSwipeStart} onTouchEnd={handleSwipeEnd}>
-          <div
-            className={`split-pane split-pane-left${activeTab === 'left' ? ' split-pane-active' : ''}`}
-          >
-            {left}
-          </div>
-          <div
-            className={`split-pane split-pane-right${activeTab === 'right' ? ' split-pane-active' : ''}`}
-          >
-            {right}
-          </div>
+        <div className="split-pane split-pane-left split-pane-active split-pane-mobile-bottom">
+          {left}
         </div>
       </div>
     )
