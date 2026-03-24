@@ -124,3 +124,79 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
   const baseName = result.fileName.replace(/\.[^/.]+$/, '')
   doc.save(`${baseName}_ocr.pdf`)
 }
+
+/**
+ * 複数ページのOCR結果を1つのPDFファイルとしてダウンロード
+ * 各ページが1ページとなる複数ページPDFを生成
+ */
+export async function downloadBatchPDF(results: OCRResult[]): Promise<void> {
+  if (results.length === 0) return
+
+  let doc: jsPDF | null = null
+  const DPI = 150
+
+  for (let pageIdx = 0; pageIdx < results.length; pageIdx++) {
+    const result = results[pageIdx]
+    const imageDataUrl = result.imageDataUrl
+    if (!imageDataUrl) continue
+
+    const { width: imgW, height: imgH } = await getImageDimensions(imageDataUrl)
+    const pdfW = (imgW / DPI) * 72
+    const pdfH = (imgH / DPI) * 72
+    const orientation = pdfW > pdfH ? 'landscape' : 'portrait'
+
+    if (doc === null) {
+      doc = new jsPDF({ orientation, unit: 'pt', format: [pdfW, pdfH] })
+    } else {
+      doc.addPage([pdfW, pdfH], orientation)
+    }
+
+    const format = getImageFormat(imageDataUrl)
+    doc.addImage(imageDataUrl, format, 0, 0, pdfW, pdfH)
+
+    const sortedBlocks = [...result.textBlocks].sort((a, b) => a.readingOrder - b.readingOrder)
+    const scaleX = pdfW / imgW
+    const scaleY = pdfH / imgH
+
+    for (const block of sortedBlocks) {
+      if (!block.text.trim()) continue
+      const bx = block.x * scaleX
+      const by = block.y * scaleY
+      const bw = block.width * scaleX
+      const bh = block.height * scaleY
+
+      const isVerticalBlock = block.height > block.width * 1.5
+      let fontSize: number
+      if (isVerticalBlock) {
+        fontSize = Math.max(4, Math.min(bw * 0.85, 48))
+      } else {
+        fontSize = Math.max(4, Math.min(bh * 0.75, 48))
+      }
+
+      doc.setFont('Helvetica')
+      doc.setFontSize(fontSize)
+      doc.setTextColor(0, 0, 0)
+      // @ts-expect-error - jsPDF internal API for invisible text rendering
+      doc.internal.write('3 Tr')
+
+      if (isVerticalBlock) {
+        const chars = block.text.replace(/\n/g, '')
+        const charHeight = fontSize * 1.2
+        let cy = by + fontSize
+        for (const ch of chars) {
+          if (cy > by + bh) break
+          doc.text(ch, bx + bw * 0.3, cy)
+          cy += charHeight
+        }
+      } else {
+        doc.text(block.text.replace(/\n/g, ' '), bx, by + fontSize, { maxWidth: bw })
+      }
+      // @ts-expect-error - jsPDF internal API
+      doc.internal.write('0 Tr')
+    }
+  }
+
+  if (doc) {
+    doc.save('ocr_all_pages.pdf')
+  }
+}

@@ -3,9 +3,9 @@ import type { OCRResult, TextBlock } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import { downloadText, copyToClipboard } from '../../utils/textExport'
-import { downloadTEI } from '../../utils/exportTEI'
-import { downloadHOCR } from '../../utils/exportHOCR'
-import { downloadPDF } from '../../utils/exportPDF'
+import { downloadTEI, downloadBatchTEI } from '../../utils/exportTEI'
+import { downloadHOCR, downloadBatchHOCR } from '../../utils/exportHOCR'
+import { downloadPDF, downloadBatchPDF } from '../../utils/exportPDF'
 import { downloadDOCX } from '../../utils/exportDOCX'
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
@@ -389,7 +389,7 @@ export function TextEditor({
   }, [result, editedText, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 全ページ一括エクスポート
-  const handleBatchExport = useCallback((format: 'txt' | 'docx') => {
+  const handleBatchExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf' | 'docx') => {
     if (allResults.length === 0) return
     setShowExportMenu(false)
     if (format === 'txt') {
@@ -406,8 +406,13 @@ export function TextEditor({
       a.download = 'ocr_all_pages.txt'
       a.click()
       URL.revokeObjectURL(url)
+    } else if (format === 'tei') {
+      downloadBatchTEI(allResults)
+    } else if (format === 'hocr') {
+      downloadBatchHOCR(allResults)
+    } else if (format === 'pdf') {
+      downloadBatchPDF(allResults)
     } else if (format === 'docx') {
-      // 全ページを1つのDOCXに結合
       const combined: OCRResult = {
         id: 'batch',
         fileName: 'all_pages',
@@ -730,6 +735,18 @@ export function TextEditor({
                     <button className="export-dropdown-item" onClick={() => handleBatchExport('txt')}>
                       <span className="export-dropdown-icon">TXT</span>
                       <span>{L(lang, { ja: '全ページ結合 (.txt)', en: 'All pages combined (.txt)', 'zh-CN': '全部页面合并 (.txt)', 'zh-TW': '全部頁面合併 (.txt)', ko: '전체 페이지 결합 (.txt)', la: 'Omnes paginae coniunctae (.txt)', eo: 'Ĉiuj paĝoj kunigitaj (.txt)', es: 'Todas las páginas combinadas (.txt)', de: 'Alle Seiten zusammen (.txt)', ar: 'جميع الصفحات مجتمعة (.txt)', hi: 'सभी पृष्ठ संयुक्त (.txt)' })}</span>
+                    </button>
+                    <button className="export-dropdown-item" onClick={() => handleBatchExport('tei')}>
+                      <span className="export-dropdown-icon">TEI</span>
+                      <span>{L(lang, { ja: '全ページ結合 (.xml)', en: 'All pages combined (.xml)', 'zh-CN': '全部页面合并 (.xml)', 'zh-TW': '全部頁面合併 (.xml)', ko: '전체 페이지 결합 (.xml)', la: 'Omnes paginae coniunctae (.xml)', eo: 'Ĉiuj paĝoj kunigitaj (.xml)', es: 'Todas las páginas combinadas (.xml)', de: 'Alle Seiten zusammen (.xml)', ar: 'جميع الصفحات مجتمعة (.xml)', hi: 'सभी पृष्ठ संयुक्त (.xml)' })}</span>
+                    </button>
+                    <button className="export-dropdown-item" onClick={() => handleBatchExport('hocr')}>
+                      <span className="export-dropdown-icon">hOCR</span>
+                      <span>{L(lang, { ja: '全ページ結合 (.hocr)', en: 'All pages combined (.hocr)', 'zh-CN': '全部页面合并 (.hocr)', 'zh-TW': '全部頁面合併 (.hocr)', ko: '전체 페이지 결합 (.hocr)', la: 'Omnes paginae coniunctae (.hocr)', eo: 'Ĉiuj paĝoj kunigitaj (.hocr)', es: 'Todas las páginas combinadas (.hocr)', de: 'Alle Seiten zusammen (.hocr)', ar: 'جميع الصفحات مجتمعة (.hocr)', hi: 'सभी पृष्ठ संयुक्त (.hocr)' })}</span>
+                    </button>
+                    <button className="export-dropdown-item" onClick={() => handleBatchExport('pdf')}>
+                      <span className="export-dropdown-icon">PDF</span>
+                      <span>{L(lang, { ja: '全ページ結合 (.pdf)', en: 'All pages combined (.pdf)', 'zh-CN': '全部页面合并 (.pdf)', 'zh-TW': '全部頁面合併 (.pdf)', ko: '전체 페이지 결합 (.pdf)', la: 'Omnes paginae coniunctae (.pdf)', eo: 'Ĉiuj paĝoj kunigitaj (.pdf)', es: 'Todas las páginas combinadas (.pdf)', de: 'Alle Seiten zusammen (.pdf)', ar: 'جميع الصفحات مجتمعة (.pdf)', hi: 'सभी पृष्ठ संयुक्त (.pdf)' })}</span>
                     </button>
                     <button className="export-dropdown-item" onClick={() => handleBatchExport('docx')}>
                       <span className="export-dropdown-icon">DOCX</span>
