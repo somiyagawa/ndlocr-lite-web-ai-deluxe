@@ -47,6 +47,11 @@ export function ImageViewer({
   const [spaceHeld, setSpaceHeld] = useState(false)
   const [smooth, setSmooth] = useState(false) // true = animate transitions
 
+  // miwo-inspired overlay modes
+  const [showTextOverlay, setShowTextOverlay] = useState(false)
+  const [showConfidence, setShowConfidence] = useState(false)
+  const [showReadingOrder, setShowReadingOrder] = useState(false)
+
   const panStartRef = useRef({ x: 0, y: 0 })
   const panOffsetRef = useRef({ x: 0, y: 0 })
   // Keep panOffset ref in sync
@@ -385,6 +390,40 @@ export function ImageViewer({
             </svg>
           </button>
         )}
+        {/* miwo-inspired overlay toggles */}
+        {textBlocks.length > 0 && (
+          <>
+            <span className="zoom-controls-sep" />
+            <button
+              className={`btn-zoom ${showTextOverlay ? 'btn-zoom-active' : ''}`}
+              onClick={() => setShowTextOverlay(prev => !prev)}
+              title="Show OCR text on image"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" />
+              </svg>
+            </button>
+            <button
+              className={`btn-zoom ${showConfidence ? 'btn-zoom-active' : ''}`}
+              onClick={() => setShowConfidence(prev => !prev)}
+              title="Show confidence heatmap"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </button>
+            <button
+              className={`btn-zoom ${showReadingOrder ? 'btn-zoom-active' : ''}`}
+              onClick={() => setShowReadingOrder(prev => !prev)}
+              title="Show reading order"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Image container */}
@@ -425,18 +464,37 @@ export function ImageViewer({
                 title={`Block ${i + 1}`}
               />
             ))}
-            {textBlocks.map((block, i) => (
-              <div
-                key={i}
-                className={`region-box ${selectedBlock === block ? 'selected' : ''}`}
-                style={{
-                  left: block.x * scaleX, top: block.y * scaleY,
-                  width: block.width * scaleX, height: block.height * scaleY,
-                }}
-                onClick={() => onBlockSelect(block)}
-                title={block.text}
-              />
-            ))}
+            {textBlocks.map((block, i) => {
+              // Confidence color: green (high) → yellow → red (low)
+              const conf = block.confidence ?? 0.5
+              const confColor = showConfidence
+                ? `hsla(${Math.round(conf * 120)}, 85%, 50%, 0.5)`
+                : undefined
+              const confBorder = showConfidence
+                ? `2px solid hsla(${Math.round(conf * 120)}, 85%, 45%, 0.8)`
+                : undefined
+
+              return (
+                <div
+                  key={i}
+                  className={`region-box ${selectedBlock === block ? 'selected' : ''} ${showTextOverlay ? 'region-box-text-overlay' : ''}`}
+                  style={{
+                    left: block.x * scaleX, top: block.y * scaleY,
+                    width: block.width * scaleX, height: block.height * scaleY,
+                    ...(confColor ? { background: confColor, border: confBorder } : {}),
+                  }}
+                  onClick={() => onBlockSelect(block)}
+                  title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
+                >
+                  {showReadingOrder && (
+                    <span className="region-reading-order">{block.readingOrder + 1}</span>
+                  )}
+                  {showTextOverlay && (
+                    <span className="region-text-label">{block.text}</span>
+                  )}
+                </div>
+              )
+            })}
             {selectionRect && (
               <div className="drag-selection" style={{
                 left: selectionRect.left, top: selectionRect.top,
