@@ -113,6 +113,10 @@ export const Header = memo(function Header({
                 ko: '클릭하여 AI 연결 방법 보기',
                 la: 'Preme ut connexionem AI videas',
                 eo: 'Alklaku por vidi kiel konekti AI',
+              es: 'Haz clic para ver cómo conectar la AI',
+              de: 'Klicken Sie, um die KI-Verbindung zu sehen',
+              ar: 'انقر لمعرفة كيفية اتصال AI',
+              hi: 'AI कनेक्ट करने का तरीका देखने के लिए क्लिक करें'
               })}
               onClick={onAIStatusClick}
             >
