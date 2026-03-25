@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import type { TextBlock, BoundingBox, PageBlock } from '../../types/ocr'
 import type { Quadrilateral } from '../../utils/documentScanner'
+import type { Language } from '../../i18n'
+import { L } from '../../i18n'
 
 interface ImageViewerProps {
   imageDataUrl: string
@@ -23,6 +25,8 @@ interface ImageViewerProps {
   adjustActive?: boolean
   onAdjustToggle?: () => void
   adjustLabel?: string
+  /** Language for toolbar labels */
+  lang?: Language
 }
 
 const MIN_ZOOM = 0.1
@@ -50,6 +54,7 @@ export function ImageViewer({
   adjustActive,
   onAdjustToggle,
   adjustLabel,
+  lang = 'ja',
 }: ImageViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
@@ -470,7 +475,7 @@ export function ImageViewer({
         <button
           className="btn-zoom btn-zoom-reset"
           onClick={handleZoomReset}
-          title="Fit to view"
+          title={L(lang, { ja: '画面に合わせる', en: 'Fit to view', 'zh-CN': '适应视图', 'zh-TW': '適應檢視', ko: '화면에 맞추기', la: 'Aptare', eo: 'Adapti', es: 'Ajustar', de: 'Einpassen', ar: 'ملاءمة', hi: 'फ़िट करें', ru: 'Вписать', el: 'Προσαρμογή', syc: 'ܚܒܘܫ' })}
           disabled={isFit && panOffset.x === 0 && panOffset.y === 0}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -479,15 +484,15 @@ export function ImageViewer({
         </button>
         <span className="zoom-controls-sep" />
         {/* Zoom out / level / in */}
-        <button className="btn-zoom" onClick={handleZoomOut} title="Zoom out">−</button>
-        <button className="zoom-level" onClick={handleZoom100} title="Click for 100%">{zoomPercent}%</button>
-        <button className="btn-zoom" onClick={handleZoomIn} title="Zoom in">+</button>
+        <button className="btn-zoom" onClick={handleZoomOut} title={L(lang, { ja: '縮小', en: 'Zoom out', 'zh-CN': '缩小', 'zh-TW': '縮小', ko: '축소', la: 'Minuere', eo: 'Malpligrandigi', es: 'Alejar', de: 'Verkleinern', ar: 'تصغير', hi: 'छोटा करें', ru: 'Уменьшить', el: 'Σμίκρυνση', syc: 'ܙܥܘܪ' })}>−</button>
+        <button className="zoom-level" onClick={handleZoom100} title={L(lang, { ja: '100%表示', en: 'Click for 100%', 'zh-CN': '点击100%', 'zh-TW': '點擊100%', ko: '100% 보기', la: '100%', eo: '100%', es: '100%', de: '100%', ar: '100%', hi: '100%', ru: '100%', el: '100%', syc: '100%' })}>{zoomPercent}%</button>
+        <button className="btn-zoom" onClick={handleZoomIn} title={L(lang, { ja: '拡大', en: 'Zoom in', 'zh-CN': '放大', 'zh-TW': '放大', ko: '확대', la: 'Augere', eo: 'Pligrandigi', es: 'Acercar', de: 'Vergrößern', ar: 'تكبير', hi: 'बड़ा करें', ru: 'Увеличить', el: 'Μεγέθυνση', syc: 'ܪܒ' })}>+</button>
         <span className="zoom-controls-sep" />
         {/* Mode toggle */}
         <button
           className={`btn-zoom ${activeMode === 'pan' ? 'btn-zoom-active' : ''}`}
           onClick={() => setMode('pan')}
-          title="Pan mode — drag to move (hold Space)"
+          title={L(lang, { ja: 'パンモード — ドラッグで移動（Space長押し）', en: 'Pan mode — drag to move (hold Space)', 'zh-CN': '平移模式 — 拖动移动（按住Space）', 'zh-TW': '平移模式 — 拖曳移動（按住Space）', ko: '팬 모드 — 드래그로 이동 (Space 길게 누르기)', la: 'Modus motus', eo: 'Pan-reĝimo', es: 'Modo panorámico', de: 'Schwenkmodus', ar: 'وضع التحريك', hi: 'पैन मोड', ru: 'Режим перемещения', el: 'Μετακίνηση', syc: 'ܫܢܝ' })}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 11V6a2 2 0 0 0-4 0v5" /><path d="M14 10V4a2 2 0 0 0-4 0v6" /><path d="M10 10.5V6a2 2 0 0 0-4 0v8a6 6 0 0 0 12 0v-2a2 2 0 0 0-4 0" />
@@ -497,7 +502,7 @@ export function ImageViewer({
           <button
             className={`btn-zoom ${activeMode === 'select' && !spaceHeld ? 'btn-zoom-active' : ''}`}
             onClick={() => setMode('select')}
-            title="Select region — drag to select area for OCR"
+            title={L(lang, { ja: '領域選択 — ドラッグでOCR範囲を選択', en: 'Select region — drag to select area for OCR', 'zh-CN': '选择区域 — 拖动选择OCR范围', 'zh-TW': '選取區域 — 拖曳選取OCR範圍', ko: '영역 선택 — 드래그로 OCR 범위 선택', la: 'Regionem seligere', eo: 'Elekti regionon', es: 'Seleccionar región', de: 'Bereich auswählen', ar: 'تحديد المنطقة', hi: 'क्षेत्र चुनें', ru: 'Выбрать область', el: 'Επιλογή περιοχής', syc: 'ܓܒܝ ܐܬܪ' })}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" strokeDasharray="4 2" />
@@ -511,7 +516,7 @@ export function ImageViewer({
             <button
               className={`btn-zoom ${showTextOverlay ? 'btn-zoom-active' : ''}`}
               onClick={() => setShowTextOverlay(prev => !prev)}
-              title="Show OCR text on image"
+              title={L(lang, { ja: 'OCRテキストを画像上に表示', en: 'Show OCR text on image', 'zh-CN': '在图像上显示OCR文字', 'zh-TW': '在影像上顯示OCR文字', ko: '이미지에 OCR 텍스트 표시', la: 'Textum OCR ostendere', eo: 'Montri OCR-tekston', es: 'Mostrar texto OCR', de: 'OCR-Text anzeigen', ar: 'عرض نص OCR', hi: 'OCR पाठ दिखाएँ', ru: 'Показать текст OCR', el: 'Εμφάνιση κειμένου OCR', syc: 'ܚܘܝ ܟܬܒ OCR' })}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" />
@@ -520,7 +525,7 @@ export function ImageViewer({
             <button
               className={`btn-zoom ${showConfidence ? 'btn-zoom-active' : ''}`}
               onClick={() => setShowConfidence(prev => !prev)}
-              title="Show confidence heatmap"
+              title={L(lang, { ja: '信頼度ヒートマップ表示', en: 'Show confidence heatmap', 'zh-CN': '显示置信度热图', 'zh-TW': '顯示信賴度熱圖', ko: '신뢰도 히트맵 표시', la: 'Fiduciam ostendere', eo: 'Montri fidmapon', es: 'Mostrar confianza', de: 'Konfidenz-Heatmap', ar: 'عرض خريطة الثقة', hi: 'विश्वसनीयता हीटमैप', ru: 'Тепловая карта', el: 'Χάρτης εμπιστοσύνης', syc: 'ܚܘܝ ܬܘܟܠܢ' })}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
@@ -530,7 +535,7 @@ export function ImageViewer({
             <button
               className={`btn-zoom ${showReadingOrder ? 'btn-zoom-active' : ''}`}
               onClick={() => setShowReadingOrder(prev => !prev)}
-              title="Show reading order"
+              title={L(lang, { ja: '読み順表示', en: 'Show reading order', 'zh-CN': '显示阅读顺序', 'zh-TW': '顯示閱讀順序', ko: '읽기 순서 표시', la: 'Ordinem legendi ostendere', eo: 'Montri legordon', es: 'Mostrar orden', de: 'Lesereihenfolge', ar: 'عرض ترتيب القراءة', hi: 'पढ़ने का क्रम', ru: 'Порядок чтения', el: 'Σειρά ανάγνωσης', syc: 'ܚܘܝ ܣܕܪ ܩܪܝܢ' })}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" />
