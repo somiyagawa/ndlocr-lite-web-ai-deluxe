@@ -133,8 +133,8 @@ export default function App() {
   }, [])
 
   const handlePreprocessReset = useCallback((index: number) => {
-    // 分割前の状態がある場合は復元する
-    if (preSplitImages) {
+    // 分割前の状態がある場合は復元する（pending画像のみ、結果ビュー index>=10000 では不適用）
+    if (preSplitImages && index < 10000) {
       setProcessedImages(preSplitImages)
       setPreSplitImages(null)
       setPreprocessedUrls({})
@@ -1066,7 +1066,7 @@ export default function App() {
                             <Suspense fallback={null}>
                               <ImagePreprocessPanel
                                 lang={lang}
-                                imageDataUrl={currentResult.imageDataUrl}
+                                imageDataUrl={preprocessedUrls[selectedResultIndex + 10000] ?? currentResult.imageDataUrl}
                                 onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
                                 onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
                                 sidePanel

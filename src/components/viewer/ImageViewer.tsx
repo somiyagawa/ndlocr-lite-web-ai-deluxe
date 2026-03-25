@@ -704,7 +704,21 @@ export function ImageViewer({
         </div>
       )}
 
-      {/* Zoom + mode controls */}
+      {/* Image container */}
+      <div
+        className="image-viewer"
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ cursor: cursorStyle, overflow: 'hidden', touchAction: 'none' }}
+      >
+      {/* Zoom + mode controls — placed inside .image-viewer so absolute positioning is relative to image area */}
       <div className="zoom-controls">
         {/* Reset / Fit */}
         <button
@@ -795,21 +809,6 @@ export function ImageViewer({
           </>
         )}
       </div>
-
-      {/* Image container */}
-      <div
-        className="image-viewer"
-        ref={containerRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onDoubleClick={handleDoubleClick}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{ cursor: cursorStyle, overflow: 'hidden', touchAction: 'none' }}
-      >
         <div className="image-viewer-transform" style={transformStyle}>
           <img
             ref={imgRef}
