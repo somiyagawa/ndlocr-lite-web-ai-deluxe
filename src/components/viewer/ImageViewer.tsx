@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import type { TextBlock, BoundingBox, PageBlock } from '../../types/ocr'
+import type { Quadrilateral } from '../../utils/documentScanner'
 
 interface ImageViewerProps {
   imageDataUrl: string
@@ -13,6 +14,15 @@ interface ImageViewerProps {
   onPageBlockSelect?: (block: PageBlock) => void
   pageIndex?: number
   totalPages?: number
+  /** Perspective crop overlay */
+  perspectiveMode?: boolean
+  perspectiveCorners?: Quadrilateral | null
+  onPerspectiveCornersChange?: (corners: Quadrilateral) => void
+  /** Image correction toggle button in toolbar */
+  showAdjustButton?: boolean
+  adjustActive?: boolean
+  onAdjustToggle?: () => void
+  adjustLabel?: string
 }
 
 const MIN_ZOOM = 0.1
@@ -33,6 +43,13 @@ export function ImageViewer({
   onPageBlockSelect,
   pageIndex,
   totalPages,
+  perspectiveMode,
+  perspectiveCorners,
+  onPerspectiveCornersChange,
+  showAdjustButton,
+  adjustActive,
+  onAdjustToggle,
+  adjustLabel,
 }: ImageViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
@@ -51,6 +68,9 @@ export function ImageViewer({
   const [showTextOverlay, setShowTextOverlay] = useState(false)
   const [showConfidence, setShowConfidence] = useState(false)
   const [showReadingOrder, setShowReadingOrder] = useState(false)
+
+  // Perspective corner dragging
+  const [perspDragging, setPerspDragging] = useState<string | null>(null)
 
   const panStartRef = useRef({ x: 0, y: 0 })
   const panOffsetRef = useRef({ x: 0, y: 0 })
@@ -190,10 +210,37 @@ export function ImageViewer({
     }
   }, [zoom, computeFitZoom, zoomTowards])
 
+  // ─── Perspective corner hit-test helper ───
+  const hitTestPerspCorner = useCallback((pos: { x: number; y: number }): string | null => {
+    if (!perspectiveCorners) return null
+    const hitRadius = 18 // pixels in displayed coords
+    const corners = [
+      { key: 'topLeft', pt: perspectiveCorners.topLeft },
+      { key: 'topRight', pt: perspectiveCorners.topRight },
+      { key: 'bottomRight', pt: perspectiveCorners.bottomRight },
+      { key: 'bottomLeft', pt: perspectiveCorners.bottomLeft },
+    ]
+    for (const { key, pt } of corners) {
+      const dx = pos.x - pt.x * scaleX
+      const dy = pos.y - pt.y * scaleY
+      if (Math.sqrt(dx * dx + dy * dy) < hitRadius) return key
+    }
+    return null
+  }, [perspectiveCorners, scaleX, scaleY])
+
   // ─── Mouse interactions ───
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return
     e.preventDefault()
+    // Perspective corner drag takes priority
+    if (perspectiveMode && perspectiveCorners && onPerspectiveCornersChange) {
+      const pos = getRelativePos(e)
+      const hit = hitTestPerspCorner(pos)
+      if (hit) {
+        setPerspDragging(hit)
+        return
+      }
+    }
     if (activeMode === 'pan') {
       setIsPanning(true)
       panStartRef.current = { x: e.clientX - panOffset.x, y: e.clientY - panOffset.y }
@@ -205,6 +252,14 @@ export function ImageViewer({
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Perspective corner dragging
+    if (perspDragging && perspectiveCorners && onPerspectiveCornersChange) {
+      const pos = getRelativePos(e)
+      const x = Math.max(0, Math.min(naturalSize.width, Math.round(pos.x / scaleX)))
+      const y = Math.max(0, Math.min(naturalSize.height, Math.round(pos.y / scaleY)))
+      onPerspectiveCornersChange({ ...perspectiveCorners, [perspDragging]: { x, y } })
+      return
+    }
     if (isPanning) {
       setPanOffset({
         x: e.clientX - panStartRef.current.x,
@@ -216,6 +271,7 @@ export function ImageViewer({
   }
 
   const handleMouseUp = () => {
+    if (perspDragging) { setPerspDragging(null); return }
     if (isPanning) { setIsPanning(false); return }
     if (dragStart && dragCurrent && onRegionSelect) {
       const x1 = Math.min(dragStart.x, dragCurrent.x) / scaleX
@@ -392,7 +448,9 @@ export function ImageViewer({
   const displayedHeight = naturalSize.height * effectiveZoom
   const zoomPercent = Math.round(effectiveZoom * 100)
   const isFit = zoom === FIT_ZOOM
-  const cursorStyle = activeMode === 'pan' ? (isPanning ? 'grabbing' : 'grab') : 'crosshair'
+  const cursorStyle = perspDragging ? 'grabbing'
+    : perspectiveMode ? 'default'
+    : activeMode === 'pan' ? (isPanning ? 'grabbing' : 'grab') : 'crosshair'
 
   const transformStyle: React.CSSProperties = {
     width: displayedWidth,
@@ -480,6 +538,22 @@ export function ImageViewer({
             </button>
           </>
         )}
+        {/* Image correction (画像補正) toggle */}
+        {showAdjustButton && onAdjustToggle && (
+          <>
+            <span className="zoom-controls-sep" />
+            <button
+              className={`btn-zoom btn-zoom-adjust ${adjustActive ? 'btn-zoom-active' : ''}`}
+              onClick={onAdjustToggle}
+              title={adjustLabel ?? 'Adjust'}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
+              </svg>
+              <span className="btn-zoom-label">{adjustLabel ?? 'Adjust'}</span>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Image container */}
@@ -521,6 +595,59 @@ export function ImageViewer({
                 left: selectedRegion.x * scaleX, top: selectedRegion.y * scaleY,
                 width: selectedRegion.width * scaleX, height: selectedRegion.height * scaleY,
               }} />
+            )}
+            {/* Perspective crop overlay */}
+            {perspectiveMode && perspectiveCorners && (
+              <svg
+                className="perspective-overlay-svg"
+                style={{ position: 'absolute', left: 0, top: 0, width: imgSize.width, height: imgSize.height, pointerEvents: 'none' }}
+                viewBox={`0 0 ${imgSize.width} ${imgSize.height}`}
+              >
+                {/* Semi-transparent mask outside the quad */}
+                <defs>
+                  <mask id="persp-mask">
+                    <rect width={imgSize.width} height={imgSize.height} fill="white" />
+                    <polygon
+                      points={[
+                        `${perspectiveCorners.topLeft.x * scaleX},${perspectiveCorners.topLeft.y * scaleY}`,
+                        `${perspectiveCorners.topRight.x * scaleX},${perspectiveCorners.topRight.y * scaleY}`,
+                        `${perspectiveCorners.bottomRight.x * scaleX},${perspectiveCorners.bottomRight.y * scaleY}`,
+                        `${perspectiveCorners.bottomLeft.x * scaleX},${perspectiveCorners.bottomLeft.y * scaleY}`,
+                      ].join(' ')}
+                      fill="black"
+                    />
+                  </mask>
+                </defs>
+                <rect width={imgSize.width} height={imgSize.height} fill="rgba(0,0,0,0.35)" mask="url(#persp-mask)" />
+                {/* Quad border */}
+                <polygon
+                  points={[
+                    `${perspectiveCorners.topLeft.x * scaleX},${perspectiveCorners.topLeft.y * scaleY}`,
+                    `${perspectiveCorners.topRight.x * scaleX},${perspectiveCorners.topRight.y * scaleY}`,
+                    `${perspectiveCorners.bottomRight.x * scaleX},${perspectiveCorners.bottomRight.y * scaleY}`,
+                    `${perspectiveCorners.bottomLeft.x * scaleX},${perspectiveCorners.bottomLeft.y * scaleY}`,
+                  ].join(' ')}
+                  fill="none"
+                  stroke="#00b4d8"
+                  strokeWidth="2"
+                />
+                {/* Corner handles */}
+                {(['topLeft', 'topRight', 'bottomRight', 'bottomLeft'] as const).map(key => {
+                  const pt = perspectiveCorners[key]
+                  return (
+                    <circle
+                      key={key}
+                      cx={pt.x * scaleX}
+                      cy={pt.y * scaleY}
+                      r={10}
+                      fill={perspDragging === key ? '#ff6b6b' : '#00b4d8'}
+                      stroke="#fff"
+                      strokeWidth="2"
+                      style={{ pointerEvents: 'all', cursor: 'grab' }}
+                    />
+                  )
+                })}
+              </svg>
             )}
           </div>
         </div>

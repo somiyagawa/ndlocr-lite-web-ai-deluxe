@@ -26,6 +26,13 @@ export const DEFAULT_PREPROCESS_OPTIONS: PreprocessOptions = {
   rotation: 0,
 }
 
+interface PerspectiveCorners {
+  topLeft: { x: number; y: number }
+  topRight: { x: number; y: number }
+  bottomRight: { x: number; y: number }
+  bottomLeft: { x: number; y: number }
+}
+
 interface ImagePreprocessPanelProps {
   lang: Language
   imageDataUrl: string
@@ -38,6 +45,11 @@ interface ImagePreprocessPanelProps {
   totalImages?: number
   /** Callback to apply current settings to ALL images */
   onApplyAll?: (options: PreprocessOptions) => void
+  /** Perspective crop state lifted to parent (displayed on ImageViewer) */
+  perspectiveActive?: boolean
+  onPerspectiveToggle?: () => void
+  perspectiveCorners?: PerspectiveCorners | null
+  onPerspectiveCornersChange?: (corners: PerspectiveCorners) => void
 }
 
 type TranslationStrings = {
@@ -559,6 +571,10 @@ export function ImagePreprocessPanel({
   sidePanel = false,
   totalImages,
   onApplyAll,
+  perspectiveActive,
+  onPerspectiveToggle,
+  perspectiveCorners,
+  onPerspectiveCornersChange,
 }: ImagePreprocessPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [options, setOptions] = useState<PreprocessOptions>(DEFAULT_PREPROCESS_OPTIONS)
@@ -566,12 +582,8 @@ export function ImagePreprocessPanel({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const strings = t[lang]
 
-  // ── Perspective crop state ──
-  const [showPerspective, setShowPerspective] = useState(false)
-  const [perspectiveCorners, setPerspectiveCorners] = useState<{topLeft:{x:number,y:number},topRight:{x:number,y:number},bottomRight:{x:number,y:number},bottomLeft:{x:number,y:number}} | null>(null)
-  const [draggingCorner, setDraggingCorner] = useState<string | null>(null)
-  const perspCanvasRef = useRef<HTMLCanvasElement>(null)
-  const perspImgRef = useRef<HTMLImageElement | null>(null)
+  // ── Perspective crop: use lifted state if available, otherwise local fallback ──
+  const showPerspective = perspectiveActive ?? false
 
   // Debounced preview update
   const updatePreview = useCallback((newOptions: PreprocessOptions) => {
@@ -663,42 +675,26 @@ export function ImagePreprocessPanel({
     }
   }, [imageDataUrl, onProcessed])
 
-  // ── Perspective crop handlers ──
+  // ── Perspective crop handlers (using lifted state via props) ──
   const handlePerspectiveToggle = useCallback(() => {
-    if (showPerspective) {
-      setShowPerspective(false)
-      setPerspectiveCorners(null)
-      return
+    if (onPerspectiveToggle) {
+      onPerspectiveToggle()
     }
-    setShowPerspective(true)
-    // Load image to get natural dimensions
-    const img = new Image()
-    img.onload = () => {
-      perspImgRef.current = img
-      const w = img.naturalWidth, h = img.naturalHeight
-      const m = 0.08
-      setPerspectiveCorners({
-        topLeft: { x: Math.round(w * m), y: Math.round(h * m) },
-        topRight: { x: Math.round(w * (1 - m)), y: Math.round(h * m) },
-        bottomRight: { x: Math.round(w * (1 - m)), y: Math.round(h * (1 - m)) },
-        bottomLeft: { x: Math.round(w * m), y: Math.round(h * (1 - m)) },
-      })
-    }
-    img.src = imageDataUrl
-  }, [showPerspective, imageDataUrl])
+  }, [onPerspectiveToggle])
 
   const handlePerspectiveDetect = useCallback(async () => {
+    if (!onPerspectiveCornersChange) return
     setIsProcessing(true)
     try {
       const { detectDocument } = await import('../../utils/documentScanner')
       const corners = await detectDocument(imageDataUrl)
-      setPerspectiveCorners(corners)
+      onPerspectiveCornersChange(corners)
     } catch (err) {
       console.error('Perspective detect error:', err)
     } finally {
       setIsProcessing(false)
     }
-  }, [imageDataUrl])
+  }, [imageDataUrl, onPerspectiveCornersChange])
 
   const handlePerspectiveApply = useCallback(async () => {
     if (!perspectiveCorners) return
@@ -707,126 +703,14 @@ export function ImagePreprocessPanel({
       const { correctPerspective } = await import('../../utils/documentScanner')
       const result = await correctPerspective(imageDataUrl, perspectiveCorners)
       onProcessed(result)
-      setShowPerspective(false)
-      setPerspectiveCorners(null)
+      // Close perspective mode after applying
+      if (onPerspectiveToggle) onPerspectiveToggle()
     } catch (err) {
       console.error('Perspective crop error:', err)
     } finally {
       setIsProcessing(false)
     }
-  }, [imageDataUrl, perspectiveCorners, onProcessed])
-
-  // Draw perspective overlay on canvas
-  useEffect(() => {
-    const canvas = perspCanvasRef.current
-    if (!canvas || !perspectiveCorners || !showPerspective) return
-    const img = perspImgRef.current
-    if (!img) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Fit canvas to container width
-    const container = canvas.parentElement
-    if (!container) return
-    const maxW = container.clientWidth - 4
-    const scale = Math.min(maxW / img.naturalWidth, 300 / img.naturalHeight, 1)
-    canvas.width = Math.round(img.naturalWidth * scale)
-    canvas.height = Math.round(img.naturalHeight * scale)
-
-    // Draw image
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-
-    // Draw semi-transparent overlay
-    ctx.fillStyle = 'rgba(0,0,0,0.35)'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    // Clear the selected quad area
-    const c = perspectiveCorners
-    ctx.save()
-    ctx.beginPath()
-    ctx.moveTo(c.topLeft.x * scale, c.topLeft.y * scale)
-    ctx.lineTo(c.topRight.x * scale, c.topRight.y * scale)
-    ctx.lineTo(c.bottomRight.x * scale, c.bottomRight.y * scale)
-    ctx.lineTo(c.bottomLeft.x * scale, c.bottomLeft.y * scale)
-    ctx.closePath()
-    ctx.clip()
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-    ctx.restore()
-
-    // Draw border lines
-    ctx.strokeStyle = '#00b4d8'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(c.topLeft.x * scale, c.topLeft.y * scale)
-    ctx.lineTo(c.topRight.x * scale, c.topRight.y * scale)
-    ctx.lineTo(c.bottomRight.x * scale, c.bottomRight.y * scale)
-    ctx.lineTo(c.bottomLeft.x * scale, c.bottomLeft.y * scale)
-    ctx.closePath()
-    ctx.stroke()
-
-    // Draw corner handles
-    const corners = [
-      { key: 'topLeft', pt: c.topLeft },
-      { key: 'topRight', pt: c.topRight },
-      { key: 'bottomRight', pt: c.bottomRight },
-      { key: 'bottomLeft', pt: c.bottomLeft },
-    ]
-    for (const { key, pt } of corners) {
-      ctx.beginPath()
-      ctx.arc(pt.x * scale, pt.y * scale, 8, 0, Math.PI * 2)
-      ctx.fillStyle = draggingCorner === key ? '#ff6b6b' : '#00b4d8'
-      ctx.fill()
-      ctx.strokeStyle = '#fff'
-      ctx.lineWidth = 2
-      ctx.stroke()
-    }
-  }, [perspectiveCorners, showPerspective, draggingCorner])
-
-  // Pointer events for perspective canvas
-  const handlePerspPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = perspCanvasRef.current
-    if (!canvas || !perspectiveCorners || !perspImgRef.current) return
-    const rect = canvas.getBoundingClientRect()
-    const scale = canvas.width / perspImgRef.current.naturalWidth
-    const px = (e.clientX - rect.left)
-    const py = (e.clientY - rect.top)
-    const hitRadius = 16
-
-    const corners = [
-      { key: 'topLeft', pt: perspectiveCorners.topLeft },
-      { key: 'topRight', pt: perspectiveCorners.topRight },
-      { key: 'bottomRight', pt: perspectiveCorners.bottomRight },
-      { key: 'bottomLeft', pt: perspectiveCorners.bottomLeft },
-    ]
-    for (const { key, pt } of corners) {
-      const dx = px - pt.x * scale, dy = py - pt.y * scale
-      if (Math.sqrt(dx * dx + dy * dy) < hitRadius) {
-        setDraggingCorner(key)
-        canvas.setPointerCapture(e.pointerId)
-        return
-      }
-    }
-  }, [perspectiveCorners])
-
-  const handlePerspPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!draggingCorner || !perspectiveCorners || !perspImgRef.current) return
-    const canvas = perspCanvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const scale = canvas.width / perspImgRef.current.naturalWidth
-    const w = perspImgRef.current.naturalWidth, h = perspImgRef.current.naturalHeight
-    const x = Math.max(0, Math.min(w, Math.round((e.clientX - rect.left) / scale)))
-    const y = Math.max(0, Math.min(h, Math.round((e.clientY - rect.top) / scale)))
-    setPerspectiveCorners(prev => prev ? { ...prev, [draggingCorner]: { x, y } } : prev)
-  }, [draggingCorner, perspectiveCorners])
-
-  const handlePerspPointerUp = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (draggingCorner) {
-      perspCanvasRef.current?.releasePointerCapture(e.pointerId)
-      setDraggingCorner(null)
-    }
-  }, [draggingCorner])
+  }, [imageDataUrl, perspectiveCorners, onProcessed, onPerspectiveToggle])
 
   const handleSplitCenter = useCallback(async () => {
     setIsProcessing(true)
@@ -988,33 +872,23 @@ export function ImagePreprocessPanel({
             </button>
           </div>
           {showPerspective && perspectiveCorners && (
-            <div className="perspective-crop-area">
-              <canvas
-                ref={perspCanvasRef}
-                className="perspective-crop-canvas"
-                onPointerDown={handlePerspPointerDown}
-                onPointerMove={handlePerspPointerMove}
-                onPointerUp={handlePerspPointerUp}
-                style={{ touchAction: 'none', cursor: draggingCorner ? 'grabbing' : 'grab' }}
-              />
-              <div className="preprocess-actions" style={{ marginTop: '0.4rem' }}>
-                <button
-                  className="preprocess-btn preprocess-btn-secondary"
-                  onClick={handlePerspectiveDetect}
-                  disabled={isProcessing}
-                  type="button"
-                >
-                  {isProcessing ? strings.processing : strings.perspectiveDetect}
-                </button>
-                <button
-                  className="preprocess-btn preprocess-btn-primary"
-                  onClick={handlePerspectiveApply}
-                  disabled={isProcessing}
-                  type="button"
-                >
-                  {isProcessing ? strings.processing : strings.perspectiveApply}
-                </button>
-              </div>
+            <div className="preprocess-actions" style={{ marginTop: '0.4rem' }}>
+              <button
+                className="preprocess-btn preprocess-btn-secondary"
+                onClick={handlePerspectiveDetect}
+                disabled={isProcessing}
+                type="button"
+              >
+                {isProcessing ? strings.processing : strings.perspectiveDetect}
+              </button>
+              <button
+                className="preprocess-btn preprocess-btn-primary"
+                onClick={handlePerspectiveApply}
+                disabled={isProcessing}
+                type="button"
+              >
+                {isProcessing ? strings.processing : strings.perspectiveApply}
+              </button>
             </div>
           )}
 

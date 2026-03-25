@@ -114,6 +114,10 @@ export default function App() {
   // 画像前処理状態
   const [preprocessedUrls, setPreprocessedUrls] = useState<Record<number, string>>({})
 
+  // 四隅指定切り出し（perspective crop）状態 — ImageViewer と ImagePreprocessPanel の間で共有
+  const [perspectiveActive, setPerspectiveActive] = useState(false)
+  const [perspectiveCorners, setPerspectiveCorners] = useState<{topLeft:{x:number,y:number},topRight:{x:number,y:number},bottomRight:{x:number,y:number},bottomLeft:{x:number,y:number}} | null>(null)
+
   const handlePreprocessed = useCallback((index: number, dataUrl: string) => {
     setPreprocessedUrls(prev => ({ ...prev, [index]: dataUrl }))
   }, [])
@@ -131,6 +135,31 @@ export default function App() {
     () => processedImages.map((img) => imageDataToDataUrl(img.imageData)),
     [processedImages]
   )
+
+  const handlePerspectiveToggle = useCallback(() => {
+    if (perspectiveActive) {
+      setPerspectiveActive(false)
+      setPerspectiveCorners(null)
+    } else {
+      // Initialize corners at 8% margins; need image dimensions
+      const currentUrl = preprocessedUrls[pendingImageIndex] ?? pendingDataUrls[pendingImageIndex]
+        ?? (sessionResults[selectedResultIndex]?.imageDataUrl)
+      if (!currentUrl) return
+      setPerspectiveActive(true)
+      const img = new Image()
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight
+        const m = 0.08
+        setPerspectiveCorners({
+          topLeft: { x: Math.round(w * m), y: Math.round(h * m) },
+          topRight: { x: Math.round(w * (1 - m)), y: Math.round(h * m) },
+          bottomRight: { x: Math.round(w * (1 - m)), y: Math.round(h * (1 - m)) },
+          bottomLeft: { x: Math.round(w * m), y: Math.round(h * (1 - m)) },
+        })
+      }
+      img.src = currentUrl
+    }
+  }, [perspectiveActive, preprocessedUrls, pendingImageIndex, pendingDataUrls, sessionResults, selectedResultIndex])
 
   // 全画像に一括で前処理を適用
   const handlePreprocessAll = useCallback(async (opts: PreprocessOptions) => {
@@ -589,15 +618,6 @@ export default function App() {
                       {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें', ru: 'Снять выделение', el: 'Εκκαθάριση επιλογής', syc: 'ܫܪܝ ܓܒܝܬܐ' })}
                     </button>
                   )}
-                  <button
-                    className={`btn btn-secondary btn-preprocess-toggle${showPreprocessPanel ? ' active' : ''}`}
-                    onClick={() => setShowPreprocessPanel(!showPreprocessPanel)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
-                    </svg>
-                    {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
-                  </button>
                 </div>
                 <div className="image-with-preprocess">
                   <div className="image-with-preprocess-main">
@@ -608,6 +628,13 @@ export default function App() {
                       onBlockSelect={() => {}}
                       onRegionSelect={handleRegionSelect}
                       selectedRegion={selectedRegion}
+                      perspectiveMode={perspectiveActive}
+                      perspectiveCorners={perspectiveCorners}
+                      onPerspectiveCornersChange={setPerspectiveCorners}
+                      showAdjustButton
+                      adjustActive={showPreprocessPanel}
+                      onAdjustToggle={() => setShowPreprocessPanel(!showPreprocessPanel)}
+                      adjustLabel={L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                     />
                     <p className="region-select-hint">
                       {L(lang, {
@@ -638,6 +665,10 @@ export default function App() {
                         sidePanel
                         totalImages={processedImages.length}
                         onApplyAll={handlePreprocessAll}
+                        perspectiveActive={perspectiveActive}
+                        onPerspectiveToggle={handlePerspectiveToggle}
+                        perspectiveCorners={perspectiveCorners}
+                        onPerspectiveCornersChange={setPerspectiveCorners}
                       />
                     </Suspense>
                   )}
@@ -745,8 +776,8 @@ export default function App() {
                     <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
                       {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
                     </button>
-                    <button className="btn btn-secondary btn-bug-report-inline" onClick={() => setShowBugReport(true)} title={L(lang, { ja: 'バグ報告・機能要望', en: 'Bug Report' })}>
-                      🐛
+                    <button className="btn btn-secondary btn-bug-report-inline" onClick={() => setShowBugReport(true)}>
+                      {L(lang, { ja: 'バグ報告・要望', en: 'Bug Report', 'zh-CN': '反馈', 'zh-TW': '回饋', ko: '버그 보고', la: 'Nuntia', eo: 'Raporti', es: 'Reportar', de: 'Melden', ar: 'إبلاغ', hi: 'रिपोर्ट', ru: 'Отчёт', el: 'Αναφορά', syc: 'ܡܘܕܥܢܘܬ', cop: 'ⲙⲉⲧⲙⲉⲑⲣⲉ', sa: 'निवेदनम्' })}
                     </button>
                   </>
                 )}
@@ -759,17 +790,6 @@ export default function App() {
                   <div className="split-image-panel">
                     {currentResult && (
                       <>
-                        <div className="split-image-toolbar">
-                          <button
-                            className={`btn btn-secondary btn-sm btn-preprocess-toggle${showPreprocessPanel ? ' active' : ''}`}
-                            onClick={() => setShowPreprocessPanel(!showPreprocessPanel)}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
-                            </svg>
-                            {L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
-                          </button>
-                        </div>
                         <div className="image-with-preprocess">
                           <div className="image-with-preprocess-main">
                             <ImageViewer
@@ -784,6 +804,13 @@ export default function App() {
                               onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
                               pageIndex={selectedResultIndex}
                               totalPages={sessionResults.length}
+                              perspectiveMode={perspectiveActive}
+                              perspectiveCorners={perspectiveCorners}
+                              onPerspectiveCornersChange={setPerspectiveCorners}
+                              showAdjustButton
+                              adjustActive={showPreprocessPanel}
+                              onAdjustToggle={() => setShowPreprocessPanel(!showPreprocessPanel)}
+                              adjustLabel={L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                             />
                             {selectedRegion && (
                               <div className="region-action-bar">
@@ -822,6 +849,10 @@ export default function App() {
                                 onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
                                 onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
                                 sidePanel
+                                perspectiveActive={perspectiveActive}
+                                onPerspectiveToggle={handlePerspectiveToggle}
+                                perspectiveCorners={perspectiveCorners}
+                                onPerspectiveCornersChange={setPerspectiveCorners}
                               />
                             </Suspense>
                           )}
