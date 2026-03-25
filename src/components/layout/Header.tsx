@@ -396,7 +396,7 @@ export const Header = memo(function Header({
             >
               <span className="classical-lang-icon">🏛️</span>
               <span className="classical-lang-label">{L(lang, {
-                ja: '古典言語', en: 'Classical', 'zh-CN': '古典语言', 'zh-TW': '古典語言', ko: '고전어',
+                ja: '古典語', en: 'Classical', 'zh-CN': '古典语', 'zh-TW': '古典語', ko: '고전어',
                 la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
                 ru: 'Классические', el: 'Κλασικές', syc: 'ܩܠܣܝ̈ܩܝ̈ܬ̈ܐ', cop: 'ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ', sa: 'शास्त्रीयाः'
               })}</span>
