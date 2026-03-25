@@ -741,9 +741,14 @@ export default function App() {
               <div className="result-toolbar">
                 {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1)}
                 {!isProcessing && (
-                  <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
-                    {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
-                  </button>
+                  <>
+                    <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
+                      {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
+                    </button>
+                    <button className="btn btn-secondary btn-bug-report-inline" onClick={() => setShowBugReport(true)} title={L(lang, { ja: 'バグ報告・機能要望', en: 'Bug Report' })}>
+                      🐛
+                    </button>
+                  </>
                 )}
               </div>
 
@@ -886,7 +891,7 @@ export default function App() {
         hasResults={hasResults}
       />
 
-      <Footer lang={lang} onBugReport={() => setShowBugReport(true)} />
+      <Footer lang={lang} />
 
       <Suspense fallback={null}>
         {showHistory && (

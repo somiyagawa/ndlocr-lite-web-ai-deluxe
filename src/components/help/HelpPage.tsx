@@ -20,9 +20,9 @@ const content: Record<string, { title: string; sections: { heading: string; body
           'トップ画面でファイルをドラッグ＆ドロップするか、「ファイルを選択」ボタンで画像（PNG, JPEG, TIFF, HEIC, PDF）を読み込みます。「フォルダ選択」でフォルダ内の全画像を一括読み込みもできます。「クリップボードから貼り付け」でスクリーンショットも処理できます。',
       },
       {
-        heading: '画像前処理',
+        heading: '画像補正',
         body:
-          '読み込んだ画像に対して、明度・コントラスト・シャープネスの調整、グレースケール化、白黒二値化、ノイズ除去、自動傾き補正、自動裁ち落としなどの前処理を適用できます。前処理パネルは画像ビューア上部のボタンから開きます。',
+          '読み込んだ画像に対して、明度・コントラスト・シャープネスの調整、グレースケール化、白黒二値化、ノイズ除去、自動傾き補正、自動裁ち落とし、四隅指定切り出しなどの補正を適用できます。画像補正パネルは画像ビューア上部のボタンから開きます。',
       },
       {
         heading: 'センター分割・自動分割',
@@ -110,7 +110,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
           'Drag and drop files on the home screen, or use the file picker to load images (PNG, JPEG, TIFF, HEIC, PDF). You can also use "Select Folder" to batch-load all images in a directory, or "Paste from Clipboard" for screenshots.',
       },
       {
-        heading: 'Image Preprocessing',
+        heading: 'Image Correction',
         body:
           'Before OCR, you can apply preprocessing such as brightness/contrast/sharpness adjustments, grayscale conversion, black & white binarization, denoising, auto-deskew, and auto-crop. Open the preprocessing panel from the button above the image viewer.',
       },
@@ -200,7 +200,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
           '在主屏幕上拖放文件，或使用文件选择器加载图像（PNG、JPEG、TIFF、HEIC、PDF）。您还可以使用"选择文件夹"批量加载目录中的所有图像，或使用"从剪贴板粘贴"来处理屏幕截图。',
       },
       {
-        heading: '图像预处理',
+        heading: '图像校正',
         body:
           'OCR 之前，您可以应用预处理，如亮度/对比度/锐度调整、灰度转换、黑白二值化、去噪、自动倾斜矫正和自动裁剪。从图像查看器上方的按钮打开预处理面板。',
       },
@@ -290,7 +290,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
           '在主屏幕上拖放文件，或使用文件選擇器加載圖像（PNG、JPEG、TIFF、HEIC、PDF）。您還可以使用"選擇文件夾"批量加載目錄中的所有圖像，或使用"從剪貼簿貼上"來處理螢幕截圖。',
       },
       {
-        heading: '圖像預處理',
+        heading: '圖像校正',
         body:
           'OCR 之前，您可以應用預處理，如亮度/對比度/銳度調整、灰度轉換、黑白二值化、去噪、自動傾斜矯正和自動裁剪。從圖像查看器上方的按鈕打開預處理面板。',
       },
@@ -380,7 +380,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
           '홈 화면에서 파일을 드래그 앤 드롭하거나 파일 선택기를 사용하여 이미지(PNG, JPEG, TIFF, HEIC, PDF)를 로드합니다. "폴더 선택"을 사용하여 디렉토리의 모든 이미지를 일괄 로드하거나 "클립보드에서 붙여넣기"로 스크린샷을 처리할 수 있습니다.',
       },
       {
-        heading: '이미지 전처리',
+        heading: '이미지 보정',
         body:
           'OCR 전에 밝기/대비/선명도 조정, 그레이스케일 변환, 흑백 이진화, 노이즈 제거, 자동 기울기 보정 및 자동 자르기 등의 전처리를 적용할 수 있습니다. 이미지 뷰어 위의 버튼에서 전처리 패널을 엽니다.',
       },

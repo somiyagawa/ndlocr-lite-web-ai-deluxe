@@ -54,6 +54,10 @@ type TranslationStrings = {
   dewarpTip: string
   deskewAuto: string
   autoCrop: string
+  perspectiveCrop: string
+  perspectiveCropTip: string
+  perspectiveDetect: string
+  perspectiveApply: string
   splitCenter: string
   splitAuto: string
   splitCenterTip: string
@@ -68,7 +72,7 @@ type TranslationStrings = {
 
 const t: Record<Language, TranslationStrings> = {
   ja: {
-    imagePreprocessing: '画像前処理',
+    imagePreprocessing: '画像補正',
     brightness: '明度',
     contrast: 'コントラスト',
     sharpness: 'シャープネス',
@@ -81,6 +85,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: '本の見開きページの湾曲を平らに補正します',
     deskewAuto: '自動傾き補正',
     autoCrop: '自動裁ち落とし',
+    perspectiveCrop: '四隅指定切り出し',
+    perspectiveCropTip: '画像内の文書の四隅をドラッグして指定し、台形補正して切り出します',
+    perspectiveDetect: '自動検出',
+    perspectiveApply: '切り出し実行',
     splitCenter: 'センター分割',
     splitAuto: '自動分割',
     splitCenterTip: '見開き画像を中央で左右2ページに分割します',
@@ -93,7 +101,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: '処理中...',
   },
   en: {
-    imagePreprocessing: 'Image Preprocessing',
+    imagePreprocessing: 'Image Correction',
     brightness: 'Brightness',
     contrast: 'Contrast',
     sharpness: 'Sharpness',
@@ -106,6 +114,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Flatten curved book page spread',
     deskewAuto: 'Deskew (auto)',
     autoCrop: 'Auto Crop',
+    perspectiveCrop: 'Perspective Crop',
+    perspectiveCropTip: 'Drag the 4 corners to select a document area, then apply perspective correction',
+    perspectiveDetect: 'Auto Detect',
+    perspectiveApply: 'Apply Crop',
     splitCenter: 'Split Center',
     splitAuto: 'Split Auto',
     splitCenterTip: 'Split a double-page scan into two pages at the exact center',
@@ -118,7 +130,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Processing...',
   },
   'zh-CN': {
-    imagePreprocessing: '图像预处理',
+    imagePreprocessing: '图像校正',
     brightness: '亮度',
     contrast: '对比度',
     sharpness: '锐度',
@@ -131,6 +143,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: '将弯曲的书页展平',
     deskewAuto: '自动去斜',
     autoCrop: '自动裁剪',
+    perspectiveCrop: '四角裁剪',
+    perspectiveCropTip: '拖动四个角选择文档区域，然后进行透视校正',
+    perspectiveDetect: '自动检测',
+    perspectiveApply: '执行裁剪',
     splitCenter: '中心分割',
     splitAuto: '自动分割',
     splitCenterTip: '将跨页扫描图像从正中央分割为左右两页',
@@ -143,7 +159,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: '处理中...',
   },
   'zh-TW': {
-    imagePreprocessing: '圖像預處理',
+    imagePreprocessing: '圖像校正',
     brightness: '亮度',
     contrast: '對比度',
     sharpness: '銳度',
@@ -156,6 +172,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: '將彎曲的書頁展平',
     deskewAuto: '自動去斜',
     autoCrop: '自動裁剪',
+    perspectiveCrop: '四角裁剪',
+    perspectiveCropTip: '拖動四個角選擇文件區域，然後進行透視校正',
+    perspectiveDetect: '自動偵測',
+    perspectiveApply: '執行裁剪',
     splitCenter: '中心分割',
     splitAuto: '自動分割',
     splitCenterTip: '將跨頁掃描圖像從正中央分割為左右兩頁',
@@ -168,7 +188,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: '處理中...',
   },
   ko: {
-    imagePreprocessing: '이미지 전처리',
+    imagePreprocessing: '이미지 보정',
     brightness: '밝기',
     contrast: '명암비',
     sharpness: '선명도',
@@ -181,6 +201,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: '구부러진 책 페이지를 평평하게 보정합니다',
     deskewAuto: '자동 기울기 보정',
     autoCrop: '자동 자르기',
+    perspectiveCrop: '사각 자르기',
+    perspectiveCropTip: '네 모서리를 드래그하여 문서 영역을 선택한 후 원근 보정을 적용합니다',
+    perspectiveDetect: '자동 감지',
+    perspectiveApply: '자르기 실행',
     splitCenter: '중심 분할',
     splitAuto: '자동 분할',
     splitCenterTip: '양면 스캔 이미지를 정중앙에서 좌우 2페이지로 분할합니다',
@@ -193,7 +217,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: '처리 중...',
   },
   la: {
-    imagePreprocessing: 'Praeparatio imaginis',
+    imagePreprocessing: 'Correctio imaginis',
     brightness: 'Claritas',
     contrast: 'Oppositio',
     sharpness: 'Acuitas',
@@ -206,6 +230,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Paginam libri curvam complanare',
     deskewAuto: 'Automatice corrigere',
     autoCrop: 'Automatice secare',
+    perspectiveCrop: 'Quadrangulare secare',
+    perspectiveCropTip: 'Angulos quattuor trahe ut documentum eligas, deinde perspectivam corrige',
+    perspectiveDetect: 'Automatice detegere',
+    perspectiveApply: 'Sectionem applicare',
     splitCenter: 'In medio dividere',
     splitAuto: 'Automatice dividere',
     splitCenterTip: 'Scansionem gemini folii in medio dividite',
@@ -218,7 +246,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Processus...',
   },
   eo: {
-    imagePreprocessing: 'Bildo-antaŭprilaborado',
+    imagePreprocessing: 'Bild-korektado',
     brightness: 'Brileco',
     contrast: 'Kontrasto',
     sharpness: 'Akuteco',
@@ -231,6 +259,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Platigi kurban libran paĝon',
     deskewAuto: 'Aŭtomate korekti',
     autoCrop: 'Aŭtomate tondi',
+    perspectiveCrop: 'Kvarlanka tondo',
+    perspectiveCropTip: 'Trenu la kvar angulojn por elekti dokumentareon, poste apliku perspektivan korekton',
+    perspectiveDetect: 'Aŭtomate detekti',
+    perspectiveApply: 'Apliki tondon',
     splitCenter: 'Dividi centre',
     splitAuto: 'Aŭtomate dividi',
     splitCenterTip: 'Dividu duel-paĝan skanaĵon en la centro en du paĝojn',
@@ -243,7 +275,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Prilaboras...',
   },
   es: {
-    imagePreprocessing: 'Preprocesamiento de imagen',
+    imagePreprocessing: 'Corrección de imagen',
     brightness: 'Brillo',
     contrast: 'Contraste',
     sharpness: 'Nitidez',
@@ -256,6 +288,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Aplanar página curva de libro',
     deskewAuto: 'Corrección automática',
     autoCrop: 'Recorte automático',
+    perspectiveCrop: 'Recorte perspectiva',
+    perspectiveCropTip: 'Arrastre las 4 esquinas para seleccionar el documento y aplique corrección de perspectiva',
+    perspectiveDetect: 'Detección automática',
+    perspectiveApply: 'Aplicar recorte',
     splitCenter: 'Dividir al centro',
     splitAuto: 'División automática',
     splitCenterTip: 'Divide una imagen de dos páginas por el centro en dos páginas',
@@ -268,7 +304,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Procesando...',
   },
   de: {
-    imagePreprocessing: 'Bildvorverarbeitung',
+    imagePreprocessing: 'Bildkorrektur',
     brightness: 'Helligkeit',
     contrast: 'Kontrast',
     sharpness: 'Schärfe',
@@ -281,6 +317,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Gewölbte Buchseite begradigen',
     deskewAuto: 'Automatische Entzerrung',
     autoCrop: 'Automatischer Zuschnitt',
+    perspectiveCrop: 'Perspektivischer Zuschnitt',
+    perspectiveCropTip: 'Ziehen Sie die 4 Ecken, um den Dokumentbereich auszuwählen und die Perspektive zu korrigieren',
+    perspectiveDetect: 'Automatisch erkennen',
+    perspectiveApply: 'Zuschnitt anwenden',
     splitCenter: 'Mittig teilen',
     splitAuto: 'Automatisch teilen',
     splitCenterTip: 'Teilt ein zweiseitiges Scan-Bild in der Mitte in zwei Seiten',
@@ -293,7 +333,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Verarbeitung...',
   },
   ar: {
-    imagePreprocessing: 'معالجة الصور',
+    imagePreprocessing: 'تصحيح الصور',
     brightness: 'السطوع',
     contrast: 'التباين',
     sharpness: 'الحدة',
@@ -306,6 +346,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'تسطيح صفحة الكتاب المنحنية',
     deskewAuto: 'تصحيح تلقائي',
     autoCrop: 'قص تلقائي',
+    perspectiveCrop: 'قص بأربع زوايا',
+    perspectiveCropTip: 'اسحب الزوايا الأربع لتحديد منطقة المستند ثم طبق تصحيح المنظور',
+    perspectiveDetect: 'كشف تلقائي',
+    perspectiveApply: 'تطبيق القص',
     splitCenter: 'تقسيم من المنتصف',
     splitAuto: 'تقسيم تلقائي',
     splitCenterTip: 'تقسيم صورة مسح ثنائية الصفحات من المنتصف إلى صفحتين',
@@ -318,7 +362,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'جارٍ المعالجة...',
   },
   hi: {
-    imagePreprocessing: 'छवि पूर्व-प्रसंस्करण',
+    imagePreprocessing: 'छवि संशोधन',
     brightness: 'चमक',
     contrast: 'कंट्रास्ट',
     sharpness: 'तीक्ष्णता',
@@ -331,6 +375,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'मुड़े हुए पुस्तक पृष्ठ को सपाट करें',
     deskewAuto: 'स्वचालित सुधार',
     autoCrop: 'स्वचालित काट-छाँट',
+    perspectiveCrop: 'चार-कोना कतरन',
+    perspectiveCropTip: 'दस्तावेज़ क्षेत्र चुनने के लिए 4 कोनों को खींचें, फिर परिप्रेक्ष्य सुधार लागू करें',
+    perspectiveDetect: 'स्वचालित पहचान',
+    perspectiveApply: 'कतरन लागू करें',
     splitCenter: 'केंद्र से विभाजन',
     splitAuto: 'स्वचालित विभाजन',
     splitCenterTip: 'दो-पृष्ठ स्कैन छवि को केंद्र में दो पृष्ठों में विभाजित करें',
@@ -343,7 +391,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'संसाधन...',
   },
   ru: {
-    imagePreprocessing: 'Предварительная обработка изображения',
+    imagePreprocessing: 'Коррекция изображения',
     brightness: 'Яркость',
     contrast: 'Контрастность',
     sharpness: 'Резкость',
@@ -356,6 +404,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Выпрямить изогнутую страницу книги',
     deskewAuto: 'Автоматическое выравнивание',
     autoCrop: 'Автоматическая обрезка',
+    perspectiveCrop: 'Обрезка по 4 углам',
+    perspectiveCropTip: 'Перетащите 4 угла для выбора области документа, затем примените коррекцию перспективы',
+    perspectiveDetect: 'Автоопределение',
+    perspectiveApply: 'Применить обрезку',
     splitCenter: 'Разделение по центру',
     splitAuto: 'Автоматическое разделение',
     splitCenterTip: 'Разделите отсканированное двухстраничное изображение по центру на две страницы',
@@ -368,7 +420,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Обработка...',
   },
   el: {
-    imagePreprocessing: 'Προ-επεξεργασία εικόνας',
+    imagePreprocessing: 'Διόρθωση εικόνας',
     brightness: 'Φωτεινότητα',
     contrast: 'Αντίθεση',
     sharpness: 'Ευκρίνεια',
@@ -381,6 +433,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'Ισιώστε τη λυγισμένη σελίδα βιβλίου',
     deskewAuto: 'Αυτόματη διόρθωση κλίσης',
     autoCrop: 'Αυτόματη αποκοπή',
+    perspectiveCrop: 'Αποκοπή 4 γωνιών',
+    perspectiveCropTip: 'Σύρετε τις 4 γωνίες για να επιλέξετε την περιοχή εγγράφου και εφαρμόστε διόρθωση προοπτικής',
+    perspectiveDetect: 'Αυτόματη ανίχνευση',
+    perspectiveApply: 'Εφαρμογή αποκοπής',
     splitCenter: 'Διαίρεση κέντρου',
     splitAuto: 'Αυτόματη διαίρεση',
     splitCenterTip: 'Διαιρέστε μια διπλής σελίδας σάρωση εικόνα στο κέντρο σε δύο σελίδες',
@@ -393,7 +449,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'Επεξεργασία...',
   },
   syc: {
-    imagePreprocessing: 'ܩܕܡܦ̈ܘܠܚܐ ܕܨܘܪܐ',
+    imagePreprocessing: 'ܬܘܪܨ ܨܘܪ̈ܐ',
     brightness: 'ܢܘܗܪܐ',
     contrast: 'ܦܪܡܐ',
     sharpness: 'ܕܩܝܩܘܬܐ',
@@ -406,6 +462,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'ܦܫܘܛ ܕ̈ܦ̈ܐ ܕ̈ܟ̈ܬ̈ܒ̈ ܡ̈ܥ̈ܩ̈ܡ̈ܐ',
     deskewAuto: 'ܬܘܦܪܐ ܓܢܒܐ',
     autoCrop: 'ܩܛܝܥܐ ܓܢܒܐ',
+    perspectiveCrop: 'ܩܛܝܥ ܒܐܪ̈ܒܥ ܙ̈ܘ̈ܝ̈ܬ̈ܐ',
+    perspectiveCropTip: 'ܓܪ ܐ̈ܪ̈ܒ̈ܥ ܙ̈ܘ̈ܝ̈ܬ̈ܐ ܠ̈ܓ̈ܒ̈ܝ̈ ܐ̈ܬ̈ܪ ܕ̈ܟ̈ܬ̈ܒ̈ܐ',
+    perspectiveDetect: 'ܓ̇ܠ̈ܝ̈ ܓ̈ܢ̈ܒ̈ܐ',
+    perspectiveApply: 'ܐ̈ܦ̈ܠ̈ܘ ܩ̈ܛ̈ܝ̈ܥ̈ܐ',
     splitCenter: 'ܦܠܓܐ ܒܡܨܥܬܐ',
     splitAuto: 'ܦܠܓܐ ܓܢܒܐ',
     splitCenterTip: 'ܦܠܓ ܓܘܗܡܐ ܕܕܦܐ ܬܪܝܢ ܡܣܩ ܒܡܨܥܬܐ ܠܬܪܝܢ ܕܦܐ',
@@ -418,7 +478,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'ܦ̈ܘܠܥܢܐ...',
   },
   cop: {
-    imagePreprocessing: 'ⲡⲓⲥⲟⲃⲧⲉ ⲛⲧⲉ ⲑⲓⲕⲱⲛ',
+    imagePreprocessing: 'ⲡⲓⲥⲟⲩⲧⲉⲛ ⲛⲧⲉ ⲑⲓⲕⲱⲛ',
     brightness: 'ⲡⲟⲩⲟⲓⲛⲓ',
     contrast: 'ⲡⲫⲱⲣϫ',
     sharpness: 'ⲡⲓⲧⲁⲓⲟ',
@@ -431,6 +491,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'ⲁⲣⲓⲥⲟⲩⲧⲉⲛ ⲛⲧⲉ ⲡⲓϫⲱⲙ ⲉⲧⲕⲩⲗϫ',
     deskewAuto: 'ⲥⲟⲩⲧⲉⲛ',
     autoCrop: 'ϣⲁⲧ',
+    perspectiveCrop: 'ϣⲁⲧ ⲛⲇ̅ ⲛⲕⲱⲛⲓⲁ',
+    perspectiveCropTip: 'ⲥⲱⲕ ⲛⲛⲓⲕⲱⲛⲓⲁ ⲛⲇ̅ ⲉⲑⲃⲉ ⲡⲓϫⲱⲙ',
+    perspectiveDetect: 'ϫⲓⲛⲓ ⲛⲁⲩⲧⲟ',
+    perspectiveApply: 'ⲁⲓⲣⲓ ⲡⲓϣⲁⲧ',
     splitCenter: 'ⲫⲱϣ ϧⲉⲛ ⲑⲙⲏⲧⲓ',
     splitAuto: 'ⲫⲱϣ ⲛⲁⲩⲧⲟ',
     splitCenterTip: 'ⲫⲱϣ ⲑⲓⲕⲱⲛ ϧⲉⲛ ⲑⲙⲏⲧⲓ',
@@ -443,7 +507,7 @@ const t: Record<Language, TranslationStrings> = {
     processing: 'ⲥⲉⲉⲣϩⲱⲃ...',
   },
   sa: {
-    imagePreprocessing: 'चित्रपूर्वसंस्करणम्',
+    imagePreprocessing: 'चित्रसंशोधनम्',
     brightness: 'दीप्तिः',
     contrast: 'वैषम्यम्',
     sharpness: 'तीक्ष्णता',
@@ -456,6 +520,10 @@ const t: Record<Language, TranslationStrings> = {
     dewarpTip: 'वक्रं पुस्तकपृष्ठं समतलं कुरुत',
     deskewAuto: 'स्वतः ऋजूकरणम्',
     autoCrop: 'स्वतः कर्तनम्',
+    perspectiveCrop: 'चतुष्कोण कर्तनम्',
+    perspectiveCropTip: 'चत्वारः कोणाः कर्षयित्वा प्रलेखक्षेत्रं चिन्वन्तु',
+    perspectiveDetect: 'स्वतः अन्वेषणम्',
+    perspectiveApply: 'कर्तनम् आरोपयतु',
     splitCenter: 'मध्ये विभागः',
     splitAuto: 'स्वतः विभागः',
     splitCenterTip: 'चित्रं मध्ये विभजतु',
@@ -497,6 +565,13 @@ export function ImagePreprocessPanel({
   const [isProcessing, setIsProcessing] = useState(false)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const strings = t[lang]
+
+  // ── Perspective crop state ──
+  const [showPerspective, setShowPerspective] = useState(false)
+  const [perspectiveCorners, setPerspectiveCorners] = useState<{topLeft:{x:number,y:number},topRight:{x:number,y:number},bottomRight:{x:number,y:number},bottomLeft:{x:number,y:number}} | null>(null)
+  const [draggingCorner, setDraggingCorner] = useState<string | null>(null)
+  const perspCanvasRef = useRef<HTMLCanvasElement>(null)
+  const perspImgRef = useRef<HTMLImageElement | null>(null)
 
   // Debounced preview update
   const updatePreview = useCallback((newOptions: PreprocessOptions) => {
@@ -587,6 +662,171 @@ export function ImagePreprocessPanel({
       setIsProcessing(false)
     }
   }, [imageDataUrl, onProcessed])
+
+  // ── Perspective crop handlers ──
+  const handlePerspectiveToggle = useCallback(() => {
+    if (showPerspective) {
+      setShowPerspective(false)
+      setPerspectiveCorners(null)
+      return
+    }
+    setShowPerspective(true)
+    // Load image to get natural dimensions
+    const img = new Image()
+    img.onload = () => {
+      perspImgRef.current = img
+      const w = img.naturalWidth, h = img.naturalHeight
+      const m = 0.08
+      setPerspectiveCorners({
+        topLeft: { x: Math.round(w * m), y: Math.round(h * m) },
+        topRight: { x: Math.round(w * (1 - m)), y: Math.round(h * m) },
+        bottomRight: { x: Math.round(w * (1 - m)), y: Math.round(h * (1 - m)) },
+        bottomLeft: { x: Math.round(w * m), y: Math.round(h * (1 - m)) },
+      })
+    }
+    img.src = imageDataUrl
+  }, [showPerspective, imageDataUrl])
+
+  const handlePerspectiveDetect = useCallback(async () => {
+    setIsProcessing(true)
+    try {
+      const { detectDocument } = await import('../../utils/documentScanner')
+      const corners = await detectDocument(imageDataUrl)
+      setPerspectiveCorners(corners)
+    } catch (err) {
+      console.error('Perspective detect error:', err)
+    } finally {
+      setIsProcessing(false)
+    }
+  }, [imageDataUrl])
+
+  const handlePerspectiveApply = useCallback(async () => {
+    if (!perspectiveCorners) return
+    setIsProcessing(true)
+    try {
+      const { correctPerspective } = await import('../../utils/documentScanner')
+      const result = await correctPerspective(imageDataUrl, perspectiveCorners)
+      onProcessed(result)
+      setShowPerspective(false)
+      setPerspectiveCorners(null)
+    } catch (err) {
+      console.error('Perspective crop error:', err)
+    } finally {
+      setIsProcessing(false)
+    }
+  }, [imageDataUrl, perspectiveCorners, onProcessed])
+
+  // Draw perspective overlay on canvas
+  useEffect(() => {
+    const canvas = perspCanvasRef.current
+    if (!canvas || !perspectiveCorners || !showPerspective) return
+    const img = perspImgRef.current
+    if (!img) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Fit canvas to container width
+    const container = canvas.parentElement
+    if (!container) return
+    const maxW = container.clientWidth - 4
+    const scale = Math.min(maxW / img.naturalWidth, 300 / img.naturalHeight, 1)
+    canvas.width = Math.round(img.naturalWidth * scale)
+    canvas.height = Math.round(img.naturalHeight * scale)
+
+    // Draw image
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+    // Draw semi-transparent overlay
+    ctx.fillStyle = 'rgba(0,0,0,0.35)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Clear the selected quad area
+    const c = perspectiveCorners
+    ctx.save()
+    ctx.beginPath()
+    ctx.moveTo(c.topLeft.x * scale, c.topLeft.y * scale)
+    ctx.lineTo(c.topRight.x * scale, c.topRight.y * scale)
+    ctx.lineTo(c.bottomRight.x * scale, c.bottomRight.y * scale)
+    ctx.lineTo(c.bottomLeft.x * scale, c.bottomLeft.y * scale)
+    ctx.closePath()
+    ctx.clip()
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    ctx.restore()
+
+    // Draw border lines
+    ctx.strokeStyle = '#00b4d8'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(c.topLeft.x * scale, c.topLeft.y * scale)
+    ctx.lineTo(c.topRight.x * scale, c.topRight.y * scale)
+    ctx.lineTo(c.bottomRight.x * scale, c.bottomRight.y * scale)
+    ctx.lineTo(c.bottomLeft.x * scale, c.bottomLeft.y * scale)
+    ctx.closePath()
+    ctx.stroke()
+
+    // Draw corner handles
+    const corners = [
+      { key: 'topLeft', pt: c.topLeft },
+      { key: 'topRight', pt: c.topRight },
+      { key: 'bottomRight', pt: c.bottomRight },
+      { key: 'bottomLeft', pt: c.bottomLeft },
+    ]
+    for (const { key, pt } of corners) {
+      ctx.beginPath()
+      ctx.arc(pt.x * scale, pt.y * scale, 8, 0, Math.PI * 2)
+      ctx.fillStyle = draggingCorner === key ? '#ff6b6b' : '#00b4d8'
+      ctx.fill()
+      ctx.strokeStyle = '#fff'
+      ctx.lineWidth = 2
+      ctx.stroke()
+    }
+  }, [perspectiveCorners, showPerspective, draggingCorner])
+
+  // Pointer events for perspective canvas
+  const handlePerspPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = perspCanvasRef.current
+    if (!canvas || !perspectiveCorners || !perspImgRef.current) return
+    const rect = canvas.getBoundingClientRect()
+    const scale = canvas.width / perspImgRef.current.naturalWidth
+    const px = (e.clientX - rect.left)
+    const py = (e.clientY - rect.top)
+    const hitRadius = 16
+
+    const corners = [
+      { key: 'topLeft', pt: perspectiveCorners.topLeft },
+      { key: 'topRight', pt: perspectiveCorners.topRight },
+      { key: 'bottomRight', pt: perspectiveCorners.bottomRight },
+      { key: 'bottomLeft', pt: perspectiveCorners.bottomLeft },
+    ]
+    for (const { key, pt } of corners) {
+      const dx = px - pt.x * scale, dy = py - pt.y * scale
+      if (Math.sqrt(dx * dx + dy * dy) < hitRadius) {
+        setDraggingCorner(key)
+        canvas.setPointerCapture(e.pointerId)
+        return
+      }
+    }
+  }, [perspectiveCorners])
+
+  const handlePerspPointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!draggingCorner || !perspectiveCorners || !perspImgRef.current) return
+    const canvas = perspCanvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const scale = canvas.width / perspImgRef.current.naturalWidth
+    const w = perspImgRef.current.naturalWidth, h = perspImgRef.current.naturalHeight
+    const x = Math.max(0, Math.min(w, Math.round((e.clientX - rect.left) / scale)))
+    const y = Math.max(0, Math.min(h, Math.round((e.clientY - rect.top) / scale)))
+    setPerspectiveCorners(prev => prev ? { ...prev, [draggingCorner]: { x, y } } : prev)
+  }, [draggingCorner, perspectiveCorners])
+
+  const handlePerspPointerUp = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (draggingCorner) {
+      perspCanvasRef.current?.releasePointerCapture(e.pointerId)
+      setDraggingCorner(null)
+    }
+  }, [draggingCorner])
 
   const handleSplitCenter = useCallback(async () => {
     setIsProcessing(true)
@@ -734,6 +974,49 @@ export function ImagePreprocessPanel({
               {isProcessing ? strings.processing : strings.autoCrop}
             </button>
           </div>
+
+          {/* Perspective Crop */}
+          <div className="preprocess-actions">
+            <button
+              className={`preprocess-btn ${showPerspective ? 'preprocess-btn-primary' : 'preprocess-btn-secondary'}`}
+              onClick={handlePerspectiveToggle}
+              disabled={isProcessing}
+              type="button"
+              title={strings.perspectiveCropTip}
+            >
+              {strings.perspectiveCrop}
+            </button>
+          </div>
+          {showPerspective && perspectiveCorners && (
+            <div className="perspective-crop-area">
+              <canvas
+                ref={perspCanvasRef}
+                className="perspective-crop-canvas"
+                onPointerDown={handlePerspPointerDown}
+                onPointerMove={handlePerspPointerMove}
+                onPointerUp={handlePerspPointerUp}
+                style={{ touchAction: 'none', cursor: draggingCorner ? 'grabbing' : 'grab' }}
+              />
+              <div className="preprocess-actions" style={{ marginTop: '0.4rem' }}>
+                <button
+                  className="preprocess-btn preprocess-btn-secondary"
+                  onClick={handlePerspectiveDetect}
+                  disabled={isProcessing}
+                  type="button"
+                >
+                  {isProcessing ? strings.processing : strings.perspectiveDetect}
+                </button>
+                <button
+                  className="preprocess-btn preprocess-btn-primary"
+                  onClick={handlePerspectiveApply}
+                  disabled={isProcessing}
+                  type="button"
+                >
+                  {isProcessing ? strings.processing : strings.perspectiveApply}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Split Actions */}
           <div className="preprocess-actions">
