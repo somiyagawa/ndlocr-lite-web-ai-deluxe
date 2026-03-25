@@ -186,6 +186,17 @@ export const Header = memo(function Header({
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [showChangelog, setShowChangelog] = useState(false)
+  const [classicalOpen, setClassicalOpen] = useState(false)
+
+  const CLASSICAL_LANGS = ['la', 'sa', 'syc', 'cop'] as const
+  const MODERN_LANGS = LANGUAGES.filter(c => !(CLASSICAL_LANGS as readonly string[]).includes(c))
+
+  const CLASSICAL_LABELS: Record<string, Record<string, string>> = {
+    la:  { ja: 'ラテン語', en: 'Latin', 'zh-CN': '拉丁语', 'zh-TW': '拉丁語', ko: '라틴어', la: 'Latina', eo: 'Latina', es: 'Latín', de: 'Latein', ar: 'اللاتينية', hi: 'लैटिन', ru: 'Латынь', el: 'Λατινικά', syc: 'ܠܛܝܢܝܐ', cop: 'ⲗⲁⲧⲓⲛⲟⲛ', sa: 'लातिनी' },
+    sa:  { ja: 'サンスクリット', en: 'Sanskrit', 'zh-CN': '梵语', 'zh-TW': '梵語', ko: '산스크리트어', la: 'Sanscrita', eo: 'Sanskrito', es: 'Sánscrito', de: 'Sanskrit', ar: 'السنسكريتية', hi: 'संस्कृत', ru: 'Санскрит', el: 'Σανσκριτικά', syc: 'ܣܢܣܩܪܝܛ', cop: 'ⲥⲁⲛⲥⲕⲣⲓⲧ', sa: 'संस्कृतम्' },
+    syc: { ja: 'シリア語', en: 'Syriac', 'zh-CN': '叙利亚语', 'zh-TW': '敘利亞語', ko: '시리아어', la: 'Syriaca', eo: 'Siria', es: 'Siríaco', de: 'Syrisch', ar: 'السريانية', hi: 'सीरियाई', ru: 'Сирийский', el: 'Συριακά', syc: 'ܣܘܪܝܝܐ', cop: 'ⲙⲉⲧⲥⲩⲣⲓⲁⲛⲟⲥ', sa: 'सिरियाक्' },
+    cop: { ja: 'コプト語', en: 'Coptic', 'zh-CN': '科普特语', 'zh-TW': '科普特語', ko: '콥트어', la: 'Coptica', eo: 'Kopta', es: 'Copto', de: 'Koptisch', ar: 'القبطية', hi: 'कॉप्टिक', ru: 'Коптский', el: 'Κοπτικά', syc: 'ܩܘܦܛܝܐ', cop: 'ⲙⲉⲧⲣⲉⲙⲛⲕⲏⲙⲉ', sa: 'कोप्तिक्' },
+  }
 
   const handleVersionClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -358,7 +369,7 @@ export const Header = memo(function Header({
           })}</div>
 
           <div className="lang-flags" role="radiogroup" aria-label="Language">
-            {LANGUAGES.map(code => (
+            {MODERN_LANGS.map(code => (
               <button
                 key={code}
                 className={`lang-flag-btn${lang === code ? ' lang-flag-active' : ''}`}
@@ -374,6 +385,43 @@ export const Header = memo(function Header({
                 {FLAG_EMOJI[code]}
               </button>
             ))}
+          </div>
+
+          {/* Classical languages dropdown */}
+          <div className="classical-lang-wrap">
+            <button
+              className={`classical-lang-toggle${CLASSICAL_LANGS.some(c => c === lang) ? ' lang-flag-active' : ''}`}
+              onClick={() => setClassicalOpen(!classicalOpen)}
+              type="button"
+            >
+              <span className="classical-lang-icon">🏛️</span>
+              <span className="classical-lang-label">{L(lang, {
+                ja: '古典言語', en: 'Classical', 'zh-CN': '古典语言', 'zh-TW': '古典語言', ko: '고전어',
+                la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
+                ru: 'Классические', el: 'Κλασικές', syc: 'ܩܠܣܝ̈ܩܝ̈ܬ̈ܐ', cop: 'ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ', sa: 'शास्त्रीयाः'
+              })}</span>
+              <svg className="classical-lang-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: classicalOpen ? 'rotate(180deg)' : 'none' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {classicalOpen && (
+              <div className="classical-lang-dropdown">
+                {CLASSICAL_LANGS.map(code => (
+                  <button
+                    key={code}
+                    className={`classical-lang-item${lang === code ? ' classical-lang-item-active' : ''}`}
+                    onClick={() => {
+                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                      setClassicalOpen(false)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="classical-lang-item-emoji">{FLAG_EMOJI[code]}</span>
+                    <span>{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
