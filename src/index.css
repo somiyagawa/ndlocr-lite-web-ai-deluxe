@@ -4499,12 +4499,19 @@ button.ai-status-clickable .ai-status-text {
   line-height: 1.15;
   padding: 1px 2px;
   overflow: hidden;
-  word-break: break-all;
   text-align: center;
   text-shadow: 0 0 2px rgba(0,0,0,0.8);
   /* writing-mode set dynamically via inline style based on block aspect ratio */
   pointer-events: none;
   box-sizing: border-box;
+}
+.region-text-label-inner {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  word-break: break-all;
+  text-align: center;
 }
 
 /* ── Reading order badge ── */

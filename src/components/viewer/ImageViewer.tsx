@@ -499,7 +499,7 @@ export function ImageViewer({
                 writingMode: block.height > block.width * 1.3 ? 'vertical-rl' : 'horizontal-tb',
                 textOrientation: block.height > block.width * 1.3 ? 'mixed' : undefined,
               }}
-            >{block.text}</span>
+            ><span className="region-text-label-inner">{block.text}</span></span>
           )}
         </div>
       )
