@@ -1350,9 +1350,10 @@ async function splitPageCenter(imageDataUrl: string): Promise<string[]> {
         leftCtx.drawImage(img, 0, 0, centerX, img.height, 0, 0, centerX, img.height)
         rightCtx.drawImage(img, centerX, 0, img.width - centerX, img.height, 0, 0, img.width - centerX, img.height)
 
+        // 日本語の本は右→左で読むため、右半分をページ1にする
         resolve([
-          leftCanvas.toDataURL('image/png'),
           rightCanvas.toDataURL('image/png'),
+          leftCanvas.toDataURL('image/png'),
         ])
       } catch (err) {
         reject(err)
@@ -1399,9 +1400,10 @@ async function splitPageAuto(imageDataUrl: string): Promise<string[]> {
         leftCtx.drawImage(img, 0, 0, splitX, img.height, 0, 0, splitX, img.height)
         rightCtx.drawImage(img, splitX, 0, img.width - splitX, img.height, 0, 0, img.width - splitX, img.height)
 
+        // 日本語の本は右→左で読むため、右半分をページ1にする
         resolve([
-          leftCanvas.toDataURL('image/png'),
           rightCanvas.toDataURL('image/png'),
+          leftCanvas.toDataURL('image/png'),
         ])
       } catch (err) {
         reject(err)

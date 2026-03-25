@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react'
-import type { OCRResult, TextBlock, BoundingBox, PageBlock } from './types/ocr'
+import type { OCRResult, TextBlock, BoundingBox, PageBlock, ProcessedImage } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { useI18n } from './hooks/useI18n'
 import { L } from './i18n'
@@ -114,6 +114,9 @@ export default function App() {
   // 画像前処理状態
   const [preprocessedUrls, setPreprocessedUrls] = useState<Record<number, string>>({})
 
+  // 分割前の processedImages を保存（リセットで復元するため）
+  const [preSplitImages, setPreSplitImages] = useState<ProcessedImage[] | null>(null)
+
   // 四隅指定切り出し（perspective crop）状態 — ImageViewer と ImagePreprocessPanel の間で共有
   const [perspectiveActive, setPerspectiveActive] = useState(false)
   const [perspectiveCorners, setPerspectiveCorners] = useState<{topLeft:{x:number,y:number},topRight:{x:number,y:number},bottomRight:{x:number,y:number},bottomLeft:{x:number,y:number}} | null>(null)
@@ -123,12 +126,19 @@ export default function App() {
   }, [])
 
   const handlePreprocessReset = useCallback((index: number) => {
+    // 分割前の状態がある場合は復元する
+    if (preSplitImages) {
+      setProcessedImages(preSplitImages)
+      setPreSplitImages(null)
+      setPreprocessedUrls({})
+      return
+    }
     setPreprocessedUrls(prev => {
       const next = { ...prev }
       delete next[index]
       return next
     })
-  }, [])
+  }, [preSplitImages, setProcessedImages])
 
   // pending 状態での ImageViewer 表示用（全解像度 DataUrl）
   const pendingDataUrls = useMemo(
@@ -184,6 +194,9 @@ export default function App() {
     const currentImg = processedImages[pendingImageIndex]
     if (!currentImg) return
     try {
+      // 分割前の状態を保存（リセットで復元可能にする）
+      setPreSplitImages([...processedImages])
+      setPreprocessedUrls({})
       const newImages = await Promise.all(
         pages.map((url, i) =>
           dataUrlToProcessedImage(url, `${currentImg.fileName}_p${i + 1}`, i)
