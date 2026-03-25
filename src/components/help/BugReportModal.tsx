@@ -178,13 +178,21 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
       '',
       '--- Environment ---',
       `Browser: ${browserInfo}`,
-      `App Version: v3.4`,
+      `App Version: v3.5`,
       `URL: ${window.location.href}`,
       `Timestamp: ${new Date().toISOString()}`,
     ].filter(Boolean).join('\n')
 
     const mailto = `mailto:miyagawa.so.36u@kyoto-u.jp?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.open(mailto, '_blank')
+    // window.open は COOP ヘッダー環境でブロックされる場合があるため、
+    // <a> 要素を生成してクリックする方式にフォールバック
+    const a = document.createElement('a')
+    a.href = mailto
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
     setSent(true)
   }, [name, email, category, categoryLabel, description, steps])
 
