@@ -1162,7 +1162,7 @@ export function TextEditor({
                 className="line-numbers-gutter"
                 ref={gutterRef}
                 style={{
-                  fontSize: `${Math.max(10, fontSize * 0.75)}px`,
+                  fontSize: `${fontSize}px`,
                   lineHeight: `${lineSpacing}`,
                 }}
               >
@@ -1170,7 +1170,10 @@ export function TextEditor({
                   <span
                     key={i}
                     className="line-number"
-                    style={{ height: computedLineHeight > 0 ? `${computedLineHeight}px` : undefined }}
+                    style={{
+                      height: computedLineHeight > 0 ? `${computedLineHeight}px` : `${fontSize * lineSpacing}px`,
+                      fontSize: `${Math.max(10, fontSize * 0.75)}px`,
+                    }}
                   >
                     {i + 1}
                   </span>
@@ -1178,12 +1181,24 @@ export function TextEditor({
               </div>
             )}
             {showLineNumbers && isVertical && (
-              <div className="line-numbers-gutter-vertical" ref={gutterRef}>
+              <div
+                className="line-numbers-gutter-vertical"
+                ref={gutterRef}
+                style={{
+                  fontSize: `${fontSize}px`,
+                  lineHeight: `${lineSpacing}`,
+                  paddingRight: '0.75rem',
+                  paddingLeft: '0.75rem',
+                }}
+              >
                 {Array.from({ length: lineCount }).map((_, i) => (
                   <span
                     key={i}
                     className="line-number-vertical"
-                    style={{ width: computedLineHeight > 0 ? `${computedLineHeight}px` : undefined }}
+                    style={{
+                      width: computedLineHeight > 0 ? `${computedLineHeight}px` : `${fontSize * lineSpacing}px`,
+                      fontSize: `${Math.max(8, fontSize * 0.6)}px`,
+                    }}
                   >
                     {i + 1}
                   </span>

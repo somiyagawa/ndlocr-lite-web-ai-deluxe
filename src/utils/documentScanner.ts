@@ -443,19 +443,21 @@ function invertHomography(H: number[]): number[] {
 // ============================================================================
 
 /**
- * Curved page dewarping — unified approach for horizontal & vertical text.
+ * Curved page dewarping — contour-following approach.
  *
  * Book page curvature causes Y-displacement that varies across X (distance
- * from spine). This function detects and corrects that curvature.
+ * from spine). This function detects text-line curvature and corrects it by
+ * fitting a smooth quadratic (parabolic) model.
  *
  * Strategy:
- * 1. Compute Otsu threshold on central region (avoids edge/shadow bias)
- * 2. Detect text orientation (vertical vs horizontal) via projection variance
- * 3. Divide page into N vertical strips
- * 4. For horizontal text: track text-line Y-positions across strips
- *    For vertical text: track text-band top/bottom edges across strips
- * 5. Compute, smooth, and cap per-strip Y-shifts
- * 6. Remap pixels with bilinear interpolation
+ * 1. Compute Otsu threshold on central region
+ * 2. Detect text lines by horizontal projection peaks
+ * 3. Track each text line's Y-position across vertical strips
+ * 4. Aggregate per-strip curvature measurements from all lines
+ * 5. Fit a quadratic curve (ax²+bx+c) via least-squares — this models the
+ *    natural parabolic curvature of book pages without noise/waviness
+ * 6. Subtract the fitted shift to straighten text (reverse the curvature)
+ * 7. Remap pixels with bilinear interpolation
  */
 export function dewarpPage(imageData: ImageData): ImageData {
   const { data, width, height } = imageData
@@ -488,13 +490,13 @@ export function dewarpPage(imageData: ImageData): ImageData {
   }
   threshold = Math.min(threshold, 180)
 
-  // 2. Detect text orientation
-  const cxStart = Math.round(width * 0.15)
-  const cxEnd = Math.round(width * 0.85)
-  const cyStart = Math.round(height * 0.15)
-  const cyEnd = Math.round(height * 0.85)
-  const cw = cxEnd - cxStart
+  // 2. Detect text lines via horizontal projection
+  const cyStart = Math.round(height * 0.08)
+  const cyEnd = Math.round(height * 0.92)
+  const cxStart = Math.round(width * 0.1)
+  const cxEnd = Math.round(width * 0.9)
   const ch = cyEnd - cyStart
+  const cw = cxEnd - cxStart
 
   const rowProj = new Float32Array(ch)
   for (let y = 0; y < ch; y++) {
@@ -504,251 +506,186 @@ export function dewarpPage(imageData: ImageData): ImageData {
     }
     rowProj[y] = cnt / cw
   }
-  const colProj = new Float32Array(cw)
-  for (let x = 0; x < cw; x++) {
-    let cnt = 0
-    for (let y = 0; y < ch; y++) {
-      if (gray[(y + cyStart) * width + (x + cxStart)] < threshold) cnt++
+
+  // Smooth projection for reliable peak detection
+  const rowSmooth = Math.max(3, Math.round(ch / 120))
+  const smoothedRow = new Float32Array(ch)
+  for (let y = 0; y < ch; y++) {
+    let s = 0, c = 0
+    for (let k = Math.max(0, y - rowSmooth); k <= Math.min(ch - 1, y + rowSmooth); k++) {
+      s += rowProj[k]; c++
     }
-    colProj[x] = cnt / ch
+    smoothedRow[y] = s / c
   }
 
-  const projVariance = (arr: Float32Array) => {
-    let s = 0, sq = 0
-    for (let i = 0; i < arr.length; i++) { s += arr[i]; sq += arr[i] * arr[i] }
-    const m = s / arr.length
-    return sq / arr.length - m * m
+  let avgDensity = 0
+  for (let y = 0; y < ch; y++) avgDensity += smoothedRow[y]
+  avgDensity /= ch
+  const peakThresh = avgDensity * 1.3
+
+  const textLineYs: number[] = []
+  const minLineGap = Math.max(10, Math.round(ch / 35))
+  for (let y = 2; y < ch - 2; y++) {
+    if (smoothedRow[y] > peakThresh &&
+        smoothedRow[y] >= smoothedRow[y - 1] &&
+        smoothedRow[y] >= smoothedRow[y + 1]) {
+      if (textLineYs.length === 0 || y - textLineYs[textLineYs.length - 1] >= minLineGap) {
+        textLineYs.push(y + cyStart)
+      }
+    }
   }
-  const rowVar = projVariance(rowProj)
-  const colVar = projVariance(colProj)
-  const isVerticalText = colVar > rowVar * 1.2
 
-  // 3–4. Compute per-strip Y-shifts
-  //   For BOTH orientations, curvature causes Y-shift that varies by X.
-  //   We divide into vertical strips and measure curvature in each strip.
-  const numSegments = 24
-  const segWidth = Math.floor(width / numSegments)
-  const shiftSum = new Float32Array(numSegments)
-  const shiftCount = new Int32Array(numSegments)
+  // Need at least 4 lines for robust curvature estimation
+  if (textLineYs.length < 4) return imageData
 
-  if (!isVerticalText) {
-    // Horizontal text: detect text lines, track Y-position across X-strips
-    const smoothedRow = new Float32Array(ch)
-    const rowSmooth = Math.max(2, Math.round(ch / 150))
-    for (let y = 0; y < ch; y++) {
-      let s = 0, c = 0
-      for (let k = Math.max(0, y - rowSmooth); k <= Math.min(ch - 1, y + rowSmooth); k++) {
-        s += rowProj[k]; c++
-      }
-      smoothedRow[y] = s / c
-    }
+  // 3. Track each text line's Y-position across vertical strips
+  const numStrips = 32
+  const stripW = Math.floor(width / numStrips)
+  const stripShiftSum = new Float64Array(numStrips)
+  const stripShiftCount = new Int32Array(numStrips)
 
-    let avgRowDensity = 0
-    for (let y = 0; y < ch; y++) avgRowDensity += smoothedRow[y]
-    avgRowDensity /= ch
-    const peakThresh = avgRowDensity * 1.2
+  for (const lineY of textLineYs) {
+    const searchHalf = Math.max(10, Math.round(height / 40))
+    const yMin = Math.max(0, lineY - searchHalf)
+    const yMax = Math.min(height - 1, lineY + searchHalf)
 
-    const textLineYs: number[] = []
-    const minLineGap = Math.max(8, Math.round(ch / 40))
-    for (let y = 2; y < ch - 2; y++) {
-      if (smoothedRow[y] > peakThresh &&
-          smoothedRow[y] >= smoothedRow[y - 1] &&
-          smoothedRow[y] >= smoothedRow[y + 1]) {
-        if (textLineYs.length === 0 || y - textLineYs[textLineYs.length - 1] >= minLineGap) {
-          textLineYs.push(y + cyStart)
-        }
-      }
-    }
+    const localYs = new Float64Array(numStrips)
+    const localValid = new Uint8Array(numStrips)
 
-    if (textLineYs.length < 3) return imageData
-
-    for (const lineY of textLineYs) {
-      const searchHalf = Math.max(8, Math.round(height / 50))
-      const yMin = Math.max(0, lineY - searchHalf)
-      const yMax = Math.min(height - 1, lineY + searchHalf)
-
-      const localYs = new Float32Array(numSegments)
-      const localValid = new Uint8Array(numSegments)
-
-      for (let s = 0; s < numSegments; s++) {
-        const x0 = s * segWidth
-        const x1 = Math.min(x0 + segWidth, width)
-        let bestY = lineY, bestDensity = 0
-
-        for (let y = yMin; y <= yMax; y++) {
-          let darkCnt = 0
-          for (let x = x0; x < x1; x++) {
-            if (gray[y * width + x] < threshold) darkCnt++
-          }
-          if (darkCnt > bestDensity) { bestDensity = darkCnt; bestY = y }
-        }
-
-        if (bestDensity > (x1 - x0) * 0.03) {
-          localYs[s] = bestY
-          localValid[s] = 1
-        }
-      }
-
-      let meanY = 0, validCnt = 0
-      for (let s = 0; s < numSegments; s++) {
-        if (localValid[s]) { meanY += localYs[s]; validCnt++ }
-      }
-      if (validCnt < numSegments * 0.3) continue
-      meanY /= validCnt
-
-      for (let s = 0; s < numSegments; s++) {
-        if (localValid[s]) {
-          shiftSum[s] += localYs[s] - meanY
-          shiftCount[s]++
-        }
-      }
-    }
-  } else {
-    // Vertical text: track text-band edges across vertical strips.
-    // For each strip, find the topmost and bottommost rows with significant
-    // dark pixel density. The midpoint of (top, bottom) reveals page curvature.
-    const minDarkRatio = 0.02
-
-    // Fused single-pass: edge detection + centroid per strip
-    const stripMidYs = new Float32Array(numSegments)
-    const stripCentroidYs = new Float32Array(numSegments)
-    const stripValid = new Uint8Array(numSegments)
-    const centroidValid = new Uint8Array(numSegments)
-    const yStart10 = Math.round(height * 0.1)
-    const yEnd90 = Math.round(height * 0.9)
-
-    for (let s = 0; s < numSegments; s++) {
-      const x0 = s * segWidth
-      const x1 = Math.min(x0 + segWidth, width)
+    for (let s = 0; s < numStrips; s++) {
+      const x0 = s * stripW
+      const x1 = Math.min(x0 + stripW, width)
       const sw = x1 - x0
       if (sw < 4) continue
 
-      let topEdge = -1, bottomEdge = -1
-      let sumY = 0, sumW = 0
-
-      for (let y = 0; y < height; y++) {
+      // Use weighted centroid (not just peak) for sub-pixel accuracy
+      let sumYW = 0, sumW = 0
+      for (let y = yMin; y <= yMax; y++) {
         let darkCnt = 0
         for (let x = x0; x < x1; x++) {
           if (gray[y * width + x] < threshold) darkCnt++
         }
-        // Edge detection
-        if (darkCnt / sw > minDarkRatio) {
-          if (topEdge < 0) topEdge = y
-          bottomEdge = y
-        }
-        // Centroid accumulation (within 10%-90% height range)
-        if (y >= yStart10 && y < yEnd90) {
-          sumY += y * darkCnt
+        if (darkCnt > sw * 0.03) {
+          sumYW += y * darkCnt
           sumW += darkCnt
         }
       }
 
-      if (topEdge >= 0 && bottomEdge > topEdge + height * 0.1) {
-        stripMidYs[s] = (topEdge + bottomEdge) / 2
-        stripValid[s] = 1
-      }
-      if (sumW > 0) {
-        stripCentroidYs[s] = sumY / sumW
-        centroidValid[s] = 1
+      if (sumW > sw * 0.5) {
+        localYs[s] = sumYW / sumW
+        localValid[s] = 1
       }
     }
 
-    // Compute mean midpoint across valid strips
-    let meanMid = 0, validCnt = 0
-    for (let s = 0; s < numSegments; s++) {
-      if (stripValid[s]) { meanMid += stripMidYs[s]; validCnt++ }
+    // Compute median Y for this line (more robust than mean)
+    const validYs: number[] = []
+    for (let s = 0; s < numStrips; s++) {
+      if (localValid[s]) validYs.push(localYs[s])
     }
-    if (validCnt < numSegments * 0.3) return imageData
-    meanMid /= validCnt
+    if (validYs.length < numStrips * 0.4) continue
+    validYs.sort((a, b) => a - b)
+    const medianY = validYs[Math.floor(validYs.length / 2)]
 
-    // The midpoint deviation IS the curvature signal
-    for (let s = 0; s < numSegments; s++) {
-      if (stripValid[s]) {
-        shiftSum[s] = stripMidYs[s] - meanMid
-        shiftCount[s] = 1
-      }
-    }
-
-    // Cross-validate with Y-centroid
-    let meanCentroid = 0
-    let centroidCnt = 0
-    for (let s = 0; s < numSegments; s++) {
-      if (centroidValid[s]) { meanCentroid += stripCentroidYs[s]; centroidCnt++ }
-    }
-    if (centroidCnt > numSegments * 0.3) {
-      meanCentroid /= centroidCnt
-      for (let s = 0; s < numSegments; s++) {
-        if (centroidValid[s]) {
-          const centroidShift = stripCentroidYs[s] - meanCentroid
-          if (shiftCount[s] > 0) {
-            shiftSum[s] = (shiftSum[s] + centroidShift) / 2
-          } else {
-            shiftSum[s] = centroidShift
-            shiftCount[s] = 1
-          }
-        }
+    // Reject outliers (> 2% of height from median) before accumulating
+    const outlierThresh = height * 0.02
+    for (let s = 0; s < numStrips; s++) {
+      if (localValid[s] && Math.abs(localYs[s] - medianY) < outlierThresh) {
+        stripShiftSum[s] += localYs[s] - medianY
+        stripShiftCount[s]++
       }
     }
   }
 
-  // 5. Smooth shifts (kernel width 5 for smoother curve)
-  const rawShifts = new Float32Array(numSegments)
-  for (let s = 0; s < numSegments; s++) {
-    rawShifts[s] = shiftCount[s] > 0 ? shiftSum[s] / shiftCount[s] : 0
-  }
-
-  // Fill gaps (interpolate from neighbors)
-  for (let s = 0; s < numSegments; s++) {
-    if (shiftCount[s] === 0) {
-      let left = -1, right = -1
-      for (let k = s - 1; k >= 0; k--) { if (shiftCount[k] > 0) { left = k; break } }
-      for (let k = s + 1; k < numSegments; k++) { if (shiftCount[k] > 0) { right = k; break } }
-      if (left >= 0 && right >= 0) {
-        const t = (s - left) / (right - left)
-        rawShifts[s] = rawShifts[left] * (1 - t) + rawShifts[right] * t
-      } else if (left >= 0) {
-        rawShifts[s] = rawShifts[left]
-      } else if (right >= 0) {
-        rawShifts[s] = rawShifts[right]
-      }
+  // 4. Compute average shift per strip
+  const rawShifts = new Float64Array(numStrips)
+  let validStrips = 0
+  for (let s = 0; s < numStrips; s++) {
+    if (stripShiftCount[s] >= 2) {
+      rawShifts[s] = stripShiftSum[s] / stripShiftCount[s]
+      validStrips++
     }
   }
+  if (validStrips < numStrips * 0.4) return imageData
 
-  const smoothShifts = new Float32Array(numSegments)
-  const smoothKernel = 4
-  for (let s = 0; s < numSegments; s++) {
-    let sum = 0, cnt = 0
-    for (let k = Math.max(0, s - smoothKernel); k <= Math.min(numSegments - 1, s + smoothKernel); k++) {
-      sum += rawShifts[k]; cnt++
+  // 5. Fit quadratic curve: shift(x) = a*x² + b*x + c
+  //    This gives a smooth parabolic correction that matches book curvature
+  //    without the waviness of per-strip raw data.
+  //    Least squares: minimize Σ(a*xᵢ²+b*xᵢ+c - yᵢ)²
+  let sx0 = 0, sx1 = 0, sx2 = 0, sx3 = 0, sx4 = 0
+  let sy0 = 0, sxy = 0, sx2y = 0
+  for (let s = 0; s < numStrips; s++) {
+    if (stripShiftCount[s] < 2) continue
+    // Normalize x to [-1, 1] for numerical stability
+    const xn = (2 * s / (numStrips - 1)) - 1
+    const xn2 = xn * xn
+    sx0 += 1
+    sx1 += xn
+    sx2 += xn2
+    sx3 += xn * xn2
+    sx4 += xn2 * xn2
+    sy0 += rawShifts[s]
+    sxy += xn * rawShifts[s]
+    sx2y += xn2 * rawShifts[s]
+  }
+
+  // Solve 3×3 normal equations [sx4 sx3 sx2; sx3 sx2 sx1; sx2 sx1 sx0] * [a;b;c] = [sx2y;sxy;sy0]
+  const M = [
+    [sx4, sx3, sx2],
+    [sx3, sx2, sx1],
+    [sx2, sx1, sx0],
+  ]
+  const rhs = [sx2y, sxy, sy0]
+
+  // Gaussian elimination
+  for (let col = 0; col < 3; col++) {
+    let maxRow = col
+    for (let row = col + 1; row < 3; row++) {
+      if (Math.abs(M[row][col]) > Math.abs(M[maxRow][col])) maxRow = row
     }
-    smoothShifts[s] = sum / cnt
+    [M[col], M[maxRow]] = [M[maxRow], M[col]];
+    [rhs[col], rhs[maxRow]] = [rhs[maxRow], rhs[col]]
+    if (Math.abs(M[col][col]) < 1e-12) return imageData // singular
+    for (let row = col + 1; row < 3; row++) {
+      const f = M[row][col] / M[col][col]
+      for (let k = col; k < 3; k++) M[row][k] -= f * M[col][k]
+      rhs[row] -= f * rhs[col]
+    }
   }
-
-  // Check significance
-  let maxShift = 0
-  for (let s = 0; s < numSegments; s++) {
-    maxShift = Math.max(maxShift, Math.abs(smoothShifts[s]))
+  // Back substitution
+  const coeffs = [0, 0, 0]
+  for (let i = 2; i >= 0; i--) {
+    let sum = rhs[i]
+    for (let j = i + 1; j < 3; j++) sum -= M[i][j] * coeffs[j]
+    coeffs[i] = sum / M[i][i]
   }
-  if (maxShift < 1.5) return imageData
+  const [fitA, fitB, fitC] = coeffs
 
-  // Cap to reasonable range
-  const maxAllowedShift = Math.min(height * 0.05, 40)
-  for (let s = 0; s < numSegments; s++) {
-    smoothShifts[s] = Math.max(-maxAllowedShift, Math.min(maxAllowedShift, smoothShifts[s]))
-  }
+  // Check significance: max curvature amplitude
+  // Evaluate fitted curve at edges and center
+  const fitAtNeg1 = fitA - fitB + fitC
+  const fitAt0 = fitC
+  const fitAtPos1 = fitA + fitB + fitC
+  const fitRange = Math.max(
+    Math.abs(fitAtNeg1 - fitAt0),
+    Math.abs(fitAtPos1 - fitAt0),
+    Math.abs(fitAtNeg1 - fitAtPos1)
+  )
+  if (fitRange < 2.0) return imageData // curvature too small to correct
 
-  // 6. Remap pixels — Y-shift always varies by X-position (for both orientations)
-  // Precompute per-column shift to avoid repeated segment interpolation in the hot loop
+  // Cap maximum correction
+  const maxAllowedShift = Math.min(height * 0.06, 60)
+
+  // 6. Compute per-column Y-shift from the fitted quadratic
+  //    SUBTRACT the shift to reverse the curvature
   const colShift = new Float32Array(width)
-  const invW = (numSegments - 1) / width
   for (let x = 0; x < width; x++) {
-    const segF = x * invW
-    const s0 = segF | 0 // fast floor
-    const s1 = s0 < numSegments - 1 ? s0 + 1 : s0
-    const t = segF - s0
-    colShift[x] = smoothShifts[s0] * (1 - t) + smoothShifts[s1] * t
+    const xn = (2 * x / (width - 1)) - 1
+    let shift = fitA * xn * xn + fitB * xn + fitC
+    shift = Math.max(-maxAllowedShift, Math.min(maxAllowedShift, shift))
+    colShift[x] = -shift // SUBTRACT to reverse curvature
   }
 
+  // 7. Remap pixels with bilinear interpolation
   const { ctx } = createCanvas(width, height)
   const outImageData = ctx.createImageData(width, height)
   const outData = outImageData.data
@@ -758,7 +695,7 @@ export function dewarpPage(imageData: ImageData): ImageData {
     const rowOut = y * w4
     for (let x = 0; x < width; x++) {
       const srcY = y + colShift[x]
-      const srcYi = srcY | 0 // fast floor for positive values
+      const srcYi = Math.floor(srcY)
       const frac = srcY - srcYi
 
       const di = rowOut + x * 4
@@ -771,10 +708,10 @@ export function dewarpPage(imageData: ImageData): ImageData {
       const si0 = srcYi * w4 + x * 4
       const si1 = si0 + w4
       const oneMinusFrac = 1 - frac
-      outData[di]     = data[si0]     * oneMinusFrac + data[si1]     * frac + 0.5 | 0
-      outData[di + 1] = data[si0 + 1] * oneMinusFrac + data[si1 + 1] * frac + 0.5 | 0
-      outData[di + 2] = data[si0 + 2] * oneMinusFrac + data[si1 + 2] * frac + 0.5 | 0
-      outData[di + 3] = data[si0 + 3] * oneMinusFrac + data[si1 + 3] * frac + 0.5 | 0
+      outData[di]     = (data[si0]     * oneMinusFrac + data[si1]     * frac + 0.5) | 0
+      outData[di + 1] = (data[si0 + 1] * oneMinusFrac + data[si1 + 1] * frac + 0.5) | 0
+      outData[di + 2] = (data[si0 + 2] * oneMinusFrac + data[si1 + 2] * frac + 0.5) | 0
+      outData[di + 3] = (data[si0 + 3] * oneMinusFrac + data[si1 + 3] * frac + 0.5) | 0
     }
   }
 

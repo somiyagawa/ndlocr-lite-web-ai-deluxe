@@ -4486,7 +4486,9 @@ button.ai-status-clickable .ai-status-text {
   background: rgba(0, 0, 0, 0.35) !important;
 }
 .region-text-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 0;
   left: 0;
@@ -4498,6 +4500,7 @@ button.ai-status-clickable .ai-status-text {
   padding: 1px 2px;
   overflow: hidden;
   word-break: break-all;
+  text-align: center;
   text-shadow: 0 0 2px rgba(0,0,0,0.8);
   /* writing-mode set dynamically via inline style based on block aspect ratio */
   pointer-events: none;
@@ -5105,7 +5108,7 @@ button.ai-status-clickable .ai-status-text {
   align-items: center;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border-light);
-  padding: 0.25rem 1rem;
+  padding: 0.25rem 0.75rem;
   overflow: hidden;
   flex-shrink: 0;
   user-select: none;
@@ -5118,7 +5121,6 @@ button.ai-status-clickable .ai-status-text {
   align-items: center;
   justify-content: center;
   color: var(--color-text-tertiary);
-  font-size: 0.6rem;
   writing-mode: horizontal-tb;
   text-orientation: mixed;
   height: 1.6rem;
