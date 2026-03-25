@@ -72,7 +72,7 @@ ${sourceDescContent}
     </fileDesc>
     <encodingDesc>
       <appInfo>
-        <application ident="ndlocr-lite-web-ai" version="3.0.0">
+        <application ident="ndlocr-lite-web-ai" version="3.5.0">
           <label>NDLOCR-lite Web AI: Model BLUEPOND</label>
         </application>
       </appInfo>
@@ -291,7 +291,7 @@ ${sourceDescContent}
     </fileDesc>
     <encodingDesc>
       <appInfo>
-        <application ident="ndlocr-lite-web-ai" version="3.0.0">
+        <application ident="ndlocr-lite-web-ai" version="3.5.0">
           <label>NDLOCR-lite Web AI: Model BLUEPOND</label>
         </application>
       </appInfo>
