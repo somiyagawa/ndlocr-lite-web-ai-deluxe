@@ -3897,6 +3897,62 @@ button.ai-status-clickable .ai-status-text {
   /* no animation — clean look */
 }
 
+.header-version-clickable {
+  cursor: pointer;
+  border-bottom: 1px dashed var(--text-muted, #888);
+  transition: color 0.2s, border-color 0.2s;
+}
+.header-version-clickable:hover {
+  color: var(--accent, #3b82f6);
+  border-color: var(--accent, #3b82f6);
+}
+
+/* Changelog Modal */
+.changelog-modal {
+  max-width: 560px;
+  max-height: 80vh;
+}
+.changelog-body {
+  padding: 0.5rem 1.2rem 1.2rem;
+  overflow-y: auto;
+  max-height: calc(80vh - 60px);
+}
+.changelog-entry {
+  margin-bottom: 1.2rem;
+}
+.changelog-entry:last-child {
+  margin-bottom: 0;
+}
+.changelog-version-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+.changelog-version-badge {
+  display: inline-block;
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+.changelog-date {
+  font-size: 0.78rem;
+  color: var(--text-muted, #888);
+}
+.changelog-list {
+  margin: 0;
+  padding-left: 1.4rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.changelog-list li {
+  margin-bottom: 0.15rem;
+}
+
 .header-actions-group {
   display: flex;
   gap: 0.35rem;
@@ -4085,6 +4141,23 @@ button.ai-status-clickable .ai-status-text {
   color: var(--color-text-tertiary);
   opacity: 0.7;
   font-style: italic;
+}
+
+.footer-license {
+  margin-top: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--color-text-tertiary);
+  opacity: 0.65;
+}
+.footer-license a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  transition: color 0.2s;
+}
+.footer-license a:hover {
+  color: var(--accent, #3b82f6);
+  opacity: 1;
 }
 
 .footer-meta {

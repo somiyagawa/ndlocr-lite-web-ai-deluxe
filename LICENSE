@@ -1,8 +1,22 @@
+This project contains code under multiple licenses:
+
+================================================================================
+1. NDLOCR-Lite (OCR model and algorithm) — CC BY 4.0
+================================================================================
+
 Creative Commons Attribution 4.0 International (CC BY 4.0)
 
-Copyright (c) 2025 Yuta Hashimoto
+Copyright (c) National Diet Library of Japan (国立国会図書館)
 
-This work is licensed under the Creative Commons Attribution 4.0 International License.
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+================================================================================
+2. ndlocrlite-web (Web browser port) — CC BY 4.0
+================================================================================
+
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2025 Yuta Hashimoto (橋本雄太)
 
 You are free to:
   Share — copy and redistribute the material in any medium or format
@@ -15,5 +29,41 @@ Under the following terms:
 
 No additional restrictions — You may not apply legal terms or technological measures
 that legally restrict others from doing anything the license permits.
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+================================================================================
+3. NDLOCR-Lite Web AI (AI proofreading feature) — MIT License
+================================================================================
+
+MIT License
+
+Copyright (c) 2025 Katsuhiro Ogata (小形克宏, Bibliostyle)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+4. NDLOCR-lite Web AI: Model BLUEPOND (additional features) — CC BY 4.0
+================================================================================
+
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2025-2026 So Miyagawa (宮川創)
 
 Full license text: https://creativecommons.org/licenses/by/4.0/legalcode

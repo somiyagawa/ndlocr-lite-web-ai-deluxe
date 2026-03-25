@@ -159,6 +159,23 @@ export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
           return <>🐸 The Choju-giga background pattern is a tribute to {link} (National Diet Library of Japan), developer of NDLOCR</>
         })()}
       </div>
+      <div className="footer-license">
+        {(() => {
+          const ccby = <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>
+          const mit = <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a>
+          const ndl = L(lang, { ja: '国立国会図書館', en: 'NDL', 'zh-CN': '日本国立国会图书馆', 'zh-TW': '日本國立國會圖書館', ko: '일본국립국회도서관', la: 'NDL', eo: 'NDL', es: 'NDL', de: 'NDL', ar: 'NDL', hi: 'NDL', ru: 'NDL', el: 'NDL', syc: 'NDL', cop: 'NDL', sa: 'NDL' })
+          const hashi = L(lang, { ja: '橋本雄太', en: 'Y. Hashimoto', 'zh-CN': '桥本雄太', 'zh-TW': '橋本雄太', ko: '하시모토 유타', ru: 'Ю. Хасимото', la: 'Y. Hashimoto', eo: 'Y. Hashimoto', es: 'Y. Hashimoto', de: 'Y. Hashimoto', ar: 'Y. Hashimoto', hi: 'Y. Hashimoto', el: 'Y. Hashimoto', syc: 'Y. Hashimoto', cop: 'Y. Hashimoto', sa: 'Y. Hashimoto' })
+          const ogata = L(lang, { ja: '小形克宏', en: 'K. Ogata', 'zh-CN': '小形克宏', 'zh-TW': '小形克宏', ko: '오가타 카쓰히로', ru: 'К. Огата', la: 'K. Ogata', eo: 'K. Ogata', es: 'K. Ogata', de: 'K. Ogata', ar: 'K. Ogata', hi: 'K. Ogata', el: 'K. Ogata', syc: 'K. Ogata', cop: 'K. Ogata', sa: 'K. Ogata' })
+          const miya = L(lang, { ja: '宮川創', en: 'S. Miyagawa', 'zh-CN': '宫川创', 'zh-TW': '宮川創', ko: '미야가와 소', ru: 'С. Миягава', la: 'S. Miyagawa', eo: 'S. Miyagawa', es: 'S. Miyagawa', de: 'S. Miyagawa', ar: 'S. Miyagawa', hi: 'S. Miyagawa', el: 'S. Miyagawa', syc: 'S. Miyagawa', cop: 'S. Miyagawa', sa: 'S. Miyagawa' })
+          const webLabel = L(lang, { ja: 'Web版', en: 'Web port', 'zh-CN': 'Web版', 'zh-TW': 'Web版', ko: 'Web판', la: 'Web', eo: 'Retversio', es: 'Web', de: 'Web', ar: 'الويب', hi: 'वेब', ru: 'Веб', el: 'Web', syc: 'ܓܘ', cop: 'Web', sa: 'Web' })
+          const aiLabel = L(lang, { ja: 'AI校正', en: 'AI proofread', 'zh-CN': 'AI校正', 'zh-TW': 'AI校正', ko: 'AI교정', la: 'AI', eo: 'AI', es: 'AI', de: 'KI', ar: 'AI', hi: 'AI', ru: 'AI', el: 'AI', syc: 'AI', cop: 'AI', sa: 'AI' })
+          return (
+            <span>
+              NDLOCR-Lite: {ccby} ({ndl}) / {webLabel}: {ccby} ({hashi}) / {aiLabel}: {mit} ({ogata}) / Model BLUEPOND: {ccby} ({miya})
+            </span>
+          )
+        })()}
+      </div>
       {onBugReport && (
         <div className="footer-bug-report">
           <button className="footer-bug-report-btn" onClick={onBugReport} type="button">

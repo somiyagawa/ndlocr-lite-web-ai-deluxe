@@ -1,8 +1,120 @@
-import { memo, useState } from 'react'
+import { memo, useState, useCallback } from 'react'
 import { LANGUAGES, LANGUAGE_LABELS, L } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Theme } from '../../hooks/useTheme'
+
+/** 更新履歴データ */
+const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
+  {
+    version: '3.5.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '一括AI校正機能を追加',
+        'ドラッグ＆ドロップによる結果ページ並べ替え',
+        'テキストブロック読み順の手動修正機能',
+        'TEI XMLメタデータ入力UI（学術用9フィールド）',
+        '自動たち落としにおける大津の方法による閾値自動算出',
+        'バグ報告のmailtoリンク修正（COOP対応）',
+        '画像前処理の適用/リセットを結果ビューで修正',
+        '読み順編集バーとズームコントロールの重なり修正',
+        'ライセンス表示の4者構成化（NDL / 橋本 / 小形 / 宮川）',
+        'エクスポートメニューのフォーマット名揃え修正',
+        '16言語UI対応',
+      ],
+      en: [
+        'Added batch AI proofreading',
+        'Drag & drop result page reordering',
+        'Manual text block reading order correction',
+        'TEI XML metadata input UI (9 academic fields)',
+        'Auto crop with Otsu\'s method for automatic thresholding',
+        'Fixed bug report mailto link (COOP compatibility)',
+        'Fixed image preprocessing apply/reset in results view',
+        'Fixed reading order edit bar overlapping zoom controls',
+        'License display with 4-party structure (NDL / Hashimoto / Ogata / Miyagawa)',
+        'Fixed export menu format name alignment',
+        '16-language UI support',
+      ],
+    },
+  },
+  {
+    version: '3.4.0',
+    date: '2026-03-15',
+    changes: {
+      ja: [
+        'AI校正機能の追加（Direct API / MCP対応）',
+        '差分表示（accept/reject UI）',
+        'DOCXエクスポート機能',
+        'hOCRエクスポート機能',
+        'テキスト付きPDFエクスポート機能',
+        'バグ報告・機能要望フォーム',
+      ],
+      en: [
+        'Added AI proofreading (Direct API / MCP support)',
+        'Diff view with accept/reject UI',
+        'DOCX export',
+        'hOCR export',
+        'Text-embedded PDF export',
+        'Bug report / feature request form',
+      ],
+    },
+  },
+  {
+    version: '3.3.0',
+    date: '2026-02-28',
+    changes: {
+      ja: [
+        '画像前処理機能（明度・コントラスト・二値化・ノイズ除去・傾き補正）',
+        '見開きページ自動分割',
+        '領域選択OCR',
+        'カメラ撮影・ドキュメントスキャナー対応',
+      ],
+      en: [
+        'Image preprocessing (brightness, contrast, binarization, denoising, deskew)',
+        'Double-page automatic splitting',
+        'Region-select OCR',
+        'Camera capture & document scanner support',
+      ],
+    },
+  },
+  {
+    version: '3.2.0',
+    date: '2026-02-10',
+    changes: {
+      ja: [
+        '縦書き表示モード',
+        '検索・置換機能',
+        'TEI XMLエクスポート',
+        '処理履歴パネル',
+      ],
+      en: [
+        'Vertical text display mode',
+        'Search & replace',
+        'TEI XML export',
+        'Processing history panel',
+      ],
+    },
+  },
+  {
+    version: '3.1.0',
+    date: '2026-01-20',
+    changes: {
+      ja: [
+        'ダークモード',
+        '多言語UI（初期対応）',
+        '鳥獣戯画の背景',
+        '一括保存機能',
+      ],
+      en: [
+        'Dark mode',
+        'Multilingual UI (initial support)',
+        'Choju-giga background',
+        'Batch save feature',
+      ],
+    },
+  },
+]
 
 const STATUS_LABELS: Record<AIConnectionStatus, Record<string, string>> = {
   connected:    { ja: 'AI接続済み', en: 'AI Connected', 'zh-CN': 'AI已连接', 'zh-TW': 'AI已連接', ko: 'AI 연결됨', la: 'AI connexum', eo: 'AI konektita', es: 'AI conectado', de: 'AI verbunden', ar: 'AI متصل', hi: 'AI जुड़ा' },
@@ -73,6 +185,19 @@ export const Header = memo(function Header({
     : (THEME_LABELS.toDark[lang] ?? THEME_LABELS.toDark.en)
 
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showChangelog, setShowChangelog] = useState(false)
+
+  const handleVersionClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowChangelog(true)
+  }, [])
+
+  const changelogTitle = L(lang, {
+    ja: '更新履歴', en: 'Changelog', 'zh-CN': '更新日志', 'zh-TW': '更新紀錄', ko: '업데이트 기록',
+    la: 'Historia mutationum', eo: 'Ŝanĝoprotokolo', es: 'Registro de cambios', de: 'Änderungsprotokoll',
+    ar: 'سجل التغييرات', hi: 'परिवर्तन लॉग', ru: 'Журнал изменений', el: 'Αρχείο αλλαγών',
+    syc: 'ܫ̈ܘ̈ܚ̈ܠ̈ܦ̈ܐ', cop: 'ⲡⲓⲥϧⲁⲓ ⲛⲧⲉ ⲛⲓϣⲟⲃⲧ', sa: 'परिवर्तन-सूची'
+  })
 
   return (
     <header className="header">
@@ -102,7 +227,13 @@ export const Header = memo(function Header({
           <span className="header-title-main">NDLOCR-lite Web AI</span>
           <span className="header-title-accent">Model BLUEPOND</span>
         </div>
-        <span className="header-version header-version-pulse">v3.5</span>
+        <span
+          className="header-version header-version-pulse header-version-clickable"
+          onClick={handleVersionClick}
+          title={changelogTitle}
+          role="button"
+          tabIndex={0}
+        >v3.5</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
@@ -246,6 +377,33 @@ export const Header = memo(function Header({
           </div>
         </div>
       </div>
+
+      {/* Changelog Modal */}
+      {showChangelog && (
+        <div className="modal-overlay" onClick={() => setShowChangelog(false)}>
+          <div className="modal-content changelog-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{changelogTitle}</h2>
+              <button className="modal-close" onClick={() => setShowChangelog(false)} type="button">&times;</button>
+            </div>
+            <div className="changelog-body">
+              {CHANGELOG.map(entry => (
+                <div key={entry.version} className="changelog-entry">
+                  <div className="changelog-version-header">
+                    <span className="changelog-version-badge">v{entry.version}</span>
+                    <span className="changelog-date">{entry.date}</span>
+                  </div>
+                  <ul className="changelog-list">
+                    {(entry.changes[lang] || entry.changes['en']).map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 })
