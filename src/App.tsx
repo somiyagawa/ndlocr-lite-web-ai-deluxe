@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import type { OCRResult, TextBlock, BoundingBox, PageBlock, ProcessedImage } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { useI18n } from './hooks/useI18n'
@@ -1188,6 +1190,8 @@ export default function App() {
           />
         )}
       </Suspense>
+      <Analytics />
+      <SpeedInsights />
     </div>
   )
 }

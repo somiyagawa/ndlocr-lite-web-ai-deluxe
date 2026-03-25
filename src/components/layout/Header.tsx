@@ -40,7 +40,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
   },
   {
     version: '3.4.0',
-    date: '2026-03-15',
+    date: '2026-03-25',
     changes: {
       ja: [
         'AI校正機能の追加（Direct API / MCP対応）',
@@ -62,7 +62,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
   },
   {
     version: '3.3.0',
-    date: '2026-02-28',
+    date: '2026-03-25',
     changes: {
       ja: [
         '画像前処理機能（明度・コントラスト・二値化・ノイズ除去・傾き補正）',
@@ -80,7 +80,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
   },
   {
     version: '3.2.0',
-    date: '2026-02-10',
+    date: '2026-03-24',
     changes: {
       ja: [
         '縦書き表示モード',
@@ -98,7 +98,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
   },
   {
     version: '3.1.0',
-    date: '2026-01-20',
+    date: '2026-03-24',
     changes: {
       ja: [
         'ダークモード',
