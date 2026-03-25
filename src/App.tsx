@@ -795,13 +795,13 @@ export default function App() {
                           <div className="image-with-preprocess-main">
                             <ImageViewer
                               imageDataUrl={preprocessedUrls[selectedResultIndex + 10000] ?? currentResult.imageDataUrl}
-                              textBlocks={currentResult.textBlocks}
-                              selectedBlock={selectedBlock}
+                              textBlocks={preprocessedUrls[selectedResultIndex + 10000] ? [] : currentResult.textBlocks}
+                              selectedBlock={preprocessedUrls[selectedResultIndex + 10000] ? null : selectedBlock}
                               onBlockSelect={(block) => { setSelectedBlock(block); setSelectedPageBlock(null) }}
                               onRegionSelect={handleRegionSelect}
                               selectedRegion={selectedRegion}
-                              pageBlocks={currentResult.pageBlocks}
-                              selectedPageBlock={selectedPageBlock}
+                              pageBlocks={preprocessedUrls[selectedResultIndex + 10000] ? undefined : currentResult.pageBlocks}
+                              selectedPageBlock={preprocessedUrls[selectedResultIndex + 10000] ? null : selectedPageBlock}
                               onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
                               pageIndex={selectedResultIndex}
                               totalPages={sessionResults.length}
@@ -814,10 +814,21 @@ export default function App() {
                               adjustLabel={L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                               lang={lang}
                             />
+                            {preprocessedUrls[selectedResultIndex + 10000] && (
+                              <p className="region-select-hint" style={{ color: 'var(--color-warning, #e67700)', fontWeight: 500 }}>
+                                {L(lang, {
+                                  ja: '画像補正済み — 領域を選択して「選択領域のOCRを開始」で再認識してください',
+                                  en: 'Image adjusted — select a region and re-run OCR to update text blocks',
+                                  'zh-CN': '图像已校正 — 请选择区域并重新运行OCR以更新文字块',
+                                  'zh-TW': '影像已校正 — 請選取區域並重新執行OCR以更新文字區塊',
+                                  ko: '이미지 보정됨 — 영역을 선택하고 OCR을 다시 실행하여 텍스트 블록을 업데이트하세요',
+                                })}
+                              </p>
+                            )}
                             {selectedRegion && (
                               <div className="region-action-bar">
                                 <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
-                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })}
+                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयنित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })}
                                 </button>
                                 <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
                                   {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें', ru: 'Снять выделение', el: 'Εκκαθάριση επιλογής', syc: 'ܫܪܝ ܓܒܝܬܐ' })}
