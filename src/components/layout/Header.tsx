@@ -193,7 +193,7 @@ export const Header = memo(function Header({
 
   const CLASSICAL_LABELS: Record<string, Record<string, string>> = {
     la:  { ja: 'ラテン語', en: 'Latin', 'zh-CN': '拉丁语', 'zh-TW': '拉丁語', ko: '라틴어', la: 'Latina', eo: 'Latina', es: 'Latín', de: 'Latein', ar: 'اللاتينية', hi: 'लैटिन', ru: 'Латынь', el: 'Λατινικά', syc: 'ܠܛܝܢܝܐ', cop: 'ⲗⲁⲧⲓⲛⲟⲛ', sa: 'लातिनी' },
-    sa:  { ja: 'サンスクリット', en: 'Sanskrit', 'zh-CN': '梵语', 'zh-TW': '梵語', ko: '산스크리트어', la: 'Sanscrita', eo: 'Sanskrito', es: 'Sánscrito', de: 'Sanskrit', ar: 'السنسكريتية', hi: 'संस्कृत', ru: 'Санскрит', el: 'Σανσκριτικά', syc: 'ܣܢܣܩܪܝܛ', cop: 'ⲥⲁⲛⲥⲕⲣⲓⲧ', sa: 'संस्कृतम्' },
+    sa:  { ja: '梵語', en: 'Sanskrit', 'zh-CN': '梵语', 'zh-TW': '梵語', ko: '산스크리트어', la: 'Sanscrita', eo: 'Sanskrito', es: 'Sánscrito', de: 'Sanskrit', ar: 'السنسكريتية', hi: 'संस्कृत', ru: 'Санскрит', el: 'Σανσκριτικά', syc: 'ܣܢܣܩܪܝܛ', cop: 'ⲥⲁⲛⲥⲕⲣⲓⲧ', sa: 'संस्कृतम्' },
     syc: { ja: 'シリア語', en: 'Syriac', 'zh-CN': '叙利亚语', 'zh-TW': '敘利亞語', ko: '시리아어', la: 'Syriaca', eo: 'Siria', es: 'Siríaco', de: 'Syrisch', ar: 'السريانية', hi: 'सीरियाई', ru: 'Сирийский', el: 'Συριακά', syc: 'ܣܘܪܝܝܐ', cop: 'ⲙⲉⲧⲥⲩⲣⲓⲁⲛⲟⲥ', sa: 'सिरियाक्' },
     cop: { ja: 'コプト語', en: 'Coptic', 'zh-CN': '科普特语', 'zh-TW': '科普特語', ko: '콥트어', la: 'Coptica', eo: 'Kopta', es: 'Copto', de: 'Koptisch', ar: 'القبطية', hi: 'कॉप्टिक', ru: 'Коптский', el: 'Κοπτικά', syc: 'ܩܘܦܛܝܐ', cop: 'ⲙⲉⲧⲣⲉⲙⲛⲕⲏⲙⲉ', sa: 'कोप्तिक्' },
   }
@@ -394,7 +394,6 @@ export const Header = memo(function Header({
               onClick={() => setClassicalOpen(!classicalOpen)}
               type="button"
             >
-              <span className="classical-lang-icon">🏛️</span>
               <span className="classical-lang-label">{L(lang, {
                 ja: '古典語', en: 'Classical', 'zh-CN': '古典语', 'zh-TW': '古典語', ko: '고전어',
                 la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
@@ -416,8 +415,7 @@ export const Header = memo(function Header({
                       setMenuOpen(false)
                     }}
                   >
-                    <span className="classical-lang-item-emoji">{FLAG_EMOJI[code]}</span>
-                    <span>{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
+                    {CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}
                   </button>
                 ))}
               </div>
