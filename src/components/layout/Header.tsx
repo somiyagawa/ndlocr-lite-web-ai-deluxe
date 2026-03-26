@@ -7,6 +7,20 @@ import type { Theme } from '../../hooks/useTheme'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '3.8.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '英語OCRのスペース認識を修正（PARSeqデコーダの特殊トークンオフセット補正）',
+        'PARSeqのオートリグレッシブ特性に合わせ、不要なCTC式連続重複除去を削除',
+      ],
+      en: [
+        'Fixed English OCR space recognition (PARSeq decoder special token offset correction)',
+        'Removed incorrect CTC-style duplicate character removal for autoregressive PARSeq model',
+      ],
+    },
+  },
+  {
     version: '3.7.0',
     date: '2026-03-26',
     changes: {
@@ -266,7 +280,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v3.7</span>
+        >v3.8</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

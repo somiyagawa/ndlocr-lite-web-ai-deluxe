@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.7.0-teal?style=for-the-badge" alt="v3.7.0" />
+  <img src="https://img.shields.io/badge/version-3.8.0-teal?style=for-the-badge" alt="v3.8.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,12 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v3.8.0 — 2026-03-26
+
+**英語OCRスペース認識修正** — PARSeqデコーダの特殊トークンオフセット計算を修正（`maxIndex - 1` → `maxIndex - 4`）。特殊トークン4つ（`<eos>`, `<s>`, `</s>`, `<pad>`）分のオフセットが不足していたため、charset[0]のスペース文字が`<s>`トークンと衝突して出力されない問題を解消。英語テキストの単語間スペースが正しく認識されるようになりました。
+
+**CTC式重複除去の削除** — PARSeqはオートリグレッシブ（自己回帰）モデルであるため、CTC方式の連続重複文字除去は不適切。"book"→"bok"のような誤った文字削除が発生していた問題を修正。
 
 ### v3.7.0 — 2026-03-26 🔷 Ultra Bluepond
 
