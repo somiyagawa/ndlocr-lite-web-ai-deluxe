@@ -8,6 +8,24 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.4',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像補正パネルをよりコンパクトに（max-height 32vh、余白・間隔縮小）',
+        '携帯版: スライダーのつまみを26px・トラックを8pxに拡大し、タッチ操作を改善',
+        '携帯版: チェックボックスを20pxに拡大し、タッチ操作を改善',
+        '携帯版: 画像補正パネルを半透明化（backdrop-filter: blur）— 背面の画像を透かして確認可能',
+      ],
+      en: [
+        'Mobile: image correction panel more compact (max-height 32vh, reduced padding/gaps)',
+        'Mobile: slider thumbs enlarged to 26px, track to 8px for better touch control',
+        'Mobile: toggle checkboxes enlarged to 20px for better touch targets',
+        'Mobile: preprocess panel now semi-transparent with backdrop blur — image partially visible behind',
+      ],
+    },
+  },
+  {
     version: '4.3.3',
     date: '2026-03-27',
     changes: {
@@ -499,7 +517,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.3</span>
+        >v4.3.4</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

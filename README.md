@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.3-teal?style=for-the-badge" alt="v4.3.3" />
+  <img src="https://img.shields.io/badge/version-4.3.4-teal?style=for-the-badge" alt="v4.3.4" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.3.4 — 2026-03-27
+
+**携帯版画像補正パネル最適化** — 画像補正パネルをよりコンパクトに（max-height 32vh、余白・間隔縮小）。スライダーのつまみを26px・トラックを8pxに拡大しタッチ操作を改善。チェックボックスを20pxに拡大。パネルを半透明化（backdrop-filter: blur）し、背面の画像を透かして確認可能に。
 
 ### v4.3.3 — 2026-03-27
 
