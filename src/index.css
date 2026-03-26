@@ -5,7 +5,7 @@
 }
 
 /* ══════════════════════════════════════
-   Splash Screen — Model BLUEPOND
+   Splash Screen — Ultra BLUEPOND
    ══════════════════════════════════════ */
 .splash-screen {
   position: fixed;
@@ -734,7 +734,7 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .landing-title-main {
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: #1a3550;
   margin: 0;
   text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
@@ -900,10 +900,19 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   font-weight: 700;
   letter-spacing: 0.15em;
   color: var(--color-primary);
-  text-shadow: 0 1px 8px rgba(255,255,255,0.7);
+  /* 強い白いハロー: 複数レイヤーで視認性を確保 */
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.95),
+    0 0 20px rgba(255,255,255,0.8),
+    0 0 40px rgba(255,255,255,0.5),
+    0 1px 3px rgba(255,255,255,1);
 }
 [data-theme="dark"] .processing-bluepond-main {
-  text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+  text-shadow:
+    0 0 10px rgba(100,180,255,0.6),
+    0 0 25px rgba(50,120,200,0.4),
+    0 0 50px rgba(30,80,160,0.3),
+    0 1px 3px rgba(0,0,0,0.7);
 }
 .processing-bluepond-sub {
   display: block;
@@ -3784,6 +3793,14 @@ button.ai-status-clickable .ai-status-text {
     max-height: 60vh;
     overflow-y: auto;
     z-index: 1000;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* モバイル: ドロップダウン項目のタッチターゲットを拡大 */
+  .text-editor-toolbar .export-dropdown-item {
+    padding: 0.6rem 0.75rem;
+    min-height: 44px;
+    -webkit-tap-highlight-color: rgba(0, 100, 200, 0.15);
   }
 
   .text-editor-toolbar .btn-secondary svg,

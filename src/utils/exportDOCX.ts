@@ -5,6 +5,7 @@
  * docx-js (npm: docx) を使用してブラウザ内で生成。
  */
 
+import { triggerBlobDownload } from './textExport'
 import {
   Document,
   Packer,
@@ -150,9 +151,5 @@ export async function downloadDOCX(
   // Blob生成 & ダウンロード
   const buffer = await Packer.toBlob(doc)
   const url = URL.createObjectURL(buffer)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${baseName}_ocr.docx`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(url, `${baseName}_ocr.docx`)
 }

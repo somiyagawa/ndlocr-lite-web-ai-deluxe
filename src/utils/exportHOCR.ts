@@ -12,6 +12,7 @@
  */
 
 import type { OCRResult } from '../types/ocr'
+import { triggerBlobDownload } from './textExport'
 
 /** HTMLの特殊文字をエスケープ */
 function escapeHtml(s: string): string {
@@ -66,7 +67,7 @@ export function generateHOCR(result: OCRResult): string {
 <head>
   <title>hOCR output: ${fileName}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="ocr-system" content="NDLOCR-lite Web AI: Model BLUEPOND"/>
+  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra BLUEPOND"/>
   <meta name="ocr-capabilities" content="ocr_page ocr_line"/>
   <meta name="dc.date" content="${now}"/>
   <meta name="dc.source" content="${fileName}"/>
@@ -89,11 +90,7 @@ export function downloadHOCR(result: OCRResult): void {
   const baseName = result.fileName.replace(/\.[^/.]+$/, '')
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${baseName}_ocr.hocr`
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(url, `${baseName}_ocr.hocr`)
 }
 
 /**
@@ -137,7 +134,7 @@ ${lines}
 <head>
   <title>hOCR output: ${results.length} pages</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="ocr-system" content="NDLOCR-lite Web AI: Model BLUEPOND"/>
+  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra BLUEPOND"/>
   <meta name="ocr-capabilities" content="ocr_page ocr_line"/>
   <meta name="dc.date" content="${now}"/>
 </head>
@@ -148,9 +145,5 @@ ${pages}
 `
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'ocr_all_pages.hocr'
-  a.click()
-  URL.revokeObjectURL(url)
+  triggerBlobDownload(url, 'ocr_all_pages.hocr')
 }

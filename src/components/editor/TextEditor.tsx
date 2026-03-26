@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef, useMemo, lazy, Suspense } fro
 import type { OCRResult, TextBlock, TEIMetadata } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
-import { downloadText, copyToClipboard } from '../../utils/textExport'
+import { downloadText, copyToClipboard, triggerBlobDownload } from '../../utils/textExport'
 import { downloadTEI, downloadBatchTEI } from '../../utils/exportTEI'
 import { downloadHOCR, downloadBatchHOCR } from '../../utils/exportHOCR'
 import { downloadPDF, downloadBatchPDF } from '../../utils/exportPDF'
@@ -488,11 +488,7 @@ export function TextEditor({
       }).join('\n\n')
       const blob = new Blob([combined], { type: 'text/plain;charset=utf-8' })
       const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'ocr_all_pages.txt'
-      a.click()
-      URL.revokeObjectURL(url)
+      triggerBlobDownload(url, 'ocr_all_pages.txt')
     } else if (format === 'tei') {
       setTeiMetadataMode('batch')
       setShowTEIMetadataModal(true)

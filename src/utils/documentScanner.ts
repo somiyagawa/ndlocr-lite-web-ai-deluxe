@@ -1,5 +1,5 @@
 /**
- * Document Scanner Module for NDLOCR-lite Web AI: Model BLUEPOND
+ * Document Scanner Module for NDLOCR-lite Web AI: Ultra BLUEPOND
  *
  * Provides browser-based document detection, perspective correction,
  * and curved page dewarping using Canvas API.

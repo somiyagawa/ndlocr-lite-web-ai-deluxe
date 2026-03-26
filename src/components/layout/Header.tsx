@@ -7,6 +7,24 @@ import type { Theme } from '../../hooks/useTheme'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '3.6.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '名称変更: Model BLUEPOND → Ultra BLUEPOND',
+        'モバイル保存ボタンの修正（iOS Safari ダウンロード互換性向上）',
+        'ローディング画面タイトルの白いハロー効果を強化',
+        'ドロップダウンメニューのモバイルタッチ操作を改善',
+      ],
+      en: [
+        'Renamed: Model BLUEPOND → Ultra BLUEPOND',
+        'Fixed mobile save button (iOS Safari download compatibility)',
+        'Enhanced white halo effect on loading screen title',
+        'Improved dropdown menu touch interaction on mobile',
+      ],
+    },
+  },
+  {
     version: '3.5.0',
     date: '2026-03-26',
     changes: {
@@ -236,7 +254,7 @@ export const Header = memo(function Header({
         </div>
         <div className="header-title-text">
           <span className="header-title-main">NDLOCR-lite Web AI</span>
-          <span className="header-title-accent">Model BLUEPOND</span>
+          <span className="header-title-accent">Ultra BLUEPOND</span>
         </div>
         <span
           className="header-version header-version-pulse header-version-clickable"
@@ -244,7 +262,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v3.5</span>
+        >v3.6</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
