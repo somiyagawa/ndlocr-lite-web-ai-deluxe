@@ -8,6 +8,26 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.1',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像ビューワ・テキストエディタの分割ペインを大幅に拡大（各70vh、従来の2倍以上）',
+        '携帯版: ステータスバー（ファイル名・改行無視等）を超コンパクト化し、テキスト編集面積を最大化',
+        '携帯版: 画像読み込み時にビューワ全体に画像がフィットするよう修正（fitZoomの上限キャップ撤廃）',
+        '携帯版: テキストエディタのtextareaがペイン全体を埋めるようflex伸長を追加',
+        'モーダルのモバイルCSS重複定義を統合',
+      ],
+      en: [
+        'Mobile: greatly enlarged image viewer and text editor split panes (70vh each, 2x+ previous)',
+        'Mobile: ultra-compact statusbar (filename, ignore-newline, etc.) to maximize text editing area',
+        'Mobile: fixed image filling viewer on load by removing fitZoom cap',
+        'Mobile: textarea now fills entire pane via flex growth',
+        'Merged duplicate mobile modal CSS definitions',
+      ],
+    },
+  },
+  {
     version: '4.3.0',
     date: '2026-03-27',
     changes: {
@@ -421,7 +441,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.0</span>
+        >v4.3.1</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

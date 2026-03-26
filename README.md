@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.0-teal?style=for-the-badge" alt="v4.3.0" />
+  <img src="https://img.shields.io/badge/version-4.3.1-teal?style=for-the-badge" alt="v4.3.1" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -205,6 +205,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ### v4.2.2 — 2026-03-26
 
 **くずし字バッジ色変更** — サンプルタイルセレクタのくずし字バッジ色をpondblue（プライマリカラー）に変更。
+
+### v4.3.1 — 2026-03-27
+
+**携帯版レイアウト大幅改善** — 画像ビューワ・テキストエディタの分割ペインを大幅に拡大（各70vh、従来の2倍以上）。ステータスバー（ファイル名・改行無視等）を超コンパクト化しテキスト編集面積を最大化。画像読み込み時にビューワ全体にフィットするようfitZoomの上限キャップを撤廃。textareaがペイン全体を埋めるようflex伸長を追加。モーダルのモバイルCSS重複定義を統合。
 
 ### v4.3.0 — 2026-03-27
 
