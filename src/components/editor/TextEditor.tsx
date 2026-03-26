@@ -968,7 +968,7 @@ export function TextEditor({
               <path d="M7 7l2 2M9 7l-2 2" strokeWidth="1.2" />
               <line x1="2" y1="13" x2="14" y2="13" />
             </svg>
-            {L(lang, { ja: '空行削除', en: 'Del blank', 'zh-CN': '删空行', 'zh-TW': '刪空行', ko: '빈줄삭제', la: 'Del. vac.', eo: 'For. malplen.', es: 'Borrar vacías', de: 'Leer lösch.', ar: 'حذف فارغ', hi: 'खाली हटाएँ', ru: 'Уд. пусто', el: 'Διαγр. κενό', syc: 'ܚܕ ܠܐ ܗܘܕ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '空行削除', en: 'Del blank', 'zh-CN': '删空行', 'zh-TW': '刪空行', ko: '빈줄삭제', la: 'Del. vac.', eo: 'For. malplen.', es: 'Borrar vacías', de: 'Leer lösch.', ar: 'حذف فارغ', hi: 'खाली हटाएँ', ru: 'Уд. пусто', el: 'Διαγр. κενό', syc: 'ܚܕ ܠܐ ܗܘܕ' })}</span>
           </button>
 
           <button
@@ -982,7 +982,7 @@ export function TextEditor({
               <polyline points="5 5 2 8 5 11" fill="none" />
               <polyline points="11 5 14 8 11 11" fill="none" />
             </svg>
-            {L(lang, { ja: '行結合', en: 'Join', 'zh-CN': '合并', 'zh-TW': '合併', ko: '합치기', la: 'Coniung.', eo: 'Kunigi', es: 'Unir', de: 'Verb.', ar: 'دمج', hi: 'जोड़ें', ru: 'Объедн.', el: 'Συγχώ.', syc: 'ܚܒܪ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '行結合', en: 'Join', 'zh-CN': '合并', 'zh-TW': '合併', ko: '합치기', la: 'Coniung.', eo: 'Kunigi', es: 'Unir', de: 'Verb.', ar: 'دمج', hi: 'जोड़ें', ru: 'Объедн.', el: 'Συγχώ.', syc: 'ܚܒܪ' })}</span>
           </button>
 
           <button
@@ -996,7 +996,7 @@ export function TextEditor({
               <path d="M4 7h6a3 3 0 0 1 0 6H8" />
               <polyline points="7 4 4 7 7 10" fill="none" />
             </svg>
-            {L(lang, { ja: '元に戻す', en: 'Undo', 'zh-CN': '撤销', 'zh-TW': '復原', ko: '실행 취소', la: 'Revocare', eo: 'Malfari', es: 'Deshacer', de: 'Rückgängig', ar: 'تراجع', hi: 'पूर्ववत', ru: 'Отменить', el: 'Αναίρεση', syc: 'ܐܗܦܟ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '元に戻す', en: 'Undo', 'zh-CN': '撤销', 'zh-TW': '復原', ko: '실행 취소', la: 'Revocare', eo: 'Malfari', es: 'Deshacer', de: 'Rückgängig', ar: 'تراجع', hi: 'पूर्ववत', ru: 'Отменить', el: 'Αναίρεση', syc: 'ܐܗܦܟ' })}</span>
           </button>
         </div>
 
@@ -1327,8 +1327,9 @@ export function TextEditor({
           )}
         </div>
         <div className="text-editor-statusbar-right">
+          {/* Desktop: separate labels; Mobile: hidden here, shown inline after line spacing */}
           <label
-            className="text-editor-option-compact"
+            className="text-editor-option-compact text-editor-option-desktop-only"
             title={L(lang, {
               ja: 'コピー・保存時にファイル名をヘッダーとして付加します',
               en: 'Prepend the filename as a header when copying or saving',
@@ -1354,7 +1355,7 @@ export function TextEditor({
             {L(lang, { ja: 'ファイル名', en: 'Filename', 'zh-CN': '文件名', 'zh-TW': '檔案名', ko: '파일명', la: 'Nomen', eo: 'Dosiernomo', es: 'Nombre', de: 'Dateiname', ar: 'اسم الملف', hi: 'फ़ाइल नाम', ru: 'Включить имя файла', el: 'Συμπερίληψη ονόματος αρχείου', syc: 'ܐܥܠ ܫܡ ܩܛܝܡܐ' })}
           </label>
           <label
-            className="text-editor-option-compact"
+            className="text-editor-option-compact text-editor-option-desktop-only"
             title={L(lang, {
               ja: 'コピー・保存時に改行を除去して1行にまとめます',
               en: 'Remove all line breaks when copying or saving',
@@ -1379,7 +1380,7 @@ export function TextEditor({
             />
             {L(lang, { ja: '改行無視', en: 'No newlines', 'zh-CN': '忽略换行', 'zh-TW': '忽略換行', ko: '줄바꿈 무시', la: 'Sine fractis', eo: 'Sen linirompoj', es: 'Sin saltos', de: 'Ohne Umbrüche', ar: 'بدون أسطر', hi: 'बिना लाइन ब्रेक', ru: 'Игнорировать переносы строк', el: 'Χωρίς αλλαγές γραμμής', syc: 'ܠܐ ܫ̈ܘܚܠܦ̈ܐ ܣܛܪܐ' })}
           </label>
-          <span className="text-editor-stat-sep" />
+          <span className="text-editor-stat-sep text-editor-option-desktop-only" />
           <div className="text-editor-font-controls-compact">
             <select
               className="text-editor-font-select"
@@ -1442,6 +1443,24 @@ export function TextEditor({
               onChange={(e) => setLineSpacing(Number(e.target.value))}
               title={`${L(lang, { ja: '行間', en: 'Line spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interlineum', eo: 'Interlinio', es: 'Interlineado', de: 'Zeilenabstand', ar: 'تباعد الأسطر', hi: 'पंक्ति अंतराल', ru: 'Интервал строк', el: 'Απόσταση γραμμών', syc: 'ܦܚܘܩܐ ܕ̈ܣܛܪܐ' })}: ${lineSpacing.toFixed(1)}`}
             />
+            {/* Mobile-only: merged copy options (filename + ignore newlines) */}
+            <span className="text-editor-copy-opts-mobile">
+              <span className="text-editor-font-sep-compact">|</span>
+              <label
+                className="text-editor-option-icon"
+                title={L(lang, { ja: 'ファイル名付加', en: 'Include filename', 'zh-CN': '含文件名', 'zh-TW': '含檔名', ko: '파일명 포함' })}
+              >
+                <input type="checkbox" checked={includeFileName} onChange={(e) => setIncludeFileName(e.target.checked)} />
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8H2V2zm8 1v3h3L10 3zM4 9h8v1H4V9zm0 2h6v1H4v-1z"/></svg>
+              </label>
+              <label
+                className="text-editor-option-icon"
+                title={L(lang, { ja: '改行無視', en: 'Ignore newlines', 'zh-CN': '忽略换行', 'zh-TW': '忽略換行', ko: '줄바꿈 무시' })}
+              >
+                <input type="checkbox" checked={ignoreNewlines} onChange={(e) => setIgnoreNewlines(e.target.checked)} />
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 4h12M2 8h8M10 8v4H4" strokeLinecap="round" strokeLinejoin="round"/><path d="M6 10l-2 2 2 2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </label>
+            </span>
           </div>
         </div>
       </div>

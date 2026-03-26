@@ -135,7 +135,18 @@ export function ImageViewer({
     window.addEventListener('resize', updateSize)
     let obs: ResizeObserver | null = null
     if (img) { obs = new ResizeObserver(updateSize); obs.observe(img) }
-    return () => { img?.removeEventListener('load', updateSize); window.removeEventListener('resize', updateSize); obs?.disconnect() }
+    // Also observe the container so fit-zoom recalculates when it gets a real size
+    let containerObs: ResizeObserver | null = null
+    if (containerRef.current) {
+      containerObs = new ResizeObserver(() => {
+        // Force re-render so computeFitZoom uses the new container size
+        if (imgRef.current) {
+          setImgSize({ width: imgRef.current.clientWidth, height: imgRef.current.clientHeight })
+        }
+      })
+      containerObs.observe(containerRef.current)
+    }
+    return () => { img?.removeEventListener('load', updateSize); window.removeEventListener('resize', updateSize); obs?.disconnect(); containerObs?.disconnect() }
   }, [imageDataUrl])
 
   // Spacebar held = temporary pan mode

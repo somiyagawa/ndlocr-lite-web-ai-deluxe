@@ -3087,6 +3087,43 @@ button.ai-status-clickable .ai-status-text {
   height: 12px;
 }
 
+/* Mobile-only merged copy options (icon-only checkboxes) */
+.text-editor-copy-opts-mobile {
+  display: none; /* hidden on desktop */
+}
+
+/* Bug report: show label on desktop, hide icon */
+.bug-report-icon-mobile {
+  display: none;
+}
+.bug-report-label-desktop {
+  display: inline;
+}
+
+.text-editor-option-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  user-select: none;
+}
+.text-editor-option-icon:hover { color: var(--color-text-secondary); }
+.text-editor-option-icon input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  width: 10px;
+  height: 10px;
+}
+.text-editor-option-icon svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.text-editor-option-icon:has(input:checked) svg {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
 .text-editor-font-controls-compact {
   display: flex;
   align-items: center;
@@ -4130,12 +4167,17 @@ button.ai-status-clickable .ai-status-text {
     min-width: auto;
   }
 
-  /* テキストのみボタン (縦書き, 空行削除 等): font-size: 0 を上書き */
+  /* テキストのみボタン (縦書き, 空行削除 等): icon-only on mobile */
   .text-editor-toolbar .btn-text-toggle {
     font-size: 0.6rem;
     padding: 0.15rem 0.35rem;
     min-width: auto;
     white-space: nowrap;
+  }
+
+  /* Hide text labels on toolbar buttons (空行削除, 行結合, 元に戻す) */
+  .text-editor-toolbar .toolbar-btn-label {
+    display: none;
   }
 
   /* 保存ドロップダウン: モバイルで画面外にはみ出さないように調整 */
@@ -4189,6 +4231,17 @@ button.ai-status-clickable .ai-status-text {
     padding: 0.1rem 0.3rem;
     font-size: 0.55rem;
     min-height: 0;
+  }
+
+  /* Hide desktop-only copy options, show mobile icon versions */
+  .text-editor-option-desktop-only {
+    display: none !important;
+  }
+
+  .text-editor-copy-opts-mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
   }
 
   .text-editor-statusbar-left,
@@ -4392,9 +4445,43 @@ button.ai-status-clickable .ai-status-text {
     flex: 1;
   }
 
-  /* ── Footer ── */
+  /* ── Hide region-select-hint on mobile (save space) ── */
+  .region-select-hint {
+    display: none;
+  }
+
+  /* ── Image preprocess panel: stack vertically on mobile ── */
+  .image-with-preprocess {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .preprocess-panel-side {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+
+  /* Allow scroll when preprocess panel is open */
+  .split-pane-mobile-top:has(.preprocess-panel-side) {
+    overflow-y: auto;
+  }
+
+  /* ── Bug report button: icon-only on mobile ── */
+  .bug-report-icon-mobile {
+    display: inline;
+  }
+  .bug-report-label-desktop {
+    display: none;
+  }
+
+  /* ── Footer: prevent overlap with viewer ── */
   .footer {
-    padding: 1rem 0.75rem;
+    position: relative;
+    z-index: 1;
+    padding: 0.5rem 0.75rem;
     font-size: 0.7rem;
   }
 }
