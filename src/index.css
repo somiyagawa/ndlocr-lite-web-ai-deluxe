@@ -4223,20 +4223,29 @@ button.ai-status-clickable .ai-status-text {
     display: none;
   }
 
-  /* 保存ドロップダウン: モバイルで画面外にはみ出さないように調整 */
-  .text-editor-toolbar .export-dropdown-menu {
+  /* 保存ドロップダウン: モバイルではfixed表示でツールバーのoverflowクリップを回避 */
+  .text-editor-toolbar .export-dropdown-menu,
+  .export-dropdown-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     right: 0;
-    left: auto;
-    min-width: 200px;
-    max-width: calc(100vw - 1rem);
-    max-height: 60vh;
+    top: auto;
+    min-width: 100%;
+    max-width: 100vw;
+    max-height: 55vh;
     overflow-y: auto;
     z-index: 1000;
     -webkit-overflow-scrolling: touch;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    margin-top: 0;
+    animation: slideUpPanel 0.2s ease-out;
   }
 
   /* モバイル: ドロップダウン項目のタッチターゲットを拡大 */
-  .text-editor-toolbar .export-dropdown-item {
+  .text-editor-toolbar .export-dropdown-item,
+  .export-dropdown-item {
     padding: 0.6rem 0.75rem;
     min-height: 44px;
     -webkit-tap-highlight-color: rgba(0, 100, 200, 0.15);
@@ -4396,22 +4405,48 @@ button.ai-status-clickable .ai-status-text {
 
   /* ── Bottom Toolbar ── */
   .bottom-toolbar {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     height: auto;
-    padding: 0.5rem;
-    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    gap: 0.25rem;
+    margin-bottom: 0;
+  }
+
+  .bottom-toolbar-left {
+    display: flex;
+  }
+
+  .bottom-toolbar-left .btn {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    min-height: 32px;
+    min-width: auto;
+    gap: 0.25rem;
+  }
+
+  .bottom-toolbar-left .btn svg {
+    width: 12px;
+    height: 12px;
   }
 
   .toolbar-left,
   .toolbar-right {
-    width: 100%;
     justify-content: center;
+  }
+
+  .toolbar-right {
+    gap: 0.5rem;
   }
 
   .toolbar-info {
     justify-content: center;
     gap: 0.5rem;
     font-size: 0.7rem;
+  }
+
+  .bottom-stat {
+    font-size: 0.65rem;
   }
 
   /* ── Buttons & Touch Targets ── */
@@ -4493,33 +4528,57 @@ button.ai-status-clickable .ai-status-text {
     display: none;
   }
 
-  /* ── Image preprocess panel: stack vertically on mobile ── */
+  /* ── Image preprocess panel: bottom-sheet overlay on mobile ── */
+  /* Image area stays full size; panel floats over it from the bottom */
   .image-with-preprocess {
     flex-direction: column;
     overflow: visible !important;
+    position: relative;
   }
 
   .image-with-preprocess-main {
     min-height: 0;
-    flex-shrink: 0;
-    height: 60vh;
+    flex: 1;
     overflow: hidden;
   }
 
   .preprocess-panel-side {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--color-border);
-    max-height: 35vh;
+    max-height: 45vh;
     overflow-y: auto;
+    z-index: 100;
+    border-left: none;
+    border-top: 2px solid var(--color-primary);
+    border-radius: 12px 12px 0 0;
+    background: var(--color-surface);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    animation: slideUpPanel 0.25s ease-out;
     flex-shrink: 0;
   }
 
-  /* When preprocess panel is open, top pane must scroll to show both image + panel */
+  /* Drag-handle visual cue at top of bottom sheet */
+  .preprocess-panel-side::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 2px;
+    margin: 0.4rem auto 0.2rem;
+  }
+
+  @keyframes slideUpPanel {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  /* Top pane does NOT need to scroll — panel is fixed overlay */
   .split-pane-mobile-top:has(.preprocess-panel-side) {
-    overflow-y: auto !important;
-    height: auto;
-    max-height: 90vh;
+    overflow: visible;
   }
 
   /* ── Bug report button: icon-only on mobile ── */
@@ -4530,12 +4589,14 @@ button.ai-status-clickable .ai-status-text {
     display: none;
   }
 
-  /* ── Footer: prevent overlap with viewer ── */
+  /* ── Footer: prevent overlap, clear separation from bottom toolbar ── */
   .footer {
     position: relative;
     z-index: 1;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.7rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.6rem;
+    margin-top: 0;
+    border-top: 1px solid var(--color-border);
   }
 }
 
@@ -4545,6 +4606,14 @@ button.ai-status-clickable .ai-status-text {
   .btn-icon {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  /* Bottom toolbar button stays compact on touch devices */
+  .bottom-toolbar .btn,
+  .bottom-toolbar .btn-sm,
+  .bottom-toolbar-left .btn {
+    min-height: 32px;
+    min-width: auto;
   }
 
   .image-viewer {
