@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.0.0-teal?style=for-the-badge" alt="v4.0.0" />
+  <img src="https://img.shields.io/badge/version-4.1.0-teal?style=for-the-badge" alt="v4.1.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -202,9 +202,13 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ## 更新記録
 
+### v4.1.0 — 2026-03-26
+
+**オート自動判定・サンプルタイル選択** — オートモードに画像特徴分析（色温度・セピア度・紙の白さ）による現代/古典籍自動判定機能を実装。サンプル画像をビジュアルタイルで選択可能に（現代: 蜘蛛の糸、くずし字: 源氏物語絵巻）。RTMDetの入力サイズバグ（1280→1024）を修正。オートモード時に全モデルを並列プリロードし切替遅延を解消。
+
 ### v4.0.0 — 2026-03-26
 
-**古典籍OCRモード追加** — ndlkotenocr-lite の ONNX モデル（RTMDet レイアウト検出 + PARSeq くずし字認識）をブラウザ統合し、古典籍・くずし字の OCR に対応。ヘッダーに「現代 / 古典籍」モード切替トグルを追加。古典籍モードでは RTMDet（1280×1280）によるレイアウト検出と PARSeq（32×384、BGR入力）による文字認識を実行する。
+**古典籍OCRモード追加** — ndlkotenocr-lite の ONNX モデル（RTMDet レイアウト検出 + PARSeq くずし字認識）をブラウザ統合し、古典籍・くずし字の OCR に対応。ヘッダーに「現代 / 古典籍」モード切替トグルを追加。古典籍モードでは RTMDet（1024×1024）によるレイアウト検出と PARSeq（32×384、BGR入力）による文字認識を実行する。
 
 ### v3.9.0 — 2026-03-26
 

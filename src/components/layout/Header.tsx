@@ -8,6 +8,26 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.1.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        'オートモードで画像の色分布・紙質を自動分析し、現代/古典籍OCRを自動選択する機能を実装',
+        'サンプル画像をビジュアルタイル形式で選択可能に（現代: 蜘蛛の糸、くずし字: 源氏物語絵巻）',
+        'くずし字/古典籍ボタンのラベルを「くずし字/古典籍」に変更し、対応範囲を明確化',
+        'RTMDetレイアウト検出モデルの入力サイズバグを修正（1280→1024、モデル実寸に合致）',
+        'オートモード初期化時に全モデル（現代+古典籍）を並列ロードし、切替遅延を解消',
+      ],
+      en: [
+        'Implemented auto-detection: analyzes image color/paper texture to auto-select Modern or Classical OCR pipeline',
+        'Added visual sample tile selector (Modern: Spider\'s Thread, Kuzushiji: Tale of Genji scroll)',
+        'Renamed Kuzushiji button to "Kuzushiji/Classical" to clarify supported scope',
+        'Fixed RTMDet layout model input size bug (1280→1024, matching actual model dimensions)',
+        'Auto mode now pre-loads all models (modern + classical) in parallel for instant switching',
+      ],
+    },
+  },
+  {
     version: '4.0.0',
     date: '2026-03-26',
     changes: {
@@ -311,7 +331,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.0</span>
+        >v4.1</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
