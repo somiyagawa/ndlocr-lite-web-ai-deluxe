@@ -917,16 +917,40 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .processing-bluepond-sub {
   display: block;
   font-size: 0.85rem;
+  font-weight: 600;
   letter-spacing: 0.2em;
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   margin-top: 0.3rem;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.9),
+    0 0 14px rgba(255,255,255,0.6),
+    0 1px 2px rgba(255,255,255,1);
+}
+[data-theme="dark"] .processing-bluepond-sub {
+  color: #c0d8ee;
+  text-shadow:
+    0 0 8px rgba(60,130,200,0.5),
+    0 0 16px rgba(30,80,160,0.3),
+    0 1px 2px rgba(0,0,0,0.6);
 }
 .processing-bluepond-desc {
   display: block;
   font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  opacity: 0.7;
+  font-weight: 500;
+  color: var(--color-text);
+  opacity: 0.85;
   margin-top: 0.25rem;
+  text-shadow:
+    0 0 5px rgba(255,255,255,0.9),
+    0 0 12px rgba(255,255,255,0.5),
+    0 1px 2px rgba(255,255,255,1);
+}
+[data-theme="dark"] .processing-bluepond-desc {
+  color: #a0bcd4;
+  text-shadow:
+    0 0 6px rgba(60,130,200,0.4),
+    0 0 14px rgba(30,80,160,0.25),
+    0 1px 2px rgba(0,0,0,0.5);
 }
 @keyframes fade-in-down {
   from { opacity: 0; transform: translateY(-12px); }
