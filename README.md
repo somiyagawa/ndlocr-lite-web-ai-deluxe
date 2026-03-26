@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.6.0-teal?style=for-the-badge" alt="v3.6.0" />
+  <img src="https://img.shields.io/badge/version-3.7.0-teal?style=for-the-badge" alt="v3.7.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -202,15 +202,19 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ## 更新記録
 
-### v3.6.0 — 2026-03-26 🔷 Ultra Bluepond
+### v3.7.0 — 2026-03-26 🔷 Ultra Bluepond
 
 **名称変更:** Model BLUEPOND → **Ultra Bluepond** に改称しました。
 
 **モバイル保存ボタン修正** — iOS Safari でファイルダウンロードが動作しない問題を修正。DOM に追加した `<a>` 要素経由でダウンロードをトリガーし、URL 解放を遅延させることで互換性を向上。
 
-**ローディング画面タイトル強化** — ローディング画面の「Ultra Bluepond」タイトルに複数レイヤーの白いハロー効果（text-shadow）を追加し、視認性を大幅に向上。
+**ローディング画面タイトル・サブタイトル強化** — ローディング画面のタイトル・サブタイトル・説明文に複数レイヤーの白いハロー効果（text-shadow）を追加し、青い池の背景画像上での視認性を大幅に向上。
 
 **モバイルUI改善** — エクスポートドロップダウンメニューのタッチターゲットサイズを44pxに拡大し、タップフィードバックを追加。
+
+**モバイルブロック選択連動修正** — ImageViewerのtouchstart preventDefaultがclick発火を阻害していた問題を修正。ブロックにタップ検出（移動量15px未満・500ms以内）を追加。TextEditorではモバイル時にreadOnlyを一時設定してキーボード表示を抑制し、scrollIntoViewでエディタへスムーズスクロール。
+
+**タイトルカラー** — 「Bluepond」の「Blue」部分にテーマのプライマリカラーを適用。
 
 ### v3.5.0 — 2026-03-26
 

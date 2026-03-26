@@ -7,20 +7,24 @@ import type { Theme } from '../../hooks/useTheme'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
-    version: '3.6.0',
+    version: '3.7.0',
     date: '2026-03-26',
     changes: {
       ja: [
         '名称変更: Model BLUEPOND → Ultra Bluepond',
         'モバイル保存ボタンの修正（iOS Safari ダウンロード互換性向上）',
-        'ローディング画面タイトルの白いハロー効果を強化',
+        'ローディング画面タイトル・サブタイトルの白いハロー効果を強化',
         'ドロップダウンメニューのモバイルタッチ操作を改善',
+        'モバイルでのブロック選択→エディタ連動を修正（タップ検出・キーボード非表示）',
+        'タイトル「Bluepond」の「Blue」部分にテーマカラーを適用',
       ],
       en: [
         'Renamed: Model BLUEPOND → Ultra Bluepond',
         'Fixed mobile save button (iOS Safari download compatibility)',
-        'Enhanced white halo effect on loading screen title',
+        'Enhanced white halo effect on loading screen title & subtitle',
         'Improved dropdown menu touch interaction on mobile',
+        'Fixed mobile block selection → editor scroll/highlight (tap detection, no keyboard)',
+        'Applied theme color to "Blue" in "Bluepond" title',
       ],
     },
   },
@@ -262,7 +266,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v3.6</span>
+        >v3.7</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
