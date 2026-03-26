@@ -114,6 +114,38 @@ export function TextEditor({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result?.id])
 
+  // エディタのスペースに応じてフォントサイズを自動調整
+  // 1行の最大文字数が少なくスペースに余裕がある場合、文字を大きくする
+  useEffect(() => {
+    if (!result?.fullText) return
+    const ta = textareaRef.current
+    if (!ta) return
+    // テキストエリアの利用可能幅（px）を取得
+    const style = window.getComputedStyle(ta)
+    const padL = parseFloat(style.paddingLeft) || 0
+    const padR = parseFloat(style.paddingRight) || 0
+    const availableWidth = ta.clientWidth - padL - padR
+    if (availableWidth <= 0) return
+
+    // 1行あたりの最大文字数を求める
+    const lines = result.fullText.split('\n')
+    let maxLineLen = 0
+    for (const line of lines) {
+      if (line.length > maxLineLen) maxLineLen = line.length
+    }
+    if (maxLineLen === 0) return
+
+    // 日本語文字は概ね fontSize と同じ幅（等幅仮定）
+    // 利用可能幅 / 最大行文字数 で1文字あたりの最大サイズを算出
+    // ただし上限は 28px、下限は 14px（デフォルト）
+    const idealSize = Math.floor(availableWidth / maxLineLen)
+    const clampedSize = Math.max(14, Math.min(28, idealSize))
+    if (clampedSize > fontSize) {
+      setFontSize(clampedSize)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result?.id])
+
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
     if (!searchQuery || shouldShowDiff) return []
