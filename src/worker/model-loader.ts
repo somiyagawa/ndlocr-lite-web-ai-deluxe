@@ -16,11 +16,15 @@ const MODEL_BASE_URL = (import.meta.env.VITE_MODEL_BASE_URL as string | undefine
 
 // ONNXモデルのURL
 export const MODEL_URLS: Record<string, string> = {
+  // === 現代日本語 (modern) ===
   layout: `${MODEL_BASE_URL}/deim-s-1024x1024.onnx`,
   // カスケード文字認識モデル（行の文字数カテゴリに応じて使い分け）
   recognition30: `${MODEL_BASE_URL}/parseq-ndl-30.onnx`,  // カテゴリ3: ≤30文字 [1,3,16,256]
   recognition50: `${MODEL_BASE_URL}/parseq-ndl-50.onnx`,  // カテゴリ2: ≤50文字 [1,3,16,384]
   recognition100: `${MODEL_BASE_URL}/parseq-ndl-100.onnx`, // カテゴリ1: ≤100文字 [1,3,16,768]
+  // === 古典籍 (koten) ===
+  koten_layout: `${MODEL_BASE_URL}/rtmdet-s-1280x1280.onnx`,          // RTMDet [1,3,1280,1280]
+  koten_recognition: `${MODEL_BASE_URL}/parseq-ndl-32x384-tiny-10.onnx`, // PARSeq [1,3,32,384]
 }
 
 function initDB(): Promise<IDBDatabase> {

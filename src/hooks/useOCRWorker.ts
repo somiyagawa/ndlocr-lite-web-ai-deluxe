@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
-import type { OCRJobState, OCRResult, ProcessedImage, TextBlock, TextRegion, PageBlock } from '../types/ocr'
+import type { OCRJobState, OCRResult, ProcessedImage, TextBlock, TextRegion, PageBlock, OCRMode } from '../types/ocr'
 import type { WorkerInMessage, WorkerOutMessage } from '../types/worker'
 import type { RecWorkerInMessage, RecWorkerOutMessage } from '../types/recognition-worker'
 import { imageDataToDataUrl } from '../utils/imageLoader'
@@ -26,6 +26,8 @@ export function useOCRWorker() {
   const recWorkersRef = useRef<Worker[]>([])
   const [isReady, setIsReady] = useState(false)
   const [jobState, setJobState] = useState<OCRJobState>(initialJobState)
+  const [ocrMode, setOcrMode] = useState<OCRMode>('modern')
+  const ocrModeRef = useRef<OCRMode>('modern')
 
   // OCR Worker + 認識 Worker を起動（UIレンダリング完了後に遅延起動して初期描画を高速化）
   useEffect(() => {
@@ -55,8 +57,8 @@ export function useOCRWorker() {
         }
       }
 
-      // OCR Worker 初期化
-      worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile } satisfies WorkerInMessage)
+      // OCR Worker 初期化（現在の ocrMode を渡す）
+      worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: ocrModeRef.current } satisfies WorkerInMessage)
 
       worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
@@ -185,21 +187,24 @@ export function useOCRWorker() {
 
         workerRef.current.addEventListener('message', handler)
 
-        if (N_REC_WORKERS === 0) {
-          // モバイル: ocr.worker 1つで完結（recognition.worker なし）
+        const currentMode = ocrModeRef.current
+        if (N_REC_WORKERS === 0 || currentMode === 'koten') {
+          // モバイル or 古典籍: ocr.worker 1つで完結（recognition.worker なし）
           workerRef.current.postMessage({
             type: 'OCR_PROCESS',
             id,
             imageData: image.imageData,
             startTime: Date.now(),
+            ocrMode: currentMode,
           } satisfies WorkerInMessage)
         } else {
-          // デスクトップ: LAYOUT_DETECT → 並列 recognition workers
+          // デスクトップ(現代): LAYOUT_DETECT → 並列 recognition workers
           workerRef.current.postMessage({
             type: 'LAYOUT_DETECT',
             id,
             imageData: image.imageData,
             startTime: Date.now(),
+            ocrMode: currentMode,
           } satisfies WorkerInMessage)
         }
       })
@@ -343,7 +348,7 @@ export function useOCRWorker() {
 
         workerRef.current.addEventListener('message', handler)
         workerRef.current.postMessage(
-          { type: 'OCR_PROCESS', id, imageData, startTime: Date.now() } satisfies WorkerInMessage,
+          { type: 'OCR_PROCESS', id, imageData, startTime: Date.now(), ocrMode: ocrModeRef.current } satisfies WorkerInMessage,
           [imageData.data.buffer]  // Transferable でゼロコピー転送
         )
       })
@@ -355,5 +360,35 @@ export function useOCRWorker() {
     setJobState(initialJobState)
   }, [])
 
-  return { isReady, jobState, processImage, processRegion, resetState }
+  /** OCRモード切替（modern ↔ koten）— Worker を再初期化 */
+  const switchOcrMode = useCallback((mode: OCRMode) => {
+    ocrModeRef.current = mode
+    setOcrMode(mode)
+    if (workerRef.current) {
+      setIsReady(false)
+      setJobState(initialJobState)
+      workerRef.current.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: mode } satisfies WorkerInMessage)
+      // OCR Worker の onmessage を再設定（初期化完了を拾う）
+      workerRef.current.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
+        const msg = event.data
+        if (msg.type === 'OCR_PROGRESS') {
+          if (msg.stage === 'initialized') {
+            setIsReady(true)
+            setJobState(initialJobState)
+          } else {
+            setJobState((prev) => ({
+              ...prev,
+              status: 'loading_model',
+              stageProgress: msg.progress,
+              stage: msg.stage,
+              message: msg.message,
+              modelProgress: msg.modelProgress,
+            }))
+          }
+        }
+      }
+    }
+  }, [])
+
+  return { isReady, jobState, ocrMode, processImage, processRegion, resetState, switchOcrMode }
 }

@@ -1,3 +1,6 @@
+/** OCR処理モード: modern = 現代日本語(DEIMv2+PARSeq), koten = 古典籍(RTMDet+PARSeq) */
+export type OCRMode = 'modern' | 'koten'
+
 export interface BoundingBox {
   x: number
   y: number
@@ -62,7 +65,7 @@ export interface OCRJobState {
   stage: string
   message: string
   errorMessage?: string
-  modelProgress?: { layout: number; rec30: number; rec50: number; rec100: number }
+  modelProgress?: { layout: number; rec30: number; rec50: number; rec100: number; koten_layout?: number; koten_rec?: number }
 }
 
 export interface TEIMetadata {

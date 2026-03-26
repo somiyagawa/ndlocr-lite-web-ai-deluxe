@@ -1,19 +1,21 @@
-import type { TextBlock, TextRegion, PageBlock } from './ocr'
+import type { TextBlock, TextRegion, PageBlock, OCRMode } from './ocr'
 
 // Workerへ送信するメッセージ
 export type WorkerInMessage =
-  | { type: 'INITIALIZE'; layoutOnly?: boolean }
+  | { type: 'INITIALIZE'; layoutOnly?: boolean; ocrMode?: OCRMode }
   | {
       type: 'OCR_PROCESS'
       id: string
       imageData: ImageData
       startTime: number
+      ocrMode?: OCRMode
     }
   | {
       type: 'LAYOUT_DETECT'
       id: string
       imageData: ImageData
       startTime: number
+      ocrMode?: OCRMode
     }
   | { type: 'TERMINATE' }
 

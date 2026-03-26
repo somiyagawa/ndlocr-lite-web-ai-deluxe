@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.9.0-teal?style=for-the-badge" alt="v3.9.0" />
+  <img src="https://img.shields.io/badge/version-4.0.0-teal?style=for-the-badge" alt="v4.0.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.0.0 — 2026-03-26
+
+**古典籍OCRモード追加** — ndlkotenocr-lite の ONNX モデル（RTMDet レイアウト検出 + PARSeq くずし字認識）をブラウザ統合し、古典籍・くずし字の OCR に対応。ヘッダーに「現代 / 古典籍」モード切替トグルを追加。古典籍モードでは RTMDet（1280×1280）によるレイアウト検出と PARSeq（32×384、BGR入力）による文字認識を実行する。
 
 ### v3.9.0 — 2026-03-26
 

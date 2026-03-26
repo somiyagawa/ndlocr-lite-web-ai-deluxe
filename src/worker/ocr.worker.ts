@@ -18,37 +18,74 @@ import './onnx-config'
 import { loadModel } from './model-loader'
 import { LayoutDetector } from './layout-detector'
 import { TextRecognizer } from './text-recognizer'
+import { KotenLayoutDetector } from './koten-layout-detector'
+import { KotenTextRecognizer } from './koten-text-recognizer'
 import { ReadingOrderProcessor } from './reading-order'
-import type { TextBlock } from '../types/ocr'
+import type { TextBlock, OCRMode } from '../types/ocr'
 import type { WorkerInMessage, WorkerOutMessage } from '../types/worker'
 
 class OCRWorker {
+  // 現代日本語モデル
   private layoutDetector: LayoutDetector | null = null
   private recognizer30: TextRecognizer | null = null  // ≤30文字 [1,3,16,256]
   private recognizer50: TextRecognizer | null = null  // ≤50文字 [1,3,16,384]
   private recognizer100: TextRecognizer | null = null // ≤100文字 [1,3,16,768]
+  // 古典籍モデル
+  private kotenLayoutDetector: KotenLayoutDetector | null = null
+  private kotenRecognizer: KotenTextRecognizer | null = null
+
   private readingOrderProcessor = new ReadingOrderProcessor()
   private isInitialized = false
   private layoutOnly = false
+  private ocrMode: OCRMode = 'modern'
+  private initializedMode: OCRMode | null = null
 
   private post(message: WorkerOutMessage) {
     self.postMessage(message)
   }
 
-  async initialize(layoutOnly = false): Promise<void> {
-    if (this.isInitialized) return
+  async initialize(layoutOnly = false, ocrMode: OCRMode = 'modern'): Promise<void> {
+    // 同じモードで既に初期化済みならスキップ
+    if (this.isInitialized && this.initializedMode === ocrMode) return
     this.layoutOnly = layoutOnly
+    this.ocrMode = ocrMode
 
     try {
       this.post({
         type: 'OCR_PROGRESS',
         stage: 'initializing',
         progress: 0.02,
-        message: 'Initializing...',
+        message: ocrMode === 'koten' ? 'Initializing classical OCR...' : 'Initializing...',
       })
 
-      if (layoutOnly) {
-        // モバイル: レイアウトモデルのみロード（認識モデルは processOCR 時に遅延ロード）
+      if (ocrMode === 'koten') {
+        // === 古典籍モード: RTMDet + PARSeq(32×384) の2モデル ===
+        const progresses = { koten_layout: 0, koten_rec: 0 }
+        const reportProgress = () => {
+          const avg = (progresses.koten_layout + progresses.koten_rec) / 2
+          this.post({
+            type: 'OCR_PROGRESS',
+            stage: 'loading_models',
+            progress: 0.02 + avg * 0.73,
+            message: `Loading classical models... ${Math.round(avg * 100)}%`,
+            modelProgress: { layout: 0, rec30: 0, rec50: 0, rec100: 0, ...progresses },
+          })
+        }
+
+        const [layoutData, recData] = await Promise.all([
+          loadModel('koten_layout',      (p) => { progresses.koten_layout = p; reportProgress() }),
+          loadModel('koten_recognition', (p) => { progresses.koten_rec = p; reportProgress() }),
+        ])
+
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.80, message: 'Preparing RTMDet layout model...' })
+        this.kotenLayoutDetector = new KotenLayoutDetector()
+        await this.kotenLayoutDetector.initialize(layoutData)
+
+        this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.92, message: 'Preparing classical PARSeq model...' })
+        this.kotenRecognizer = new KotenTextRecognizer()
+        await this.kotenRecognizer.initialize(recData)
+      } else if (layoutOnly) {
+        // === 現代モバイル: レイアウトモデルのみ ===
         const layoutModelData = await loadModel('layout', (p) => {
           this.post({
             type: 'OCR_PROGRESS',
@@ -62,7 +99,7 @@ class OCRWorker {
         this.layoutDetector = new LayoutDetector()
         await this.layoutDetector.initialize(layoutModelData)
       } else {
-        // デスクトップ: 4モデルを並列ダウンロード（各モデルの進捗を合算してレポート）
+        // === 現代デスクトップ: 4モデル並列 ===
         const progresses = { layout: 0, rec30: 0, rec50: 0, rec100: 0 }
         const reportProgress = () => {
           const avg = (progresses.layout + progresses.rec30 + progresses.rec50 + progresses.rec100) / 4
@@ -82,7 +119,6 @@ class OCRWorker {
           loadModel('recognition100',(p) => { progresses.rec100 = p; reportProgress() }),
         ])
 
-        // ONNXセッション作成（WASMシングルスレッドのため直列）
         this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.76, message: 'Preparing layout model...' })
         this.layoutDetector = new LayoutDetector()
         await this.layoutDetector.initialize(layoutModelData)
@@ -101,6 +137,7 @@ class OCRWorker {
       }
 
       this.isInitialized = true
+      this.initializedMode = ocrMode
 
       this.post({
         type: 'OCR_PROGRESS',
@@ -120,15 +157,21 @@ class OCRWorker {
 
   /** 認識モデルを遅延ロード（layoutOnly モードで processOCR が呼ばれた場合） */
   private async ensureRecognizers(): Promise<void> {
+    if (this.ocrMode === 'koten') {
+      if (this.kotenRecognizer) return
+      const recData = await loadModel('koten_recognition')
+      this.kotenRecognizer = new KotenTextRecognizer()
+      await this.kotenRecognizer.initialize(recData)
+      return
+    }
+
     if (this.recognizer100) return  // rec100 があれば最低限OK
 
     if (this.layoutOnly) {
-      // モバイル: rec100 のみ（WASM ランタイムを 1 つに抑えるため）
       const rec100Data = await loadModel('recognition100')
       this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
       await this.recognizer100.initialize(rec100Data)
     } else {
-      // デスクトップ: 3モデル全部
       if (this.recognizer30 && this.recognizer50) return
       const [rec30Data, rec50Data, rec100Data] = await Promise.all([
         loadModel('recognition30'),
@@ -154,12 +197,15 @@ class OCRWorker {
   }
 
   /** 領域OCR用: レイアウト検出 + 逐次認識 + 読み順処理 (processRegion から使用) */
-  async processOCR(id: string, imageData: ImageData, startTime: number): Promise<void> {
+  async processOCR(id: string, imageData: ImageData, startTime: number, mode?: OCRMode): Promise<void> {
     try {
-      if (!this.isInitialized) {
-        await this.initialize()
+      const effectiveMode = mode ?? this.ocrMode
+      if (!this.isInitialized || this.initializedMode !== effectiveMode) {
+        await this.initialize(this.layoutOnly, effectiveMode)
       }
       await this.ensureRecognizers()
+
+      const isKoten = effectiveMode === 'koten'
 
       // Stage 1: レイアウト検出
       this.post({
@@ -167,10 +213,11 @@ class OCRWorker {
         id,
         stage: 'layout_detection',
         progress: 0.1,
-        message: 'Detecting text regions...',
+        message: isKoten ? 'Detecting text regions (classical)...' : 'Detecting text regions...',
       })
 
-      const { lines: textRegions, blocks: pageBlocks } = await this.layoutDetector!.detect(
+      const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
+      const { lines: textRegions, blocks: pageBlocks } = await detector.detect(
         imageData,
         (progress) => {
           this.post({
@@ -183,7 +230,7 @@ class OCRWorker {
         }
       )
 
-      // Stage 2: 逐次文字認識（cropImageDataBatch で sourceCanvas を1回だけ生成）
+      // Stage 2: 逐次文字認識
       this.post({
         type: 'OCR_PROGRESS',
         id,
@@ -192,12 +239,19 @@ class OCRWorker {
         message: `Recognizing text in ${textRegions.length} regions...`,
       })
 
-      const croppedImages = TextRecognizer.cropImageDataBatch(imageData, textRegions)
+      const croppedImages = isKoten
+        ? KotenTextRecognizer.cropImageDataBatch(imageData, textRegions)
+        : TextRecognizer.cropImageDataBatch(imageData, textRegions)
       const recognitionResults: TextBlock[] = []
       for (let i = 0; i < textRegions.length; i++) {
         const region = textRegions[i]
-        const recognizer = this.selectRecognizer(region.charCountCategory)
-        const result = await recognizer.recognizeCropped(croppedImages[i])
+        let result: { text: string; confidence: number }
+        if (isKoten) {
+          result = await this.kotenRecognizer!.recognizeCropped(croppedImages[i])
+        } else {
+          const recognizer = this.selectRecognizer(region.charCountCategory)
+          result = await recognizer.recognizeCropped(croppedImages[i])
+        }
 
         recognitionResults.push({
           ...region,
@@ -256,21 +310,25 @@ class OCRWorker {
   }
 
   /** バッチOCR用: レイアウト検出のみ実行し LAYOUT_DONE を返す (processImage から使用) */
-  async detectLayout(id: string, imageData: ImageData, startTime: number): Promise<void> {
+  async detectLayout(id: string, imageData: ImageData, startTime: number, mode?: OCRMode): Promise<void> {
     try {
-      if (!this.isInitialized) {
-        await this.initialize()
+      const effectiveMode = mode ?? this.ocrMode
+      if (!this.isInitialized || this.initializedMode !== effectiveMode) {
+        await this.initialize(this.layoutOnly, effectiveMode)
       }
+
+      const isKoten = effectiveMode === 'koten'
 
       this.post({
         type: 'OCR_PROGRESS',
         id,
         stage: 'layout_detection',
         progress: 0.1,
-        message: 'Detecting text regions...',
+        message: isKoten ? 'Detecting text regions (classical)...' : 'Detecting text regions...',
       })
 
-      const { lines: textRegions, blocks: pageBlocks } = await this.layoutDetector!.detect(
+      const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
+      const { lines: textRegions, blocks: pageBlocks } = await detector.detect(
         imageData,
         (progress) => {
           this.post({
@@ -283,8 +341,10 @@ class OCRWorker {
         }
       )
 
-      // 各領域を事前クロップ（メインスレッドに Transferable で返す）
-      const croppedImages = TextRecognizer.cropImageDataBatch(imageData, textRegions)
+      // 各領域を事前クロップ
+      const croppedImages = isKoten
+        ? KotenTextRecognizer.cropImageDataBatch(imageData, textRegions)
+        : TextRecognizer.cropImageDataBatch(imageData, textRegions)
       const transferables = croppedImages.map(img => img.data.buffer)
 
       self.postMessage(
@@ -308,15 +368,15 @@ self.onmessage = async (event: MessageEvent<WorkerInMessage>) => {
 
   switch (message.type) {
     case 'INITIALIZE':
-      await ocrWorker.initialize(message.layoutOnly)
+      await ocrWorker.initialize(message.layoutOnly, message.ocrMode)
       break
 
     case 'OCR_PROCESS':
-      await ocrWorker.processOCR(message.id, message.imageData, message.startTime)
+      await ocrWorker.processOCR(message.id, message.imageData, message.startTime, message.ocrMode)
       break
 
     case 'LAYOUT_DETECT':
-      await ocrWorker.detectLayout(message.id, message.imageData, message.startTime)
+      await ocrWorker.detectLayout(message.id, message.imageData, message.startTime, message.ocrMode)
       break
 
     case 'TERMINATE':

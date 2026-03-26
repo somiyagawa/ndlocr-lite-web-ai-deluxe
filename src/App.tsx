@@ -79,7 +79,7 @@ export default function App() {
   const { lang, toggleLanguage } = useI18n()
   const [showSplash, setShowSplash] = useState(true)
   const handleSplashDone = useCallback(() => setShowSplash(false), [])
-  const { isReady, jobState, processImage, processRegion, resetState } = useOCRWorker()
+  const { isReady, jobState, ocrMode, processImage, processRegion, resetState, switchOcrMode } = useOCRWorker()
   const { processedImages, setProcessedImages, isLoading: isLoadingFiles, processFiles, clearImages, fileLoadingState } = useFileProcessor()
   const { runs: historyRuns, saveRun, clearResults } = useResultCache()
   const {
@@ -690,6 +690,8 @@ export default function App() {
         aiConnectionStatus={aiConnectionStatus}
         theme={theme}
         onToggleTheme={toggleTheme}
+        ocrMode={ocrMode}
+        onSwitchOcrMode={switchOcrMode}
       />
 
       <main className="main">

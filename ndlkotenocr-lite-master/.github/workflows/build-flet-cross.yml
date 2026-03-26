@@ -1,0 +1,89 @@
+name: build-flet-cross
+on:
+  push:
+    tags:
+      - "*"
+    
+jobs:
+  create-release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Create Release"
+        run: gh release create ${{github.ref_name}} --draft --verify-tag --notes "Release ${{github.ref_name}}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONLEGACYWINDOWSSTDIO: "utf-8"
+          PYTHONIOENCODING: "UTF-8"
+          PYTHONUTF8: 1
+  cross-build:
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - runs-on: ubuntu-22.04
+            binary-name: ${{ vars.APP_NAME }}_v${{github.ref_name}}_linux.tar.gz
+            target-platform: linux
+          - runs-on: macos-latest
+            binary-name: ${{ vars.APP_NAME }}_v${{github.ref_name}}_macos_apple_silicon.tar.gz
+            target-platform: macos
+          - runs-on: macos-15-intel
+            binary-name: ${{ vars.APP_NAME }}_v${{github.ref_name}}_macos_intel.tar.gz
+            target-platform: macos
+          - runs-on: windows-latest
+            binary-name: ${{ vars.APP_NAME }}_v${{github.ref_name}}_windows.zip
+            target-platform: windows
+    runs-on: ${{ matrix.runs-on }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' 
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: "Install GStreamer libraries"
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgtk-3-dev ninja-build
+          sudo apt-get install libunwind-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+      - name: "Flet build"
+        if: runner.os != 'Windows'
+        run: |
+          cd ndlkotenocr-lite-gui
+          cp -r ../src .
+          EXTRA_ARGS=""
+          # Intel Macの場合のみ引数を追加する処理
+          if [ "${{ matrix.runs-on }}" = "macos-15-intel" ]; then
+            echo "Intel Mac detected: Configuring specific settings..."
+            EXTRA_ARGS="--arch x86_64"
+          fi
+          flet build ${{ matrix.target-platform }} --output ../${{ matrix.target-platform }} --build-version ${{github.ref_name}} $EXTRA_ARGS
+      - name: "Flet build(Windows)"
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cd ndlkotenocr-lite-gui
+          echo D | xcopy ..\src .\src /E
+          set PYTHONUTF8=1
+          flet build ${{ matrix.target-platform }} --output ..\${{ matrix.target-platform }} --build-version ${{github.ref_name}}
+          copy main.py ..\${{ matrix.target-platform }}
+      - name: "Linux/MacOS compress"
+        if: runner.os != 'Windows'
+        run: tar zcvf ${{matrix.binary-name}} ${{ matrix.target-platform }}
+      - name: "Windows compress"
+        if: runner.os == 'Windows'
+        run: powershell Compress-Archive -Path ${{ matrix.target-platform }} -DestinationPath ${{matrix.binary-name}}
+      - name: "Upload Release"
+        run: gh release upload ${{github.ref_name}} ${{matrix.binary-name}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -3,9 +3,26 @@ import { LANGUAGES, LANGUAGE_LABELS, L } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Theme } from '../../hooks/useTheme'
+import type { OCRMode } from '../../types/ocr'
 
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
+  {
+    version: '4.0.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '古典籍OCRモード追加（RTMDetレイアウト検出 + PARSeqくずし字認識）',
+        '現代 / 古典籍 モード切替UIをヘッダーに追加',
+        'ndlkotenocr-lite の ONNX モデルをブラウザ統合',
+      ],
+      en: [
+        'Added classical Japanese OCR mode (RTMDet layout detection + PARSeq cursive script recognition)',
+        'Added Modern / Classical mode toggle in header',
+        'Integrated ndlkotenocr-lite ONNX models for browser-based execution',
+      ],
+    },
+  },
   {
     version: '3.9.0',
     date: '2026-03-26',
@@ -180,6 +197,8 @@ interface HeaderProps {
   aiConnectionStatus?: AIConnectionStatus
   theme: Theme
   onToggleTheme: () => void
+  ocrMode: OCRMode
+  onSwitchOcrMode: (mode: OCRMode) => void
 }
 
 export const Header = memo(function Header({
@@ -193,6 +212,8 @@ export const Header = memo(function Header({
   aiConnectionStatus = 'disconnected',
   theme,
   onToggleTheme,
+  ocrMode,
+  onSwitchOcrMode,
 }: HeaderProps) {
   const statusClass = `ai-status ai-status-${aiConnectionStatus}`
   const statusText = STATUS_LABELS[aiConnectionStatus]?.[lang]
@@ -291,7 +312,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v3.9</span>
+        >v4.0</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
@@ -407,6 +428,24 @@ export const Header = memo(function Header({
             </svg>
             <span className="drawer-label">{THEME_LABELS.history[lang] ?? 'History'}</span>
           </button>
+
+          {/* OCR Mode switcher — modern / koten toggle */}
+          <div className="ocr-mode-toggle">
+            <button
+              className={`ocr-mode-btn${ocrMode === 'modern' ? ' ocr-mode-btn-active' : ''}`}
+              onClick={() => onSwitchOcrMode('modern')}
+              title={L(lang, { ja: '現代日本語OCR', en: 'Modern Japanese OCR', 'zh-CN': '现代日语OCR', 'zh-TW': '現代日語OCR', ko: '현대 일본어 OCR' })}
+            >
+              {L(lang, { ja: '現代', en: 'Modern', 'zh-CN': '现代', 'zh-TW': '現代', ko: '현대', la: 'Moderna', eo: 'Moderna', es: 'Moderno', de: 'Modern', ar: 'حديث', hi: 'आधुनिक' })}
+            </button>
+            <button
+              className={`ocr-mode-btn${ocrMode === 'koten' ? ' ocr-mode-btn-active' : ''}`}
+              onClick={() => onSwitchOcrMode('koten')}
+              title={L(lang, { ja: '古典籍OCR（くずし字対応）', en: 'Classical Japanese OCR (cursive script)', 'zh-CN': '古典日语OCR（草书）', 'zh-TW': '古典日語OCR（草書）', ko: '고전 일본어 OCR (초서)' })}
+            >
+              {L(lang, { ja: '古典籍', en: 'Classical', 'zh-CN': '古典', 'zh-TW': '古典', ko: '고전', la: 'Classica', eo: 'Klasika', es: 'Clásico', de: 'Klassisch', ar: 'كلاسيكي', hi: 'शास्त्रीय' })}
+            </button>
+          </div>
 
           {/* Language selectors — compact dropdowns */}
           <div className="lang-selector-row">
