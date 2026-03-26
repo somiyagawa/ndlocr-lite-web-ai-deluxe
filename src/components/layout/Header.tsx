@@ -13,12 +13,12 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     changes: {
       ja: [
         '古典籍OCRモード追加（RTMDetレイアウト検出 + PARSeqくずし字認識）',
-        '現代 / 古典籍 モード切替UIをヘッダーに追加',
+        'オート / 現代 / くずし字 の3モード切替UIをヘッダーに追加（アイコン・目立つデザイン）',
         'ndlkotenocr-lite の ONNX モデルをブラウザ統合',
       ],
       en: [
         'Added classical Japanese OCR mode (RTMDet layout detection + PARSeq cursive script recognition)',
-        'Added Modern / Classical mode toggle in header',
+        'Added Auto / Modern / Kuzushiji 3-way mode toggle in header with icons',
         'Integrated ndlkotenocr-lite ONNX models for browser-based execution',
       ],
     },
@@ -429,21 +429,38 @@ export const Header = memo(function Header({
             <span className="drawer-label">{THEME_LABELS.history[lang] ?? 'History'}</span>
           </button>
 
-          {/* OCR Mode switcher — modern / koten toggle */}
+          {/* OCR Mode switcher — auto / modern / koten (3-way toggle) */}
           <div className="ocr-mode-toggle">
+            <button
+              className={`ocr-mode-btn${ocrMode === 'auto' ? ' ocr-mode-btn-active' : ''}`}
+              onClick={() => onSwitchOcrMode('auto')}
+              title={L(lang, { ja: 'オート認識（自動判定）', en: 'Auto detect', 'zh-CN': '自动识别', 'zh-TW': '自動辨識', ko: '자동 인식' })}
+            >
+              <svg className="ocr-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+              </svg>
+              {L(lang, { ja: 'オート', en: 'Auto', 'zh-CN': '自动', 'zh-TW': '自動', ko: '자동', la: 'Auto', eo: 'Aŭto', es: 'Auto', de: 'Auto', ar: 'تلقائي', hi: 'ऑटो' })}
+            </button>
             <button
               className={`ocr-mode-btn${ocrMode === 'modern' ? ' ocr-mode-btn-active' : ''}`}
               onClick={() => onSwitchOcrMode('modern')}
-              title={L(lang, { ja: '現代日本語OCR', en: 'Modern Japanese OCR', 'zh-CN': '现代日语OCR', 'zh-TW': '現代日語OCR', ko: '현대 일본어 OCR' })}
+              title={L(lang, { ja: '現代日本語OCR（活字・印刷物）', en: 'Modern Japanese OCR (printed text)', 'zh-CN': '现代日语OCR（印刷体）', 'zh-TW': '現代日語OCR（印刷體）', ko: '현대 일본어 OCR (인쇄체)' })}
             >
+              <svg className="ocr-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" />
+              </svg>
               {L(lang, { ja: '現代', en: 'Modern', 'zh-CN': '现代', 'zh-TW': '現代', ko: '현대', la: 'Moderna', eo: 'Moderna', es: 'Moderno', de: 'Modern', ar: 'حديث', hi: 'आधुनिक' })}
             </button>
             <button
               className={`ocr-mode-btn${ocrMode === 'koten' ? ' ocr-mode-btn-active' : ''}`}
               onClick={() => onSwitchOcrMode('koten')}
-              title={L(lang, { ja: '古典籍OCR（くずし字対応）', en: 'Classical Japanese OCR (cursive script)', 'zh-CN': '古典日语OCR（草书）', 'zh-TW': '古典日語OCR（草書）', ko: '고전 일본어 OCR (초서)' })}
+              title={L(lang, { ja: 'くずし字OCR（古典籍・写本）', en: 'Cursive script OCR (classical texts)', 'zh-CN': '草书OCR（古典文献）', 'zh-TW': '草書OCR（古典文獻）', ko: '흘림체 OCR (고전 문헌)' })}
             >
-              {L(lang, { ja: '古典籍', en: 'Classical', 'zh-CN': '古典', 'zh-TW': '古典', ko: '고전', la: 'Classica', eo: 'Klasika', es: 'Clásico', de: 'Klassisch', ar: 'كلاسيكي', hi: 'शास्त्रीय' })}
+              <svg className="ocr-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              </svg>
+              {L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체', la: 'Cursiva', eo: 'Kursiva', es: 'Cursiva', de: 'Kursiv', ar: 'مخطوط', hi: 'कुज़ुशिजी' })}
             </button>
           </div>
 

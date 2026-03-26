@@ -1,5 +1,5 @@
-/** OCR処理モード: modern = 現代日本語(DEIMv2+PARSeq), koten = 古典籍(RTMDet+PARSeq) */
-export type OCRMode = 'modern' | 'koten'
+/** OCR処理モード: auto = 自動判定, modern = 現代日本語(DEIMv2+PARSeq), koten = 古典籍/くずし字(RTMDet+PARSeq) */
+export type OCRMode = 'auto' | 'modern' | 'koten'
 
 export interface BoundingBox {
   x: number

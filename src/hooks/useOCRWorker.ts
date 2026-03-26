@@ -26,8 +26,8 @@ export function useOCRWorker() {
   const recWorkersRef = useRef<Worker[]>([])
   const [isReady, setIsReady] = useState(false)
   const [jobState, setJobState] = useState<OCRJobState>(initialJobState)
-  const [ocrMode, setOcrMode] = useState<OCRMode>('modern')
-  const ocrModeRef = useRef<OCRMode>('modern')
+  const [ocrMode, setOcrMode] = useState<OCRMode>('auto')
+  const ocrModeRef = useRef<OCRMode>('auto')
 
   // OCR Worker + 認識 Worker を起動（UIレンダリング完了後に遅延起動して初期描画を高速化）
   useEffect(() => {
@@ -187,15 +187,17 @@ export function useOCRWorker() {
 
         workerRef.current.addEventListener('message', handler)
 
+        // auto → modern として扱う（将来的に画像特徴で自動判定を追加可能）
         const currentMode = ocrModeRef.current
-        if (N_REC_WORKERS === 0 || currentMode === 'koten') {
+        const effectiveMode = currentMode === 'auto' ? 'modern' : currentMode
+        if (N_REC_WORKERS === 0 || effectiveMode === 'koten') {
           // モバイル or 古典籍: ocr.worker 1つで完結（recognition.worker なし）
           workerRef.current.postMessage({
             type: 'OCR_PROCESS',
             id,
             imageData: image.imageData,
             startTime: Date.now(),
-            ocrMode: currentMode,
+            ocrMode: effectiveMode,
           } satisfies WorkerInMessage)
         } else {
           // デスクトップ(現代): LAYOUT_DETECT → 並列 recognition workers
@@ -204,7 +206,7 @@ export function useOCRWorker() {
             id,
             imageData: image.imageData,
             startTime: Date.now(),
-            ocrMode: currentMode,
+            ocrMode: effectiveMode,
           } satisfies WorkerInMessage)
         }
       })
@@ -348,7 +350,7 @@ export function useOCRWorker() {
 
         workerRef.current.addEventListener('message', handler)
         workerRef.current.postMessage(
-          { type: 'OCR_PROCESS', id, imageData, startTime: Date.now(), ocrMode: ocrModeRef.current } satisfies WorkerInMessage,
+          { type: 'OCR_PROCESS', id, imageData, startTime: Date.now(), ocrMode: ocrModeRef.current === 'auto' ? 'modern' : ocrModeRef.current } satisfies WorkerInMessage,
           [imageData.data.buffer]  // Transferable でゼロコピー転送
         )
       })
@@ -360,14 +362,15 @@ export function useOCRWorker() {
     setJobState(initialJobState)
   }, [])
 
-  /** OCRモード切替（modern ↔ koten）— Worker を再初期化 */
+  /** OCRモード切替（auto / modern / koten）— Worker を再初期化 */
   const switchOcrMode = useCallback((mode: OCRMode) => {
     ocrModeRef.current = mode
     setOcrMode(mode)
+    const effectiveMode = mode === 'auto' ? 'modern' : mode
     if (workerRef.current) {
       setIsReady(false)
       setJobState(initialJobState)
-      workerRef.current.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: mode } satisfies WorkerInMessage)
+      workerRef.current.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: effectiveMode } satisfies WorkerInMessage)
       // OCR Worker の onmessage を再設定（初期化完了を拾う）
       workerRef.current.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
