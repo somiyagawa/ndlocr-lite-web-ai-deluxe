@@ -415,15 +415,20 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
               <div className="iiif-modal-body">
                 <p className="iiif-description">
                   {L(lang, {
-                    ja: 'IIIFマニフェストのURLを入力してください。Presentation API v2/v3に対応しています。',
-                    en: 'Enter a IIIF manifest URL. Supports Presentation API v2 and v3.',
+                    ja: 'IIIF対応の画像コレクション（国立国会図書館デジタルコレクション、国文学研究資料館、ColBase等）からマニフェストURLを貼り付けて画像を読み込みます。Presentation API v2/v3に対応。',
+                    en: 'Paste a manifest URL from any IIIF-compatible collection (NDL Digital Collections, NIJL, ColBase, etc.) to load images. Supports Presentation API v2 and v3.',
                   })}
                 </p>
+                <label className="iiif-input-label" htmlFor="iiif-manifest-url">{L(lang, {
+                  ja: 'マニフェストURL',
+                  en: 'Manifest URL',
+                })}</label>
                 <div className="iiif-input-row">
                   <input
+                    id="iiif-manifest-url"
                     type="url"
                     className="iiif-url-input"
-                    placeholder="https://www.dl.ndl.go.jp/api/iiif/XXXXXXX/manifest.json"
+                    placeholder="https://www.dl.ndl.go.jp/api/iiif/1234567/manifest.json"
                     value={manifestUrl}
                     onChange={e => { setManifestUrl(e.target.value); setError('') }}
                     onKeyDown={e => e.key === 'Enter' && handleFetchManifest()}
@@ -443,8 +448,8 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
                 </div>
                 <p className="iiif-hint">
                   {L(lang, {
-                    ja: '例: 国立国会図書館デジタルコレクション、国文学研究資料館、ColBase 等のIIIFマニフェストURL',
-                    en: 'e.g. IIIF manifest URLs from NDL Digital Collections, NIJL, ColBase, etc.',
+                    ja: 'NDLデジコレの場合: 資料ページURL末尾の数字が資料IDです → https://www.dl.ndl.go.jp/api/iiif/資料ID/manifest.json',
+                    en: 'For NDL Digital Collections: the number at the end of the item page URL is the item ID → https://www.dl.ndl.go.jp/api/iiif/ITEM_ID/manifest.json',
                   })}
                 </p>
               </div>

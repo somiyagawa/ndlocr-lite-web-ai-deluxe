@@ -120,7 +120,7 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }
               />
               <span className={`sample-tile-badge sample-tile-badge-${sample.category}`}>
                 {sample.category === 'modern'
-                  ? L(lang, { ja: '現代', en: 'Modern', 'zh-CN': '现代', 'zh-TW': '現代', ko: '현대' })
+                  ? L(lang, { ja: '現代活字', en: 'Modern Print', 'zh-CN': '现代印刷', 'zh-TW': '現代活字', ko: '현대 활자' })
                   : L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체' })
                 }
               </span>

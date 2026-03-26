@@ -6300,42 +6300,49 @@ button.ai-status-clickable .ai-status-text {
   gap: 4px;
 }
 
+/* ===== IIIF Modal — follows app's standard modal pattern ===== */
 .iiif-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
 }
 
 .iiif-modal {
   background: var(--color-surface);
   color: var(--color-text);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   width: 100%;
-  max-width: 640px;
+  max-width: 580px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
+  animation: slide-up 0.3s ease;
+}
+[data-theme="dark"] .iiif-modal {
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.4);
 }
 
 .iiif-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
 }
 
 .iiif-modal-header h3 {
   font-size: 1.1rem;
   font-weight: 600;
+  margin: 0;
 }
 
 .iiif-modal-close {
@@ -6344,12 +6351,18 @@ button.ai-status-clickable .ai-status-text {
   font-size: 1.5rem;
   cursor: pointer;
   color: var(--color-text-secondary);
-  padding: 0 4px;
+  padding: 4px 8px;
   line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.iiif-modal-close:hover {
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
 }
 
 .iiif-modal-body {
-  padding: 20px;
+  padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
 }
@@ -6357,43 +6370,59 @@ button.ai-status-clickable .ai-status-text {
 .iiif-description {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* URL入力エリア: ラベル付き、大きめで目立つ */
+.iiif-input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
 }
 
 .iiif-input-row {
   display: flex;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .iiif-url-input {
   flex: 1;
-  padding: 10px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  background: var(--color-surface-elevated);
+  padding: 12px 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  background: var(--color-bg);
   color: var(--color-text);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-
+.iiif-url-input::placeholder {
+  color: var(--color-text-tertiary);
+}
 .iiif-url-input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
 }
 
 .iiif-hint {
   font-size: 0.8rem;
   color: var(--color-text-tertiary);
-  line-height: 1.4;
+  line-height: 1.5;
+  margin-top: 4px;
 }
 
+/* Canvas選択画面 */
 .iiif-select-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .iiif-select-actions {
@@ -6405,17 +6434,18 @@ button.ai-status-clickable .ai-status-text {
   max-height: 40vh;
   overflow-y: auto;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius);
   margin-bottom: 16px;
+  background: var(--color-bg);
 }
 
 .iiif-canvas-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   cursor: pointer;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
   transition: background 0.15s;
   font-size: 0.85rem;
 }
@@ -6449,6 +6479,7 @@ button.ai-status-clickable .ai-status-text {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  padding-top: 8px;
 }
 
 .iiif-error {
@@ -6457,5 +6488,5 @@ button.ai-status-clickable .ai-status-text {
   color: var(--color-danger);
   font-size: 0.85rem;
   border-top: 1px solid var(--color-border);
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
