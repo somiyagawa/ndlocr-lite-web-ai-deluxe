@@ -382,13 +382,17 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 }
 
 .header-subtitle {
-  font-size: 0.7rem;
-  color: var(--color-text-tertiary);
-  margin-left: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--color-primary);
+  margin-left: 0.5rem;
   white-space: nowrap;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  opacity: 0.85;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 1;
+  padding: 0.1rem 0.45rem;
+  background: var(--color-primary-light);
+  border-radius: 0.3rem;
+  border: 1px solid var(--color-primary-subtle);
 }
 
 .header-version {
