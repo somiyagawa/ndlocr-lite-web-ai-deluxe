@@ -511,11 +511,6 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 
 /* ── Language flag buttons ── */
 /* Language selector — compact dropdown row */
-.lang-selector-row {
-  display: flex;
-  gap: 0.4rem;
-  align-items: center;
-}
 .lang-dropdown-wrap {
   position: relative;
 }
@@ -523,12 +518,15 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.25rem 0.55rem;
+  padding: 0 0.55rem;
+  height: 1.9rem;
+  box-sizing: border-box;
   border: 1px solid var(--color-border, #ddd);
   border-radius: 6px;
   background: transparent;
   color: var(--color-text);
   font-size: 0.78rem;
+  line-height: 1;
   cursor: pointer;
   transition: opacity 0.2s, border-color 0.2s, background 0.2s;
   white-space: nowrap;
@@ -542,8 +540,12 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: var(--color-primary-light);
 }
 .lang-dropdown-flag {
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 1rem;
+  overflow: hidden;
 }
 .lang-dropdown-label {
   max-width: 7rem;
@@ -600,6 +602,19 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 }
 .lang-dropdown-item-name {
   white-space: nowrap;
+}
+.lang-dropdown-section-label {
+  padding: 0.35rem 0.75rem 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+  user-select: none;
+  letter-spacing: 0.05em;
+}
+.lang-ui-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
 /* ===== BUTTONS ===== */
@@ -3702,11 +3717,6 @@ button.ai-status-clickable .ai-status-text {
   }
 
   /* Language dropdowns in drawer: full-width stacked */
-  .lang-selector-row {
-    flex-direction: column;
-    gap: 0.3rem;
-    width: 100%;
-  }
   .lang-dropdown-wrap {
     width: 100%;
   }

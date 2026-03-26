@@ -13,7 +13,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     changes: {
       ja: [
         '古典籍OCRモード追加（RTMDetレイアウト検出 + PARSeqくずし字認識）',
-        'オート / 現代 / くずし字 の3モード切替UIをヘッダーに追加（アイコン・目立つデザイン）',
+        'オート / 現代 / くずし字・古典籍 の3モード切替UIをヘッダーに追加（アイコン・目立つデザイン）',
         'ndlkotenocr-lite の ONNX モデルをブラウザ統合',
       ],
       en: [
@@ -253,8 +253,7 @@ export const Header = memo(function Header({
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [showChangelog, setShowChangelog] = useState(false)
-  const [modernOpen, setModernOpen] = useState(false)
-  const [classicalOpen, setClassicalOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
 
   const CLASSICAL_LANGS = ['la', 'sa', 'syc', 'cop'] as const
   const MODERN_LANGS = LANGUAGES.filter(c => !(CLASSICAL_LANGS as readonly string[]).includes(c))
@@ -455,87 +454,76 @@ export const Header = memo(function Header({
             <button
               className={`ocr-mode-btn${ocrMode === 'koten' ? ' ocr-mode-btn-active' : ''}`}
               onClick={() => onSwitchOcrMode('koten')}
-              title={L(lang, { ja: 'くずし字OCR（古典籍・写本）', en: 'Cursive script OCR (classical texts)', 'zh-CN': '草书OCR（古典文献）', 'zh-TW': '草書OCR（古典文獻）', ko: '흘림체 OCR (고전 문헌)' })}
+              title={L(lang, { ja: 'くずし字/古典籍OCR（写本・版本・古文書）', en: 'Kuzushiji/Classical OCR (manuscripts & old texts)', 'zh-CN': '草书/古籍OCR（手稿及古文献）', 'zh-TW': '草書/古籍OCR（手稿及古文獻）', ko: '흘림체/고전 OCR (필사본 및 고문서)' })}
             >
               <svg className="ocr-mode-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
               </svg>
-              {L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체', la: 'Cursiva', eo: 'Kursiva', es: 'Cursiva', de: 'Kursiv', ar: 'مخطوط', hi: 'कुज़ुशिजी' })}
+              {L(lang, { ja: 'くずし字/古典籍', en: 'Kuzushiji/Classical', 'zh-CN': '草书/古籍', 'zh-TW': '草書/古籍', ko: '흘림체/고전', la: 'Cursiva/Classica', eo: 'Kursiva/Klasika', es: 'Cursiva/Clásica', de: 'Kursiv/Klassisch', ar: 'مخطوط/كلاسيكي', hi: 'कुज़ुशिजी/शास्त्रीय' })}
             </button>
           </div>
 
-          {/* Language selectors — compact dropdowns */}
-          <div className="lang-selector-row">
-            {/* Modern languages dropdown */}
-            <div className="lang-dropdown-wrap">
-              <button
-                className="lang-dropdown-toggle"
-                onClick={() => { setModernOpen(!modernOpen); setClassicalOpen(false) }}
-                type="button"
-                title={LANGUAGE_LABELS[lang] ?? 'Language'}
-              >
-                <span className="lang-dropdown-flag">{FLAG_EMOJI[lang] ?? FLAG_EMOJI['ja']}</span>
-                <span className="lang-dropdown-label">{LANGUAGE_LABELS[lang] ?? 'Language'}</span>
-                <svg className="lang-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: modernOpen ? 'rotate(180deg)' : 'none' }}>
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {modernOpen && (
-                <div className="lang-dropdown-menu">
-                  {MODERN_LANGS.map(code => (
-                    <button
-                      key={code}
-                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
-                      onClick={() => {
-                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                        setModernOpen(false)
-                        setMenuOpen(false)
-                      }}
-                    >
-                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
-                      <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Classical languages dropdown */}
-            <div className="lang-dropdown-wrap">
-              <button
-                className={`lang-dropdown-toggle lang-dropdown-toggle-classical${CLASSICAL_LANGS.some(c => c === lang) ? ' lang-dropdown-toggle-active' : ''}`}
-                onClick={() => { setClassicalOpen(!classicalOpen); setModernOpen(false) }}
-                type="button"
-              >
-                <span className="lang-dropdown-flag">{CLASSICAL_LANGS.some(c => c === lang) ? (FLAG_EMOJI[lang] ?? '') : ''}</span>
-                <span className="lang-dropdown-label">{L(lang, {
-                  ja: '古典語', en: 'Classical', 'zh-CN': '古典语', 'zh-TW': '古典語', ko: '고전어',
-                  la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
-                  ru: 'Классические', el: 'Κλασικές', syc: 'ܩܠܣܝ̈ܩܝ̈ܬ̈ܐ', cop: 'ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ', sa: 'शास्त्रीयाः'
-                })}</span>
-                <svg className="lang-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: classicalOpen ? 'rotate(180deg)' : 'none' }}>
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {classicalOpen && (
-                <div className="lang-dropdown-menu">
-                  {CLASSICAL_LANGS.map(code => (
-                    <button
-                      key={code}
-                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
-                      onClick={() => {
-                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                        setClassicalOpen(false)
-                        setMenuOpen(false)
-                      }}
-                    >
-                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
-                      <span className="lang-dropdown-item-name">{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+          {/* Unified UI language selector */}
+          <div className="lang-dropdown-wrap">
+            <button
+              className="lang-dropdown-toggle"
+              onClick={() => setLangOpen(!langOpen)}
+              type="button"
+              title={L(lang, { ja: 'UI言語', en: 'UI Language', 'zh-CN': 'UI语言', 'zh-TW': 'UI語言', ko: 'UI 언어' })}
+            >
+              <svg className="lang-ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span className="lang-dropdown-flag">{FLAG_EMOJI[lang] ?? FLAG_EMOJI['ja']}</span>
+              <span className="lang-dropdown-label">{LANGUAGE_LABELS[lang] ?? 'Language'}</span>
+              <svg className="lang-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: langOpen ? 'rotate(180deg)' : 'none' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {langOpen && (
+              <div className="lang-dropdown-menu">
+                <div className="lang-dropdown-section-label">{L(lang, {
+                  ja: '── 現代語 ──', en: '── Modern ──', 'zh-CN': '── 现代语 ──', 'zh-TW': '── 現代語 ──',
+                  ko: '── 현대어 ──', la: '── Modernae ──', eo: '── Modernaj ──', es: '── Modernas ──',
+                  de: '── Modern ──', ar: '── حديثة ──', hi: '── आधुनिक ──', ru: '── Современные ──',
+                  el: '── Σύγχρονες ──', sa: '── आधुनिकाः ──', syc: '── ܚ̈ܕ̈ܬ̈ܬ̈ܐ ──', cop: '── ⲛⲓⲕⲉⲙⲟⲇⲉⲣⲛ ──'
+                })}</div>
+                {MODERN_LANGS.map(code => (
+                  <button
+                    key={code}
+                    className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
+                    onClick={() => {
+                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                      setLangOpen(false)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                    <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                  </button>
+                ))}
+                <div className="lang-dropdown-section-label">{L(lang, {
+                  ja: '── 古典語 ──', en: '── Classical ──', 'zh-CN': '── 古典语 ──', 'zh-TW': '── 古典語 ──',
+                  ko: '── 고전어 ──', la: '── Classicae ──', eo: '── Klasikaj ──', es: '── Clásicas ──',
+                  de: '── Klassisch ──', ar: '── كلاسيكية ──', hi: '── शास्त्रीय ──', ru: '── Классические ──',
+                  el: '── Κλασικές ──', sa: '── शास्त्रीयाः ──', syc: '── ܩ̈ܕ̈ܝ̈ܡ̈ܬ̈ܐ ──', cop: '── ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ ──'
+                })}</div>
+                {CLASSICAL_LANGS.map(code => (
+                  <button
+                    key={code}
+                    className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
+                    onClick={() => {
+                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                      setLangOpen(false)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                    <span className="lang-dropdown-item-name">{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

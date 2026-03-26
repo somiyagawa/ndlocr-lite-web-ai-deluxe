@@ -57,8 +57,9 @@ export function useOCRWorker() {
         }
       }
 
-      // OCR Worker 初期化（現在の ocrMode を渡す）
-      worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: ocrModeRef.current } satisfies WorkerInMessage)
+      // OCR Worker 初期化（auto → modern に解決して渡す）
+      const initMode = ocrModeRef.current === 'auto' ? 'modern' : ocrModeRef.current
+      worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: initMode } satisfies WorkerInMessage)
 
       worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
