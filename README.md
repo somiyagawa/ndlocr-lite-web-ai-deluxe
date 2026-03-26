@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.2.0-teal?style=for-the-badge" alt="v4.2.0" />
+  <img src="https://img.shields.io/badge/version-4.2.1-teal?style=for-the-badge" alt="v4.2.1" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.2.1 — 2026-03-26
+
+**IIIF読み込みエラー修正** — `Cross-Origin-Embedder-Policy` ヘッダーを `require-corp` から `credentialless` に変更し、クロスオリジンのIIIFマニフェスト・画像取得がブロックされる問題を修正。IIIFマニフェスト取得時のContent-Type検証も緩和し、`text/plain`等で応答するサーバーに対応。
 
 ### v4.2.0 — 2026-03-26
 

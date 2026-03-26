@@ -8,6 +8,20 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.2.1',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        'IIIF画像読み込みエラーを修正: COEP headerを require-corp → credentialless に変更し、クロスオリジンIIIF fetchを許可',
+        'IIIFマニフェスト取得時のContent-Type検証を緩和（text/plain等で返すサーバーに対応）',
+      ],
+      en: [
+        'Fixed IIIF image loading error: changed COEP header from require-corp to credentialless, allowing cross-origin IIIF fetches',
+        'Relaxed Content-Type validation for IIIF manifest fetch (supports servers returning text/plain etc.)',
+      ],
+    },
+  },
+  {
     version: '4.2.0',
     date: '2026-03-26',
     changes: {
@@ -349,7 +363,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.2</span>
+        >v4.2.1</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

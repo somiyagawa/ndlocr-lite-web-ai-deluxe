@@ -11,11 +11,11 @@
  * - ダウンロード進捗表示
  */
 import { useState, useCallback, useRef } from 'react'
-import { L } from '../i18n'
+import { L, type Language } from '../i18n'
 
 interface IIIFLoaderProps {
   onImagesLoaded: (files: File[]) => void
-  lang: string
+  lang: Language
   disabled?: boolean
 }
 
@@ -197,7 +197,7 @@ async function fetchImageWithFallback(
   for (const url of urls) {
     if (signal.aborted) throw new DOMException('Aborted', 'AbortError')
     try {
-      const res = await fetch(url, { signal })
+      const res = await fetch(url, { signal, mode: 'cors' })
       if (!res.ok) { lastError = new Error(`HTTP ${res.status}`); continue }
       const blob = await res.blob()
       // 画像バリデーション: Content-Type + マジックバイトチェック
@@ -257,16 +257,19 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
     setError('')
     abortRef.current = new AbortController()
     try {
-      const res = await fetch(url, { signal: abortRef.current.signal })
+      const res = await fetch(url, { signal: abortRef.current.signal, mode: 'cors' })
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-      const contentType = res.headers.get('content-type') ?? ''
-      if (!contentType.includes('json') && !contentType.includes('ld')) {
+      // Content-Type チェックは緩和: text/plain 等で返すサーバーもある
+      // JSON パースで判定し、失敗時にエラーを出す
+      let manifest: Record<string, unknown>
+      try {
+        manifest = await res.json()
+      } catch {
         throw new Error(L(lang, {
           ja: 'JSONではないレスポンスが返されました。URLがIIIFマニフェストか確認してください。',
           en: 'Response is not JSON. Please verify the URL points to a IIIF manifest.',
         }))
       }
-      const manifest = await res.json()
 
       // IIIF Collection 判定
       if (manifest['@type'] === 'sc:Collection' || manifest.type === 'Collection') {
