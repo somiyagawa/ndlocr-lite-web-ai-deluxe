@@ -116,6 +116,8 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }
                 src={sample.imagePath}
                 alt={L(lang, sample.label)}
                 className="sample-tile-image"
+                width={270}
+                height={180}
                 loading="lazy"
               />
               <span className={`sample-tile-badge sample-tile-badge-${sample.category}`}>

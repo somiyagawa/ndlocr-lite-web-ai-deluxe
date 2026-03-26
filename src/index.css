@@ -767,6 +767,7 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   justify-content: center;
   gap: 1.25rem;
   padding: 2rem 0;
+  min-height: 480px;
   animation: slide-up 0.5s ease;
   /* 青い池（美瑛）背景 / Blue Pond (Biei) background */
   background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.55)),
@@ -3722,9 +3723,10 @@ button.ai-status-clickable .ai-status-text {
 @media (max-width: 768px) {
   /* ── Header Compression ── */
   .header {
-    flex-wrap: wrap;
     padding: 0.5rem 0.75rem;
     gap: 0.5rem;
+    height: 44px;
+    overflow: hidden;
   }
 
   .header-title {

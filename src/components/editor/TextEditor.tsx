@@ -74,6 +74,7 @@ export function TextEditor({
   const [searchQuery, setSearchQuery] = useState('')
   const [replaceQuery, setReplaceQuery] = useState('')
   const [isVertical, setIsVertical] = useState(false)
+  const [verticalAutoDetected, setVerticalAutoDetected] = useState(false)
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
   const [undoStack, setUndoStack] = useState<UndoRedoEntry[]>([])
   const [redoStack, setRedoStack] = useState<UndoRedoEntry[]>([])
@@ -95,6 +96,24 @@ export function TextEditor({
 
   // Determine if we should show diff view
   const shouldShowDiff = proofreadState.status === 'done'
+
+  // OCR結果のテキストブロック形状から縦書き/横書きを自動判定
+  // テキストブロックの過半数が縦長 (height > width * 1.3) なら縦書きと判定
+  useEffect(() => {
+    if (!result?.textBlocks || result.textBlocks.length === 0) return
+    // 手動で切り替え済みなら自動判定しない（同じ result.id に対して1回だけ）
+    const blocks = result.textBlocks
+    let vertCount = 0
+    for (const b of blocks) {
+      if (b.height > b.width * 1.3) vertCount++
+    }
+    const shouldBeVertical = vertCount > blocks.length * 0.5
+    if (shouldBeVertical !== verticalAutoDetected || !verticalAutoDetected) {
+      setIsVertical(shouldBeVertical)
+      setVerticalAutoDetected(shouldBeVertical)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result?.id])
 
   // テキストエリアの実際の lineHeight を計測して行番号と同期する
   useEffect(() => {
