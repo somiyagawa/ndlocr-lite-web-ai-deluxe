@@ -97,11 +97,12 @@ export function ImageViewer({
   const touchStartRef = useRef<{ x: number; y: number; dist: number; zoom: number }>({ x: 0, y: 0, dist: 0, zoom: 1 })
   const lastTouchRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
-  // Compute fit-to-container zoom
+  // Compute fit-to-container zoom (scale image to fill visible area)
   const computeFitZoom = useCallback(() => {
     if (!containerRef.current || naturalSize.width === 0) return 1
     const c = containerRef.current
-    return Math.min(c.clientWidth / naturalSize.width, c.clientHeight / naturalSize.height, 1)
+    // Allow scaling up so image fills the container on small screens
+    return Math.min(c.clientWidth / naturalSize.width, c.clientHeight / naturalSize.height)
   }, [naturalSize])
 
   const effectiveZoom = zoom === FIT_ZOOM ? computeFitZoom() : zoom

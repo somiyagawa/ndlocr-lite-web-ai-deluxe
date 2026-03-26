@@ -4023,14 +4023,14 @@ button.ai-status-clickable .ai-status-text {
   }
 
   .split-pane-mobile-top {
-    min-height: 30vh;
-    max-height: 50vh;
+    min-height: 65vh;
+    max-height: none;
     overflow-y: auto;
   }
 
   .split-pane-mobile-bottom {
-    min-height: 30vh;
-    max-height: 50vh;
+    min-height: 65vh;
+    max-height: none;
     overflow: hidden;
     position: relative;
   }
@@ -4175,50 +4175,62 @@ button.ai-status-clickable .ai-status-text {
     padding: 0.3rem 0.5rem !important;
   }
 
-  /* ── Status bar ── */
+  /* ── Status bar (ultra-compact mobile) ── */
   .text-editor-statusbar {
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 0.25rem;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.65rem;
+    gap: 0.15rem;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.55rem;
+    min-height: 0;
   }
 
+  .text-editor-statusbar-left,
   .text-editor-statusbar-right {
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
 
   .text-editor-stat-item {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
+  }
+
+  .text-editor-option-compact {
+    font-size: 0.55rem;
+    gap: 0.1rem;
+  }
+
+  .text-editor-option-compact input[type="checkbox"] {
+    width: 10px;
+    height: 10px;
   }
 
   .text-editor-font-controls-compact {
     flex-wrap: wrap;
-    gap: 0.2rem;
+    gap: 0.1rem;
   }
 
   .text-editor-font-controls-compact .btn-sm,
   .text-editor-font-controls-compact select {
-    min-height: 24px !important;
-    font-size: 0.6rem !important;
-    padding: 0.1rem 0.25rem !important;
+    min-height: 20px !important;
+    font-size: 0.55rem !important;
+    padding: 0.05rem 0.2rem !important;
   }
 
   .text-editor-font-size-group {
-    padding: 0.1rem 0.2rem;
-    gap: 0.1rem;
+    padding: 0.05rem 0.15rem;
+    gap: 0.05rem;
   }
 
   .text-editor-font-size-btn {
-    width: 18px;
-    height: 18px;
-    font-size: 0.75rem;
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
   }
 
   .text-editor-font-size-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
   }
 
   .text-editor-font-slider-compact {
@@ -4335,6 +4347,15 @@ button.ai-status-clickable .ai-status-text {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
     white-space: nowrap;
+  }
+
+  /* ── Image Viewer: fill mobile pane ── */
+  .split-pane-mobile-top .image-viewer-wrap {
+    min-height: 60vh;
+  }
+
+  .split-pane-mobile-top .image-viewer-wrap > .image-viewer {
+    min-height: 55vh;
   }
 
   /* ── Footer ── */
