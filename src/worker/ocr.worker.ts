@@ -45,11 +45,32 @@ class OCRWorker {
     self.postMessage(message)
   }
 
+  /** 必要なモデルが既にロード済みかチェック */
+  private hasRequiredModels(ocrMode: OCRMode, layoutOnly: boolean): boolean {
+    if (ocrMode === 'koten') {
+      return !!(this.kotenLayoutDetector && this.kotenRecognizer)
+    }
+    if (ocrMode === 'modern') {
+      if (layoutOnly) return !!this.layoutDetector
+      return !!(this.layoutDetector && this.recognizer100)
+    }
+    // auto: 両方必要
+    const hasModern = layoutOnly ? !!this.layoutDetector : !!(this.layoutDetector && this.recognizer100)
+    const hasKoten = !!(this.kotenLayoutDetector && this.kotenRecognizer)
+    return hasModern && hasKoten
+  }
+
   async initialize(layoutOnly = false, ocrMode: OCRMode = 'modern'): Promise<void> {
-    // 同じモードで既に初期化済みならスキップ
-    if (this.isInitialized && this.initializedMode === ocrMode) return
     this.layoutOnly = layoutOnly
     this.ocrMode = ocrMode
+
+    // 必要なモデルが既にロード済みなら即 ready
+    if (this.hasRequiredModels(ocrMode, layoutOnly)) {
+      this.isInitialized = true
+      this.initializedMode = ocrMode
+      this.post({ type: 'OCR_PROGRESS', stage: 'initialized', progress: 1.0, message: 'Ready' })
+      return
+    }
 
     try {
       const modeLabel = ocrMode === 'koten' ? 'classical' : ocrMode === 'auto' ? 'auto (all models)' : 'modern'
@@ -270,28 +291,40 @@ class OCRWorker {
       this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
       await this.recognizer100.initialize(rec100Data)
     } else {
-      if (this.recognizer30 && this.recognizer50) return
-      const [rec30Data, rec50Data, rec100Data] = await Promise.all([
-        loadModel('recognition30'),
-        loadModel('recognition50'),
-        loadModel('recognition100'),
-      ])
-      this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
-      await this.recognizer30.initialize(rec30Data)
-      this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
-      await this.recognizer50.initialize(rec50Data)
-      this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
-      await this.recognizer100.initialize(rec100Data)
+      // 不足しているモデルだけをロード
+      const promises: Promise<void>[] = []
+      if (!this.recognizer30) {
+        promises.push((async () => {
+          const data = await loadModel('recognition30')
+          this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
+          await this.recognizer30.initialize(data)
+        })())
+      }
+      if (!this.recognizer50) {
+        promises.push((async () => {
+          const data = await loadModel('recognition50')
+          this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
+          await this.recognizer50.initialize(data)
+        })())
+      }
+      if (!this.recognizer100) {
+        promises.push((async () => {
+          const data = await loadModel('recognition100')
+          this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+          await this.recognizer100.initialize(data)
+        })())
+      }
+      if (promises.length > 0) await Promise.all(promises)
     }
   }
 
-  /** charCountCategory に応じたモデルを選択 */
-  private selectRecognizer(charCountCategory?: number): TextRecognizer {
+  /** charCountCategory に応じたモデルを選択（null-safe: フォールバック付き） */
+  private selectRecognizer(charCountCategory?: number): TextRecognizer | null {
     if (!this.layoutOnly) {
-      if (charCountCategory === 3) return this.recognizer30!
-      if (charCountCategory === 2) return this.recognizer50!
+      if (charCountCategory === 3 && this.recognizer30) return this.recognizer30
+      if (charCountCategory === 2 && this.recognizer50) return this.recognizer50
     }
-    return this.recognizer100!  // モバイルは常に rec100
+    return this.recognizer100  // モバイルは常に rec100（null の場合もあり得る）
   }
 
   /**
@@ -338,7 +371,8 @@ class OCRWorker {
         detectedMode: requestedMode === 'auto' ? effectiveMode : undefined,
       })
 
-      const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
+      const detector = isKoten ? this.kotenLayoutDetector : this.layoutDetector
+      if (!detector) throw new Error(`${isKoten ? 'Koten' : 'Modern'} layout detector not initialized`)
       const { lines: textRegions, blocks: pageBlocks } = await detector.detect(
         imageData,
         (progress) => {
@@ -369,9 +403,11 @@ class OCRWorker {
         const region = textRegions[i]
         let result: { text: string; confidence: number }
         if (isKoten) {
-          result = await this.kotenRecognizer!.recognizeCropped(croppedImages[i])
+          if (!this.kotenRecognizer) throw new Error('Koten recognizer not initialized')
+          result = await this.kotenRecognizer.recognizeCropped(croppedImages[i])
         } else {
           const recognizer = this.selectRecognizer(region.charCountCategory)
+          if (!recognizer) throw new Error('Text recognizer not initialized')
           result = await recognizer.recognizeCropped(croppedImages[i])
         }
 
@@ -464,7 +500,8 @@ class OCRWorker {
         detectedMode: requestedMode === 'auto' ? effectiveMode : undefined,
       })
 
-      const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
+      const detector = isKoten ? this.kotenLayoutDetector : this.layoutDetector
+      if (!detector) throw new Error(`${isKoten ? 'Koten' : 'Modern'} layout detector not initialized`)
       const { lines: textRegions, blocks: pageBlocks } = await detector.detect(
         imageData,
         (progress) => {

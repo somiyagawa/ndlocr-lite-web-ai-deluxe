@@ -95,7 +95,8 @@ export function classifyImage(imageData: ImageData): ClassificationResult {
   }
 
   const avgR = totalR / samples
-  const avgG = totalG / samples
+  // totalG は将来の色相分析拡張用に保持
+  void totalG
   const avgB = totalB / samples
   const avgBrightness = totalBrightness / samples
 

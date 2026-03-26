@@ -146,7 +146,8 @@ export function useOCRWorker() {
 
         const handler = (event: MessageEvent<WorkerOutMessage>) => {
           const msg = event.data
-          if (msg.id !== undefined && msg.id !== id) return
+          // id が無い進捗メッセージ（初期化完了等）や他ジョブのメッセージを無視
+          if (msg.id !== id) return
 
           if (msg.type === 'OCR_PROGRESS') {
             setJobState((prev) => ({
@@ -379,13 +380,14 @@ export function useOCRWorker() {
       setIsReady(false)
       setJobState(initialJobState)
       workerRef.current.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: mode } satisfies WorkerInMessage)
-      // OCR Worker の onmessage を再設定（初期化完了を拾う）
-      workerRef.current.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
+      // addEventListener を使い、既存の processImage ハンドラを壊さない
+      const initHandler = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
         if (msg.type === 'OCR_PROGRESS') {
           if (msg.stage === 'initialized') {
             setIsReady(true)
             setJobState(initialJobState)
+            workerRef.current?.removeEventListener('message', initHandler)
           } else {
             setJobState((prev) => ({
               ...prev,
@@ -398,6 +400,7 @@ export function useOCRWorker() {
           }
         }
       }
+      workerRef.current.addEventListener('message', initHandler)
     }
   }, [])
 
