@@ -425,16 +425,20 @@ export function TextEditor({
     handleUndo()
   }, [handleUndo])
 
-  // Export menu: close on click outside
+  // Export menu: close on click outside (mousedown + touchstart for mobile)
   useEffect(() => {
     if (!showExportMenu) return
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
         setShowExportMenu(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
   }, [showExportMenu])
 
   const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf' | 'docx') => {
@@ -800,7 +804,7 @@ export function TextEditor({
       </div>
 
       {/* ── Row 2: Toolbar ── */}
-      <div className="text-editor-toolbar">
+      <div className="text-editor-toolbar" style={showExportMenu ? { overflow: 'visible' } : undefined}>
         {/* Left: edit tools */}
         <div className="text-editor-toolbar-group">
           <button

@@ -3775,6 +3775,17 @@ button.ai-status-clickable .ai-status-text {
     white-space: nowrap;
   }
 
+  /* 保存ドロップダウン: モバイルで画面外にはみ出さないように調整 */
+  .text-editor-toolbar .export-dropdown-menu {
+    right: 0;
+    left: auto;
+    min-width: 200px;
+    max-width: calc(100vw - 1rem);
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+
   .text-editor-toolbar .btn-secondary svg,
   .text-editor-toolbar .btn-primary svg {
     width: 11px;
