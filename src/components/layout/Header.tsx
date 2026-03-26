@@ -8,6 +8,28 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.3',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: ズームコントロール・オーバーレイ文字・信頼度・読み順ボタンがタッチ操作で反応しなかった問題を修正（touchイベント伝播制御）',
+        '携帯版: 画像補正パネルが表示されなかった問題を修正（overflow:hidden → visible、パネル縦スタック表示を確実に）',
+        '携帯版: メニューを左からスライドするように変更（ハンバーガーボタン位置に合わせて）',
+        '携帯版: メニュー内の言語選択・OCRモード切替のレイアウトを改善',
+        '携帯版: ドロップゾーンを超コンパクト化（フォーマット表記非表示）',
+        '携帯版: テキストエディタの縦方向領域を拡大（80vh）',
+      ],
+      en: [
+        'Mobile: fixed zoom controls, overlay text, confidence, and reading order buttons not responding to touch (touch event propagation fix)',
+        'Mobile: fixed image correction panel not appearing (overflow:hidden → visible, reliable vertical stack layout)',
+        'Mobile: menu now slides from LEFT to match hamburger button position',
+        'Mobile: improved language selector and OCR mode toggle layout in drawer menu',
+        'Mobile: ultra-compact dropzone (format text hidden)',
+        'Mobile: increased text editor vertical area (80vh)',
+      ],
+    },
+  },
+  {
     version: '4.3.2',
     date: '2026-03-27',
     changes: {
@@ -467,7 +489,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.2</span>
+        >v4.3.3</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

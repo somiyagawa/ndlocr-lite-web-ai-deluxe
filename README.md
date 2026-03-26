@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.2-teal?style=for-the-badge" alt="v4.3.2" />
+  <img src="https://img.shields.io/badge/version-4.3.3-teal?style=for-the-badge" alt="v4.3.3" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -205,6 +205,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ### v4.2.2 — 2026-03-26
 
 **くずし字バッジ色変更** — サンプルタイルセレクタのくずし字バッジ色をpondblue（プライマリカラー）に変更。
+
+### v4.3.3 — 2026-03-27
+
+**携帯版タッチ操作・メニュー・レイアウト修正** — ズームコントロール・オーバーレイ文字・信頼度・読み順ボタンがモバイルでタッチに反応しなかった問題を修正（touchイベント伝播制御）。画像補正パネルが表示されなかった問題を修正（overflow:hidden撤廃、縦スタック確実化）。メニューを左からスライドするよう変更。メニュー内の言語選択・OCRモード切替レイアウトを改善。ドロップゾーン超コンパクト化。テキストエディタ縦方向領域を拡大（80vh）。
 
 ### v4.3.2 — 2026-03-27
 

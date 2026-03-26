@@ -766,7 +766,8 @@ export function ImageViewer({
         style={{ cursor: cursorStyle, overflow: 'hidden', touchAction: 'none' }}
       >
       {/* Zoom + mode controls — placed inside .image-viewer so absolute positioning is relative to image area */}
-      <div className="zoom-controls">
+      {/* onTouchStart stopPropagation prevents parent pan/zoom handlers from stealing button taps on mobile */}
+      <div className="zoom-controls" onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
         {/* Reset / Fit */}
         <button
           className="btn-zoom btn-zoom-reset"
