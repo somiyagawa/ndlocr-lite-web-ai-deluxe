@@ -8,20 +8,22 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
-    version: '4.3.4',
+    version: '4.3.5',
     date: '2026-03-27',
     changes: {
       ja: [
-        '携帯版: 画像補正パネルをよりコンパクトに（max-height 32vh、余白・間隔縮小）',
-        '携帯版: スライダーのつまみを26px・トラックを8pxに拡大し、タッチ操作を改善',
-        '携帯版: チェックボックスを20pxに拡大し、タッチ操作を改善',
-        '携帯版: 画像補正パネルを半透明化（backdrop-filter: blur）— 背面の画像を透かして確認可能',
+        '携帯版: 画像補正パネルを超コンパクト化（max-height 28vh、ヘッダー・セクションラベル非表示）',
+        '携帯版: スライダーを横一行レイアウトに変更（ラベル＋スライダー＋数値が一行）',
+        '携帯版: スライダーにtouch-action: none＋stopPropagationを追加 — パネルスクロールとの干渉を解消',
+        '携帯版: パネル半透明化（backdrop-filter: blur）— 背面の画像を透かして確認可能',
+        '携帯版: ボタン・チェックボックス・つまみをタッチサイズに最適化',
       ],
       en: [
-        'Mobile: image correction panel more compact (max-height 32vh, reduced padding/gaps)',
-        'Mobile: slider thumbs enlarged to 26px, track to 8px for better touch control',
-        'Mobile: toggle checkboxes enlarged to 20px for better touch targets',
-        'Mobile: preprocess panel now semi-transparent with backdrop blur — image partially visible behind',
+        'Mobile: ultra-compact preprocess panel (max-height 28vh, header and section labels hidden)',
+        'Mobile: sliders in horizontal inline layout (label + slider + value on one row)',
+        'Mobile: touch-action: none + stopPropagation on sliders — fixes scroll conflict during drag',
+        'Mobile: panel semi-transparent with backdrop blur — image visible behind',
+        'Mobile: buttons, checkboxes, slider thumbs optimized for touch targets',
       ],
     },
   },
@@ -517,7 +519,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.4</span>
+        >v4.3.5</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
