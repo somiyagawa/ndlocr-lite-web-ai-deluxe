@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.4.1-teal?style=for-the-badge" alt="v4.4.1" />
+  <img src="https://img.shields.io/badge/version-4.4.2-teal?style=for-the-badge" alt="v4.4.2" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.4.2 — 2026-03-27
+
+**テキスト付きPDF日本語文字化け修正** — PDFエクスポート時に CJK フォント（Noto Sans JP Regular）を Google Fonts から動的取得し jsPDF に登録することで、埋め込みテキストレイヤーの日本語文字化けを修正。取得した TTF は IndexedDB にキャッシュし2回目以降の高速化を実現。単一ページ・複数ページ一括エクスポートの両方に対応。
 
 ### v4.4.1 — 2026-03-27
 

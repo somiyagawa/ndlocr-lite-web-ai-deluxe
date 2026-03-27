@@ -8,6 +8,7 @@
 
 import { jsPDF } from 'jspdf'
 import type { OCRResult } from '../types/ocr'
+import { registerCJKFont } from './pdfFont'
 
 /**
  * dataURL から画像の自然サイズを取得
@@ -57,6 +58,10 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
     format: [pdfW, pdfH],
   })
 
+  // CJK フォントを登録（日本語テキストの文字化け防止）
+  const cjkFontName = await registerCJKFont(doc)
+  const fontName = cjkFontName ?? 'Helvetica'
+
   // 背景画像を配置
   const format = getImageFormat(imageDataUrl)
   doc.addImage(imageDataUrl, format, 0, 0, pdfW, pdfH)
@@ -77,21 +82,17 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
     const bh = block.height * scaleY
 
     // テキストブロックの高さに合わせたフォントサイズを推定
-    // 縦書き文書: 幅に基づいてフォントサイズを決定
-    // 横書き文書: 高さに基づいてフォントサイズを決定
     const isVerticalBlock = block.height > block.width * 1.5
     let fontSize: number
 
     if (isVerticalBlock) {
-      // 縦書き: 幅がほぼ1文字分
       fontSize = Math.max(4, Math.min(bw * 0.85, 48))
     } else {
-      // 横書き: 高さがほぼ1行分
       fontSize = Math.max(4, Math.min(bh * 0.75, 48))
     }
 
     // 透明テキストを描画（renderingMode 3 = invisible）
-    doc.setFont('Helvetica')
+    doc.setFont(fontName)
     doc.setFontSize(fontSize)
     doc.setTextColor(0, 0, 0)
 
@@ -99,7 +100,6 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
     doc.internal.write('3 Tr') // Set text rendering mode to invisible
 
     if (isVerticalBlock) {
-      // 縦書き: 1文字ずつ縦に配置
       const chars = block.text.replace(/\n/g, '')
       const charHeight = fontSize * 1.2
       let cy = by + fontSize
@@ -109,13 +109,11 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
         cy += charHeight
       }
     } else {
-      // 横書き: テキスト全体を配置
       doc.text(block.text.replace(/\n/g, ' '), bx, by + fontSize, {
         maxWidth: bw,
       })
     }
 
-    // テキストレンダリングモードを元に戻す
     // @ts-expect-error - jsPDF internal API
     doc.internal.write('0 Tr')
   }
@@ -133,6 +131,7 @@ export async function downloadBatchPDF(results: OCRResult[]): Promise<void> {
   if (results.length === 0) return
 
   let doc: jsPDF | null = null
+  let fontName = 'Helvetica'
   const DPI = 150
 
   for (let pageIdx = 0; pageIdx < results.length; pageIdx++) {
@@ -147,6 +146,9 @@ export async function downloadBatchPDF(results: OCRResult[]): Promise<void> {
 
     if (doc === null) {
       doc = new jsPDF({ orientation, unit: 'pt', format: [pdfW, pdfH] })
+      // CJK フォントを登録（最初のページ作成時に1回だけ）
+      const cjkFontName = await registerCJKFont(doc)
+      fontName = cjkFontName ?? 'Helvetica'
     } else {
       doc.addPage([pdfW, pdfH], orientation)
     }
@@ -173,7 +175,7 @@ export async function downloadBatchPDF(results: OCRResult[]): Promise<void> {
         fontSize = Math.max(4, Math.min(bh * 0.75, 48))
       }
 
-      doc.setFont('Helvetica')
+      doc.setFont(fontName)
       doc.setFontSize(fontSize)
       doc.setTextColor(0, 0, 0)
       // @ts-expect-error - jsPDF internal API for invisible text rendering

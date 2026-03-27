@@ -8,6 +8,22 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.2',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        'テキスト付きPDFエクスポート: CJKフォント（Noto Sans JP）を動的取得・登録し、日本語テキストの文字化けを修正',
+        'PDFフォントキャッシュ: Google Fonts TTFをIndexedDBにキャッシュし、2回目以降の高速化を実現',
+        '一括PDFエクスポート: 複数ページPDFでも日本語テキスト埋め込みに対応（全ページでCJKフォント使用）',
+      ],
+      en: [
+        'PDF export: dynamically fetch and register CJK font (Noto Sans JP) to fix garbled Japanese text in embedded text layer',
+        'PDF font cache: cache Google Fonts TTF in IndexedDB for faster subsequent exports',
+        'Batch PDF export: apply CJK font to all pages in multi-page PDF for correct Japanese text embedding',
+      ],
+    },
+  },
+  {
     version: '4.4.1',
     date: '2026-03-27',
     changes: {
@@ -555,7 +571,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.4.1</span>
+        >v4.4.2</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
