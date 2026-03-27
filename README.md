@@ -204,7 +204,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ### v4.4.2 — 2026-03-27
 
-**テキスト付きPDF日本語文字化け修正** — PDFエクスポート時に CJK フォント（Noto Sans JP Regular）を Google Fonts から動的取得し jsPDF に登録することで、埋め込みテキストレイヤーの日本語文字化けを修正。取得した TTF は IndexedDB にキャッシュし2回目以降の高速化を実現。単一ページ・複数ページ一括エクスポートの両方に対応。
+**テキスト付きPDF日本語文字化け根本修正** — PDFライブラリを jsPDF から **pdf-lib + fontkit** に全面移行し、日本語テキスト埋め込みの文字化けを根本的に修正。jsPDF のビルトインフォント（Helvetica）は Latin-1 のみ対応であったため、CJK 文字が正しくエンコードされなかった。pdf-lib は Unicode を正しく処理し、Google Fonts から Noto Sans JP (woff2) を動的取得してフォントサブセットとして埋め込む。取得したフォントは IndexedDB にキャッシュし2回目以降を高速化。また、jsPDF の非公式 API (`internal.write('3 Tr')`) による Acrobat エラーを解消し、pdf-lib の `opacity: 0` による正規の不可視テキストレイヤーに変更。PDF座標系も左下原点に正しく対応し、縦書き・横書き両方のテキスト位置を正確に配置。
 
 ### v4.4.1 — 2026-03-27
 

@@ -12,14 +12,16 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     date: '2026-03-27',
     changes: {
       ja: [
-        'テキスト付きPDFエクスポート: CJKフォント（Noto Sans JP）を動的取得・登録し、日本語テキストの文字化けを修正',
-        'PDFフォントキャッシュ: Google Fonts TTFをIndexedDBにキャッシュし、2回目以降の高速化を実現',
-        '一括PDFエクスポート: 複数ページPDFでも日本語テキスト埋め込みに対応（全ページでCJKフォント使用）',
+        'テキスト付きPDFエクスポート: PDFライブラリをjsPDFからpdf-lib + fontkitに全面移行し、日本語テキスト埋め込みの文字化けを根本修正',
+        'PDF CJKフォント: Google FontsからNoto Sans JP (woff2) を動的取得、IndexedDBキャッシュで2回目以降を高速化、フォントサブセット埋め込みでファイルサイズ最適化',
+        'PDF透明テキスト: jsPDFの非公式API (internal.write) によるAcrobatエラーを解消、pdf-libのopacity:0による正規の不可視テキストレイヤーに変更',
+        'PDF座標系修正: pdf-libの左下原点座標系に対応、縦書き・横書き両方のテキスト位置を正確に配置',
       ],
       en: [
-        'PDF export: dynamically fetch and register CJK font (Noto Sans JP) to fix garbled Japanese text in embedded text layer',
-        'PDF font cache: cache Google Fonts TTF in IndexedDB for faster subsequent exports',
-        'Batch PDF export: apply CJK font to all pages in multi-page PDF for correct Japanese text embedding',
+        'PDF export: migrated from jsPDF to pdf-lib + fontkit, fundamentally fixing garbled Japanese text in the embedded text layer',
+        'PDF CJK font: dynamically fetch Noto Sans JP (woff2) from Google Fonts, cache in IndexedDB for speed, embed as font subset for optimized file size',
+        'PDF invisible text: replaced jsPDF internal.write hack (caused Acrobat errors) with pdf-lib opacity:0 for standards-compliant invisible text layer',
+        'PDF coordinate fix: adapted to pdf-lib bottom-left origin, correctly positioning both vertical and horizontal text blocks',
       ],
     },
   },
