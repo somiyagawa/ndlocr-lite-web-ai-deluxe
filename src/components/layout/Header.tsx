@@ -8,6 +8,42 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.1',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像補正パネルに✕閉じるボタンを追加（ボトムシート右上に丸形ボタン）',
+        'バグ報告: mailto送信方式をwindow.location.hrefに変更 — COOPヘッダー環境・モバイルでの送信失敗を修正',
+        'バグ報告: 送信メール本文のバージョン表記を v4.4.1 に更新',
+      ],
+      en: [
+        'Mobile: added close button to image correction panel (circular button at top-right of bottom sheet)',
+        'Bug report: changed mailto method to window.location.href — fixes submission failure under COOP headers and on mobile',
+        'Bug report: updated app version in email body to v4.4.1',
+      ],
+    },
+  },
+  {
+    version: '4.4.0',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: ノッチ付き端末（iPhone等）対応 — env(safe-area-inset-*) をヘッダー・ドロワー・ボトムシート・FABに適用',
+        '携帯版: 仮想キーボード対応 — vh → dvh（dynamic viewport height）に変更し、キーボード表示時のレイアウト崩れを防止',
+        '携帯版: viewport-fit=cover メタタグ追加（セーフエリア対応の前提条件）',
+        'OCR処理中の進捗表示を改善 — スピナーアニメーション追加、パーセンテージ表示、1ファイル処理時も状態表示',
+        'ダークモード自動検出 — OS設定の prefers-color-scheme: dark を初回起動時に自動反映（既存機能の確認）',
+      ],
+      en: [
+        'Mobile: notched device support — env(safe-area-inset-*) applied to header, drawer, bottom sheets, FAB',
+        'Mobile: virtual keyboard support — vh → dvh (dynamic viewport height) prevents layout collapse when keyboard opens',
+        'Mobile: added viewport-fit=cover meta tag (prerequisite for safe-area insets)',
+        'Improved OCR progress display — spinner animation, percentage indicator, status shown for single-file processing',
+        'Dark mode auto-detection — prefers-color-scheme: dark reflected on first launch (existing feature verified)',
+      ],
+    },
+  },
+  {
     version: '4.3.5',
     date: '2026-03-27',
     changes: {
@@ -519,7 +555,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.5</span>
+        >v4.4.1</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
