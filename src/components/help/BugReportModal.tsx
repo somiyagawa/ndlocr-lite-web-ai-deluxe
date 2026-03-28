@@ -158,7 +158,7 @@ function getBrowserInfo(): string {
   return `${ua} | Screen: ${screen}`
 }
 
-const APP_VERSION = '4.4.3'
+const APP_VERSION = '4.4.4'
 
 /**
  * Web3Forms アクセスキー（オプション）
