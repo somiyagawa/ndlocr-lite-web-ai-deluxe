@@ -13,14 +13,16 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     changes: {
       ja: [
         'PDF座標系修正（重要）: OCRブロック座標は元画像（数千px）基準だが、imageDataUrlはサムネイル（最大200px幅）だったため、テキストがPDF上部に集中する問題を修正 — OCRResultにoriginalWidth/originalHeightを追加し、元画像サイズ基準で正しくスケーリング',
-        'PDFテキストレイヤー: 複数drawTextによる半角スペース誤挿入を根本解消 — 縦書き・横書きを問わず1ブロック=1回のdrawTextに統一',
-        'PDFテキスト配置: ブロック中央付近にテキストベースラインを配置するよう変更',
+        'PDF縦書きテキスト配置: 1文字ずつ正しいY座標に配置 — 各文字が対応する画像位置に重なるよう charStep = blockHeight / charCount で等間隔配置',
+        'PDF横書きテキスト: 1ブロック=1回のdrawTextに統一し、半角スペース誤挿入を解消',
+        'PDF履歴復元修正: 履歴からの読込時にブロック座標がサムネイル基準にリスケールされた場合、originalWidth/originalHeightを未設定にして座標系の不整合を防止',
         'バグ報告: Web3Formsキー未設定時にGitHub Issuesへのフォールバックを追加 — COOP環境でも動作するwindow.location.href遷移',
       ],
       en: [
         'PDF coordinate fix (critical): OCR block coordinates are in original image space (thousands of px) but imageDataUrl was a thumbnail (max 200px wide), causing all text to cluster at the top — added originalWidth/originalHeight to OCRResult for correct scaling',
-        'PDF text layer: eliminated half-width space artifacts from multiple drawText calls — unified to 1 block = 1 drawText for both vertical and horizontal text',
-        'PDF text positioning: text baseline now placed at vertical center of each block',
+        'PDF vertical text placement: per-character positioning at correct Y coordinates — each character overlaps its corresponding image position using charStep = blockHeight / charCount',
+        'PDF horizontal text: unified to 1 block = 1 drawText, eliminating half-width space artifacts',
+        'PDF history restoration fix: when blocks are rescaled to thumbnail coords on history load, originalWidth/originalHeight are cleared to prevent coordinate system mismatch',
         'Bug report: added GitHub Issues fallback when Web3Forms key is not set — uses window.location.href redirect compatible with COOP headers',
       ],
     },
