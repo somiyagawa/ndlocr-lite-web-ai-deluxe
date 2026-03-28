@@ -25,7 +25,8 @@ import fontkit from '@pdf-lib/fontkit'
 import type { OCRResult } from '../types/ocr'
 import { loadCJKFontBytes } from './pdfFont'
 
-const TEXT_OPACITY = 0.01
+// デバッグ: 0.3 にしてテキスト配置を目視確認 → 本番では 0.01 に戻す
+const TEXT_OPACITY = 0.3
 
 // CJK全角文字の幅は概ね fontSize の 0.5〜0.6 倍（フォント依存）
 const CJK_WIDTH_RATIO = 0.55
@@ -173,27 +174,46 @@ async function addPageToPdf(
 ): Promise<void> {
   const { width: imgW, height: imgH } = await getImageDimensions(imageDataUrl)
 
-  // ブロック座標の基準サイズ:
-  //   originalWidth/originalHeight が渡された場合 → 元画像サイズ（ブロック座標の基準）
-  //   渡されない場合 → imageDataUrl の実サイズ（サムネイルの場合あり）をフォールバック
-  const coordW = blockCoordWidth && blockCoordWidth > 0 ? blockCoordWidth : imgW
-  const coordH = blockCoordHeight && blockCoordHeight > 0 ? blockCoordHeight : imgH
+  // ブロック座標の基準サイズを決定
+  let coordW = blockCoordWidth && blockCoordWidth > 0 ? blockCoordWidth : imgW
+  let coordH = blockCoordHeight && blockCoordHeight > 0 ? blockCoordHeight : imgH
 
-  // PDF ページサイズは元画像サイズ基準で計算（高解像度PDFを生成）
+  // 安全チェック: ブロック座標が coordW/coordH を大きく超える場合、
+  // coordW/coordH が間違っている可能性が高い → ブロック座標から推定する
+  const blocks = result.textBlocks.filter(b => b.text.trim())
+  if (blocks.length > 0) {
+    const maxBlockX = Math.max(...blocks.map(b => b.x + b.width))
+    const maxBlockY = Math.max(...blocks.map(b => b.y + b.height))
+    if (maxBlockX > coordW * 1.1 || maxBlockY > coordH * 1.1) {
+      console.warn(
+        `[exportPDF] Block coords exceed coordW/coordH — blocks max: ${maxBlockX}x${maxBlockY}, ` +
+        `coord: ${coordW}x${coordH}, image: ${imgW}x${imgH}. Using block extent as coord basis.`
+      )
+      coordW = Math.max(coordW, maxBlockX)
+      coordH = Math.max(coordH, maxBlockY)
+    }
+  }
+
+  console.log(
+    `[exportPDF] image: ${imgW}x${imgH}, coordBasis: ${coordW}x${coordH}, ` +
+    `originalW/H: ${blockCoordWidth ?? 'none'}x${blockCoordHeight ?? 'none'}, ` +
+    `blocks: ${blocks.length}`
+  )
+
+  // PDF ページサイズは座標基準サイズで計算
   const DPI = 150
   const pdfW = (coordW / DPI) * 72
   const pdfH = (coordH / DPI) * 72
 
   const page = pdfDoc.addPage([pdfW, pdfH])
   const image = await embedImage(pdfDoc, imageDataUrl)
-  // 画像はページ全体に引き伸ばして配置（サムネイルでも元サイズのページに拡大表示）
+  // 画像はページ全体に引き伸ばして配置
   page.drawImage(image, { x: 0, y: 0, width: pdfW, height: pdfH })
 
   if (!font) return
 
-  const sortedBlocks = [...result.textBlocks].sort((a, b) => a.readingOrder - b.readingOrder)
+  const sortedBlocks = [...blocks].sort((a, b) => a.readingOrder - b.readingOrder)
   // ブロック座標 → PDF座標への変換係数
-  // ブロック座標は coordW × coordH の空間、PDF座標は pdfW × pdfH の空間
   const scaleX = pdfW / coordW
   const scaleY = pdfH / coordH
 
@@ -207,6 +227,14 @@ async function addPageToPdf(
     const bh = block.height * scaleY
 
     const isVertical = block.height / block.width >= VERTICAL_ASPECT_RATIO
+
+    // デバッグ: 全ブロックの座標を出力
+    console.log(
+      `[exportPDF] block[${sortedBlocks.indexOf(block)}]: ` +
+      `orig(${block.x.toFixed(0)},${block.y.toFixed(0)},${block.width.toFixed(0)}x${block.height.toFixed(0)}) → ` +
+      `pdf(x=${bx.toFixed(1)},y=${(byTop - bh).toFixed(1)}..${byTop.toFixed(1)},${bw.toFixed(1)}x${bh.toFixed(1)}) ` +
+      `${isVertical ? 'VERT' : 'HORIZ'} "${block.text.slice(0, 15)}"`
+    )
 
     if (isVertical) {
       // ---- 縦書きブロック: 1文字ずつ正しいY座標に配置 ----

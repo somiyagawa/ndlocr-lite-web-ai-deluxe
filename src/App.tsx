@@ -527,6 +527,7 @@ export default function App() {
     const restoredResults: OCRResult[] = await Promise.all(
       run.files.map(async (file, i) => {
         let textBlocks = file.textBlocks
+        let blocksWereRescaled = false
         // 元画像サイズが記録されている場合、サムネイルとの比率でブロック座標を変換
         if (file.originalWidth && file.originalHeight && file.originalWidth > 0) {
           const thumbSize = await new Promise<{ w: number; h: number }>((resolve) => {
@@ -538,6 +539,7 @@ export default function App() {
           const scaleX = thumbSize.w / file.originalWidth
           const scaleY = thumbSize.h / file.originalHeight
           if (Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
+            blocksWereRescaled = true
             textBlocks = file.textBlocks.map(b => ({
               ...b,
               x: b.x * scaleX,
@@ -555,8 +557,11 @@ export default function App() {
           fullText: file.fullText,
           processingTimeMs: file.processingTimeMs,
           createdAt: run.createdAt,
-          originalWidth: file.originalWidth,
-          originalHeight: file.originalHeight,
+          // ブロック座標がサムネイルにリスケール済み → originalWidth/Height は設定しない
+          // （exportPDF が getImageDimensions でサムネイルサイズを取得し、座標と一致させる）
+          // リスケールなし → 元画像サイズを保持（座標がそのまま元画像基準）
+          originalWidth: blocksWereRescaled ? undefined : file.originalWidth,
+          originalHeight: blocksWereRescaled ? undefined : file.originalHeight,
         }
       })
     )
