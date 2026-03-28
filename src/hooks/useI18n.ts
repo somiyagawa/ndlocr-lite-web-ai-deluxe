@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   type Language,
   type TranslationParams,
@@ -14,6 +14,11 @@ export function useI18n() {
     (key: string, params?: TranslationParams) => createTranslator(lang)(key, params),
     [lang]
   )
+
+  // Set data-lang attribute on document root when language changes
+  useEffect(() => {
+    document.documentElement.dataset.lang = lang
+  }, [lang])
 
   // For <select onChange> — reads value from the event
   const toggleLanguage = useCallback((e?: React.ChangeEvent<HTMLSelectElement> | Language) => {

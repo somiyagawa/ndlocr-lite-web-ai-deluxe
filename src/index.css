@@ -302,11 +302,45 @@ body {
 [data-lang="egy"] .header-title-main,
 [data-lang="egy"] .header-title-accent,
 [data-lang="egy"] .header-subtitle,
-[data-lang="akk"] .header-title-main,
-[data-lang="sux"] .header-title-main,
-[data-lang="hit"] .header-title-main {
+[data-lang="egy"] .footer,
+[data-lang="egy"] .panel,
+[data-lang="egy"] .help-panel,
+[data-lang="egy"] .btn {
+  font-family: 'Noto Sans Egyptian Hieroglyphs', 'Aegyptus', serif;
   font-size: 1.1em;
   line-height: 1.8;
+  font-feature-settings: 'ccmp' 1, 'liga' 1;
+}
+[data-lang="akk"] .header-title-main,
+[data-lang="akk"] .footer,
+[data-lang="akk"] .panel,
+[data-lang="sux"] .header-title-main,
+[data-lang="sux"] .footer,
+[data-lang="sux"] .panel,
+[data-lang="hit"] .header-title-main,
+[data-lang="hit"] .footer,
+[data-lang="hit"] .panel {
+  font-family: 'Noto Sans Cuneiform', serif;
+  font-size: 1.1em;
+  line-height: 1.8;
+}
+[data-lang="cop"] .header-title-main,
+[data-lang="cop"] .footer,
+[data-lang="cop"] .panel,
+[data-lang="cop"] .btn {
+  font-family: 'Noto Sans Coptic', serif;
+}
+[data-lang="syc"] .header-title-main,
+[data-lang="syc"] .footer,
+[data-lang="syc"] .panel,
+[data-lang="syc"] .btn {
+  font-family: 'Noto Sans Syriac', serif;
+}
+[data-lang="got"] .header-title-main,
+[data-lang="got"] .footer,
+[data-lang="got"] .panel,
+[data-lang="got"] .btn {
+  font-family: 'Noto Sans Gothic', serif;
 }
 
 a {

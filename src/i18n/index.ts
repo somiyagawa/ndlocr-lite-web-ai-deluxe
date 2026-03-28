@@ -172,6 +172,23 @@ export function createTranslator(lang: Language) {
   }
 }
 
+/**
+ * Standalone translation resolver: t(lang, 'section.key') → translated string.
+ * Falls back to English, then returns the key itself.
+ */
+export function t(lang: Language, key: string, params?: TranslationParams): string {
+  let text = getNestedValue(translations[lang] as unknown as Record<string, unknown>, key)
+  if (text === key && lang !== 'en') {
+    text = getNestedValue(translations.en as unknown as Record<string, unknown>, key)
+  }
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(`{${k}}`, String(v))
+    }
+  }
+  return text
+}
+
 export const LANG_STORAGE_KEY = 'ndlocrlite_lang'
 
 export function getStoredLang(): Language {

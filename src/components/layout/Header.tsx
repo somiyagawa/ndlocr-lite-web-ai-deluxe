@@ -1,5 +1,5 @@
 import { memo, useState, useCallback } from 'react'
-import { LANGUAGES, LANGUAGE_LABELS, L } from '../../i18n'
+import { LANGUAGES, LANGUAGE_LABELS, L, t } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Theme } from '../../hooks/useTheme'
@@ -950,13 +950,6 @@ export const Header = memo(function Header({
     ?? STATUS_LABELS[aiConnectionStatus]?.en
     ?? ''
 
-  const THEME_LABELS: Record<string, Record<string, string>> = {
-    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड', ru: 'Перейти в светлый режим', el: 'Αλλαγή σε λαμπερή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܢܘܗܪܐ', cop: 'ⲙⲉⲧⲟⲩⲟⲣⲱⲧ ⲉⲡⲟⲩⲟⲓ', sa: 'ज्योतिर्मोड-प्रवेशम्' },
-    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड', ru: 'Перейти в темный режим', el: 'Αλλαγή σε σκοτεινή λειτουργία', syc: 'ܫܘܢܐ ܠܓܢܒܐ ܕܚܫܡܐ', cop: 'ⲙⲉⲧⲟⲩⲟⲣⲱⲧ ⲉⲡܚܫܡܐ', sa: 'तामस-मोड-प्रवेशम्' },
-    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास', ru: 'История', el: 'Ιστορικό', syc: 'ܬ̈ܫ̈ܥ̈ܝ̈ܬ', cop: 'ⲧⲁⲓⲟ', sa: 'चरितम्' },
-    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स', ru: 'Параметры', el: 'Ρυθμίσεις', syc: 'ܛ̈ܘ̈ܟ̈ܣ̈ܐ', cop: 'ⲛⲓⲥⲉⲧⲧⲓⲛⲅⲥ', sa: 'विन्यासाः' },
-    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका', ru: 'Руководство пользователя', el: 'Οδηγός χρήστη', syc: 'ܡܠܦܢܬܐ ܕܦܠܓܐ', cop: 'ⲡⲙⲁⲧⲟⲉ', sa: 'उपयोगकर्ता-मार्गदर्शनम्' },
-  }
 
   const FLAG_EMOJI: Record<string, string> = {
     ja: '\u{1F1EF}\u{1F1F5}',      // 🇯🇵
@@ -1010,8 +1003,8 @@ export const Header = memo(function Header({
   }
 
   const themeTitle = theme === 'dark'
-    ? (THEME_LABELS.toLight[lang] ?? THEME_LABELS.toLight.en)
-    : (THEME_LABELS.toDark[lang] ?? THEME_LABELS.toDark.en)
+    ? t(lang, 'header.switchToLight')
+    : t(lang, 'header.switchToDark')
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [showChangelog, setShowChangelog] = useState(false)
@@ -1035,12 +1028,7 @@ export const Header = memo(function Header({
     setShowChangelog(true)
   }, [])
 
-  const changelogTitle = L(lang, {
-    ja: '更新履歴', en: 'Changelog', 'zh-CN': '更新日志', 'zh-TW': '更新紀錄', ko: '업데이트 기록',
-    la: 'Historia mutationum', eo: 'Ŝanĝoprotokolo', es: 'Registro de cambios', de: 'Änderungsprotokoll',
-    ar: 'سجل التغييرات', hi: 'परिवर्तन लॉग', ru: 'Журнал изменений', el: 'Αρχείο αλλαγών',
-    syc: 'ܫ̈ܘ̈ܚ̈ܠ̈ܦ̈ܐ', cop: 'ⲡⲓⲥϧⲁⲓ ⲛⲧⲉ ⲛⲓϣⲟⲃⲧ', sa: 'परिवर्तन-सूची'
-  })
+  const changelogTitle = t(lang, 'header.changelog')
 
   return (
     <header className="header">
@@ -1069,24 +1057,7 @@ export const Header = memo(function Header({
         <div className="header-title-text">
           <span className="header-title-main">NDL(Kotenseki)OCR-lite Web AI</span>
           <span className="header-title-accent">Ultra <span className="bluepond-blue">Blue</span>pond</span>
-          <span className="header-subtitle">{L(lang, {
-            ja: '現代の活字からくずし字まで',
-            en: 'Modern print to kuzushiji',
-            'zh-CN': '现代印刷体到古典草书',
-            'zh-TW': '現代印刷體到古典草書',
-            ko: '현대 인쇄체에서 흘림체까지',
-            la: 'A typis modernis ad kuzushiji',
-            eo: 'De moderna presaĵo ĝis kuzushiji',
-            es: 'Del texto moderno al kuzushiji',
-            de: 'Vom Druck bis Kuzushiji',
-            ar: 'من الطباعة الحديثة إلى الكوزوشيجي',
-            hi: 'आधुनिक मुद्रण से कुज़ुशिजी तक',
-            ru: 'От печати до кудзусидзи',
-            el: 'Από τυπωμένα κείμενα έως κουζουσίτζι',
-            syc: 'ܡܢ ܐܬܘ̈ܬ ܛܒ̈ܥܐ ܥܕܡܐ ܠܟ̈ܘ̈ܙ̈ܘ̈ܫ̈ܝ̈ܓ̈ܝ',
-            cop: 'Ⲓⲥϫⲉⲛ ⲛⲓⲧⲩⲡⲟⲥ ϣⲁ ⲛⲓⲕⲟⲩⲍⲟⲩϣⲓϫⲓ',
-            sa: 'आधुनिक-मुद्रणात् कुज़ुशिजी-पर्यन्तम्',
-          })}</span>
+          <span className="header-subtitle">{t(lang, 'header.subtitle')}</span>
         </div>
         <span
           className="header-version header-version-pulse header-version-clickable"
@@ -1150,13 +1121,13 @@ export const Header = memo(function Header({
           <button
             className="btn-icon drawer-menu-item"
             onClick={() => { onOpenSettings(); setMenuOpen(false) }}
-            title={THEME_LABELS.settings[lang] ?? 'Settings'}
+            title={t(lang, 'header.settings')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
-            <span className="drawer-label">{THEME_LABELS.settings[lang] ?? 'Settings'}</span>
+            <span className="drawer-label">{t(lang, 'header.settings')}</span>
           </button>
         </div>
 
@@ -1165,14 +1136,14 @@ export const Header = memo(function Header({
           <button
             className="btn-icon drawer-menu-item"
             onClick={() => { onOpenHelp(); setMenuOpen(false) }}
-            title={THEME_LABELS.help[lang] ?? 'User Guide'}
+            title={t(lang, 'header.userGuide')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-            <span className="drawer-label">{THEME_LABELS.help[lang] ?? 'User Guide'}</span>
+            <span className="drawer-label">{t(lang, 'header.userGuide')}</span>
           </button>
           <button
             className="btn-icon btn-theme-toggle drawer-menu-item"
@@ -1202,13 +1173,13 @@ export const Header = memo(function Header({
           <button
             className="btn-icon drawer-menu-item"
             onClick={() => { onOpenHistory(); setMenuOpen(false) }}
-            title={THEME_LABELS.history[lang] ?? 'History'}
+            title={t(lang, 'header.history')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 8v4l3 3" />
               <circle cx="12" cy="12" r="10" />
             </svg>
-            <span className="drawer-label">{THEME_LABELS.history[lang] ?? 'History'}</span>
+            <span className="drawer-label">{t(lang, 'header.history')}</span>
           </button>
 
           {/* OCR Mode switcher — auto / modern / koten (3-way toggle) */}
