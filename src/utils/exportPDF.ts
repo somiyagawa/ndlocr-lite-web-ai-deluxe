@@ -6,6 +6,18 @@
  * これによりPDF上でテキスト検索・選択が可能になる。
  *
  * pdf-lib + fontkit を使用し、CJK (日本語) テキストを正しくエンコードする。
+ *
+ * === テキストレイヤー設計方針 ===
+ * テキストレイヤーは不可視 (opacity: 0.01) であり、
+ * 検索・選択のみに使用される。したがって:
+ *   - 視覚的な位置精度は不要（ブロック左上付近に配置すれば十分）
+ *   - 各ブロックのテキストは 1 回の drawText で一括描画する
+ *     （1 文字ずつ描画すると PDF ビューアが文字間ギャップを
+ *       半角スペースと誤認する問題を回避）
+ *   - maxWidth は使用しない
+ *     （pdf-lib はスペースで折り返すため、スペースのない日本語で機能しない）
+ *   - 縦書き・横書きの区別なく横方向に描画する
+ *     （不可視なので向きは無関係、テキスト内容のみが重要）
  */
 
 import { PDFDocument, rgb } from 'pdf-lib'
@@ -65,19 +77,18 @@ async function embedImage(pdfDoc: PDFDocument, dataUrl: string) {
 
 /**
  * テキストからフォントでエンコードできない文字を除去する。
- * 1文字ずつ encodeText を試すのではなく、
- * 文字列全体を一度に試し、失敗した場合のみ文字単位でフィルタする。
+ * 文字列全体を一度に試し、成功すればそのまま返す（高速パス）。
+ * 失敗した場合のみ文字単位でフィルタする。
  */
 function filterEncodableText(
   font: Awaited<ReturnType<PDFDocument['embedFont']>>,
   text: string,
 ): string {
-  // まず文字列全体を試す（大半のケースでこれが成功 → 高速）
   try {
     font.encodeText(text)
     return text
   } catch {
-    // 失敗した場合のみ文字単位でフィルタ
+    // 失敗時のみ文字単位フィルタ
   }
 
   let result = ''
@@ -117,7 +128,6 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
 
   await addPageToPdf(pdfDoc, result, imageDataUrl, font)
 
-  // ダウンロード
   const pdfBytes = await pdfDoc.save()
   const baseName = result.fileName.replace(/\.[^/.]+$/, '')
   triggerDownload(pdfBytes, `${baseName}_ocr.pdf`)
@@ -125,7 +135,6 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
 
 /**
  * 複数ページのOCR結果を1つのPDFファイルとしてダウンロード
- * 各ページが1ページとなる複数ページPDFを生成
  *
  * @param results - OCR結果配列
  * @param fullImageDataUrls - 各ページのフルサイズ画像 dataURL 配列（オプション）
@@ -139,7 +148,6 @@ export async function downloadBatchPDF(
   const pdfDoc = await PDFDocument.create()
   pdfDoc.registerFontkit(fontkit)
 
-  // CJK フォント読み込み（ドキュメント単位で1回だけ）
   const fontBytes = await loadCJKFontBytes()
   const font = fontBytes
     ? await pdfDoc.embedFont(fontBytes, { subset: false })
@@ -151,7 +159,6 @@ export async function downloadBatchPDF(
 
   for (let i = 0; i < results.length; i++) {
     const result = results[i]
-    // フルサイズ画像があればそちらを使用、なければサムネイルにフォールバック
     const imageDataUrl = fullImageDataUrls?.[i] || result.imageDataUrl
     if (!imageDataUrl) continue
     await addPageToPdf(pdfDoc, result, imageDataUrl, font)
@@ -167,6 +174,10 @@ export async function downloadBatchPDF(
 
 /**
  * PDFDocument に1ページを追加（画像背景 + 透明テキストレイヤー）
+ *
+ * テキストは各ブロックにつき 1 回の drawText で一括描画する。
+ * 1 文字ずつ描画すると PDF ビューアがギャップを半角スペースと
+ * 誤認するため、必ず連続した文字列として描画する。
  */
 async function addPageToPdf(
   pdfDoc: PDFDocument,
@@ -176,7 +187,6 @@ async function addPageToPdf(
 ): Promise<void> {
   const { width: imgW, height: imgH } = await getImageDimensions(imageDataUrl)
 
-  // PDF サイズ（150dpi 基準でポイント変換）
   const DPI = 150
   const pdfW = (imgW / DPI) * 72
   const pdfH = (imgH / DPI) * 72
@@ -187,13 +197,10 @@ async function addPageToPdf(
   const image = await embedImage(pdfDoc, imageDataUrl)
   page.drawImage(image, { x: 0, y: 0, width: pdfW, height: pdfH })
 
-  // フォントが無ければテキスト埋め込みスキップ
   if (!font) return
 
-  // テキストブロックを読み順で並べてテキストレイヤーを重ねる
   const sortedBlocks = [...result.textBlocks].sort((a, b) => a.readingOrder - b.readingOrder)
 
-  // スケールファクター（画像ピクセル → PDFポイント）
   const scaleX = pdfW / imgW
   const scaleY = pdfH / imgH
 
@@ -203,71 +210,38 @@ async function addPageToPdf(
     const bx = block.x * scaleX
     // pdf-lib は左下原点なので Y を反転
     const by = pdfH - (block.y * scaleY)
-    const bw = block.width * scaleX
     const bh = block.height * scaleY
 
-    const isVerticalBlock = block.height > block.width * 1.5
-    let fontSize: number
+    // フォントサイズ: ブロック高さから推定（小さすぎず大きすぎず）
+    // 不可視テキストなので正確さよりも存在が重要
+    const fontSize = Math.max(4, Math.min(bh * 0.15, 24))
 
-    if (isVerticalBlock) {
-      fontSize = Math.max(4, Math.min(bw * 0.85, 48))
-    } else {
-      fontSize = Math.max(4, Math.min(bh * 0.75, 48))
-    }
-
-    // テキストをフォントでエンコード可能な文字のみに絞る
-    // （文字列全体を一括チェック → 失敗時のみ文字単位フィルタ）
+    // 改行を除去し、エンコード可能な文字のみに絞る
     const rawText = block.text.replace(/\n/g, '')
     const safeText = filterEncodableText(font, rawText)
     if (!safeText.trim()) continue
 
+    // ブロック全体のテキストを 1 回の drawText で描画。
+    // - 1 文字ずつ描画しない（ビューアがギャップを半角スペースと誤認するため）
+    // - maxWidth を使わない（pdf-lib はスペースで折り返すため日本語で機能しない）
+    // - 縦書き/横書きの区別なし（不可視テキストなので向きは無関係）
     try {
-      if (isVerticalBlock) {
-        // 縦書き: ブロック上端から1文字ずつ下へ配置
-        // drawText は横書きなので、縦書きは1文字ずつ配置が必要
-        const charHeight = fontSize * 1.2
-        let cy = by - fontSize
-        for (const ch of safeText) {
-          if (cy < by - bh) break
-          if (!ch.trim()) { cy -= charHeight; continue }
-          page.drawText(ch, {
-            x: bx + bw * 0.3,
-            y: cy,
-            size: fontSize,
-            font,
-            color: rgb(0, 0, 0),
-            opacity: TEXT_OPACITY,
-          })
-          cy -= charHeight
-        }
-      } else {
-        // 横書き: ブロック全体のテキストを一括描画
-        // テキストは不可視（検索・選択用）なので、
-        // はみ出しは視覚的に問題にならない。
-        // 一括描画により数千回の drawText を 1 回に削減。
-        page.drawText(safeText, {
-          x: bx,
-          y: by - fontSize,
-          size: fontSize,
-          font,
-          color: rgb(0, 0, 0),
-          opacity: TEXT_OPACITY,
-          maxWidth: bw,
-          lineHeight: fontSize * 1.2,
-        })
-      }
+      page.drawText(safeText, {
+        x: bx,
+        y: by - fontSize,
+        size: fontSize,
+        font,
+        color: rgb(0, 0, 0),
+        opacity: TEXT_OPACITY,
+      })
     } catch (e) {
-      console.warn(`[exportPDF] drawText failed for block:`, e)
+      console.warn('[exportPDF] drawText failed for block:', e)
     }
   }
 }
 
 /**
  * Uint8Array を Blob 化してブラウザダウンロードをトリガー
- *
- * 注意: Uint8Array.buffer は元の ArrayBuffer 全体を返すため、
- * Uint8Array がビューの場合にサイズ不一致で PDF が破損する。
- * .slice(0) で独立した ArrayBuffer を作成する。
  */
 function triggerDownload(pdfBytes: Uint8Array, fileName: string): void {
   const blob = new Blob([pdfBytes.slice(0).buffer], { type: 'application/pdf' })

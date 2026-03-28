@@ -22,7 +22,6 @@
     "docx": "^9.6.1",
     "heic2any": "^0.0.4",
     "js-yaml": "^4.1.0",
-    "jspdf": "^4.2.1",
     "onnxruntime-web": "^1.20.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.9.0",

@@ -24,11 +24,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // PDF読込（pdfjs-dist は大きいので独立）
+          // PDF読込（pdfjs-dist は大きいので独立チャンク、動的importで遅延ロード済み）
           'pdf-reader': ['pdfjs-dist'],
-          // PDF生成
-          'pdf-writer': ['jspdf'],
-          // HEIC変換（大きいが使用頻度低い）
+          // PDF生成（pdf-lib + fontkit、動的importでエクスポート時のみロード）
+          'pdf-writer': ['pdf-lib', '@pdf-lib/fontkit'],
+          // DOCX生成（動的importでエクスポート時のみロード）
+          'docx-writer': ['docx'],
+          // HEIC変換（使用頻度低い、動的import済み）
           'heic': ['heic2any'],
           // 差分表示
           'diff': ['diff-match-patch'],

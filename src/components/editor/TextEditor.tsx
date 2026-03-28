@@ -2,11 +2,10 @@ import { useState, useCallback, useEffect, useRef, useMemo, lazy, Suspense } fro
 import type { OCRResult, TextBlock, TEIMetadata } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
+// 軽量ユーティリティのみ静的 import（テキストコピー・ダウンロードはバンドルサイズ極小）
 import { downloadText, copyToClipboard, triggerBlobDownload } from '../../utils/textExport'
-import { downloadTEI, downloadBatchTEI } from '../../utils/exportTEI'
-import { downloadHOCR, downloadBatchHOCR } from '../../utils/exportHOCR'
-import { downloadPDF, downloadBatchPDF } from '../../utils/exportPDF'
-import { downloadDOCX } from '../../utils/exportDOCX'
+// 重いエクスポートモジュール (pdf-lib, fontkit, docx 等) は使用時に動的 import
+// → 初期ロードから pdf-lib(25MB) + fontkit(6MB) + docx 等を除外
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
 import { L } from '../../i18n'
@@ -554,23 +553,25 @@ export function TextEditor({
       setTeiMetadataMode('single')
       setShowTEIMetadataModal(true)
     } else if (format === 'hocr') {
-      downloadHOCR(result)
+      import('../../utils/exportHOCR').then(m => m.downloadHOCR(result))
     } else if (format === 'pdf') {
-      downloadPDF(result, imageDataUrl)
+      import('../../utils/exportPDF').then(m => m.downloadPDF(result, imageDataUrl))
     } else if (format === 'docx') {
-      downloadDOCX(result, { includeFileName, ignoreNewlines })
+      import('../../utils/exportDOCX').then(m => m.downloadDOCX(result, { includeFileName, ignoreNewlines }))
     }
     setSaved(true)
   }, [result, editedText, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // TEI Metadata Modal handlers
-  const handleTEIMetadataSave = useCallback((metadata: TEIMetadata) => {
+  const handleTEIMetadataSave = useCallback(async (metadata: TEIMetadata) => {
     setLastTEIMetadata(metadata)
     setShowTEIMetadataModal(false)
 
     if (teiMetadataMode === 'single' && result) {
+      const { downloadTEI } = await import('../../utils/exportTEI')
       downloadTEI(result, metadata)
     } else if (teiMetadataMode === 'batch' && allResults.length > 0) {
+      const { downloadBatchTEI } = await import('../../utils/exportTEI')
       downloadBatchTEI(allResults, metadata)
     }
   }, [result, allResults, teiMetadataMode])
@@ -593,9 +594,9 @@ export function TextEditor({
       setTeiMetadataMode('batch')
       setShowTEIMetadataModal(true)
     } else if (format === 'hocr') {
-      downloadBatchHOCR(allResults)
+      import('../../utils/exportHOCR').then(m => m.downloadBatchHOCR(allResults))
     } else if (format === 'pdf') {
-      downloadBatchPDF(allResults)
+      import('../../utils/exportPDF').then(m => m.downloadBatchPDF(allResults))
     } else if (format === 'docx') {
       const combined: OCRResult = {
         id: 'batch',
@@ -609,7 +610,7 @@ export function TextEditor({
         processingTimeMs: 0,
         createdAt: Date.now(),
       }
-      downloadDOCX(combined, { includeFileName: false, ignoreNewlines })
+      import('../../utils/exportDOCX').then(m => m.downloadDOCX(combined, { includeFileName: false, ignoreNewlines }))
     }
     setSaved(true)
   }, [allResults, includeFileName, ignoreNewlines])
