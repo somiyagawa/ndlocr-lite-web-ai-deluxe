@@ -57,6 +57,16 @@ export function useOCRWorker() {
         }
       }
 
+      // ワーカースクリプト自体の読み込みエラー（WASM 初期化失敗等）をキャッチ
+      worker.onerror = (e) => {
+        console.error('OCR Worker script error:', e)
+        setJobState((prev) => ({
+          ...prev,
+          status: 'error',
+          message: `Worker error: ${e.message || 'Unknown error'}. Please reload. / ワーカーエラー。ページを再読み込みしてください。`,
+        }))
+      }
+
       // OCR Worker 初期化（auto モードはワーカー側で全モデルロード）
       worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: ocrModeRef.current } satisfies WorkerInMessage)
 
@@ -65,11 +75,15 @@ export function useOCRWorker() {
         const msg = event.data
         if (msg.type === 'OCR_PROGRESS') {
           if (msg.stage === 'initialized') {
+            clearTimeout(initTimeout)
             ocrWorkerReady = true
             checkBothReady()
             worker.removeEventListener('message', initHandler)
           } else if (!msg.id) {
             // id なし = 初期化進捗（ジョブ進捗ではない）
+            // 進捗があればタイムアウトをリセット（ダウンロード中は生存）
+            clearTimeout(initTimeout)
+            initTimeout = setTimeout(onInitTimeout, INIT_TIMEOUT_MS)
             setJobState((prev) => ({
               ...prev,
               status: 'loading_model',
@@ -79,9 +93,32 @@ export function useOCRWorker() {
               modelProgress: msg.modelProgress,
             }))
           }
+        } else if (msg.type === 'OCR_ERROR') {
+          clearTimeout(initTimeout)
+          console.error('OCR Worker initialization error:', msg.error)
+          setJobState((prev) => ({
+            ...prev,
+            status: 'error',
+            message: `Initialization error: ${msg.error}`,
+          }))
         }
       }
       worker.addEventListener('message', initHandler)
+
+      // 初期化タイムアウト（Safari 等でワーカーが無応答になった場合のセーフガード）
+      const INIT_TIMEOUT_MS = 90_000  // 90秒（大きなモデルのダウンロードを考慮）
+      const onInitTimeout = () => {
+        if (!ocrWorkerReady) {
+          console.error('OCR Worker initialization timed out')
+          worker.removeEventListener('message', initHandler)
+          setJobState((prev) => ({
+            ...prev,
+            status: 'error',
+            message: 'OCR initialization timed out. Please reload the page. / OCR初期化がタイムアウトしました。ページを再読み込みしてください。',
+          }))
+        }
+      }
+      let initTimeout = setTimeout(onInitTimeout, INIT_TIMEOUT_MS)
 
       // 認識 Worker 初期化
       recWorkers.forEach((w) => {

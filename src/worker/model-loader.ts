@@ -1,6 +1,11 @@
 /**
  * モデルファイルのダウンロード・IndexedDBキャッシュ管理
  * 参照実装: ndlkotenocr-worker/src/utils/model-loader.js
+ *
+ * Safari 対策:
+ *  - DB接続をシングルトン化（並列 indexedDB.open() のデッドロック回避）
+ *  - IndexedDB 接続にタイムアウト付与（Safari Private Browsing 等の無応答対策）
+ *  - response.body が null の場合のフォールバック（Safari Web Worker 対策）
  */
 
 const DB_NAME = 'NDLOCRLiteDB'
@@ -27,12 +32,32 @@ export const MODEL_URLS: Record<string, string> = {
   koten_recognition: `${MODEL_BASE_URL}/parseq-ndl-32x384-tiny-10.onnx`, // PARSeq [1,3,32,384]
 }
 
-function initDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION)
+// --- IndexedDB シングルトン接続 ---
+// Safari の Web Worker 内で indexedDB.open() を並列実行するとデッドロックするため、
+// 接続を一度だけ行い、以降はキャッシュを返す。
+let dbPromise: Promise<IDBDatabase> | null = null
+const IDB_OPEN_TIMEOUT = 5000 // 5秒でタイムアウト
 
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve(request.result)
+function initDB(): Promise<IDBDatabase> {
+  if (dbPromise) return dbPromise
+  dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
+    // Safari Private Browsing などで indexedDB が無応答になる場合のタイムアウト
+    const timer = setTimeout(() => {
+      console.warn('IndexedDB open timeout — proceeding without cache')
+      reject(new Error('IndexedDB open timeout'))
+    }, IDB_OPEN_TIMEOUT)
+
+    let request: IDBOpenDBRequest
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION)
+    } catch (e) {
+      clearTimeout(timer)
+      reject(e)
+      return
+    }
+
+    request.onerror = () => { clearTimeout(timer); reject(request.error) }
+    request.onsuccess = () => { clearTimeout(timer); resolve(request.result) }
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
@@ -47,47 +72,61 @@ function initDB(): Promise<IDBDatabase> {
       resultsStore.createIndex('by_createdAt', 'createdAt', { unique: false })
     }
   })
+  // 失敗した場合は次回再試行できるようにキャッシュを破棄
+  dbPromise.catch(() => { dbPromise = null })
+  return dbPromise
 }
 
 async function getModelFromCache(
   modelName: string
 ): Promise<ArrayBuffer | undefined> {
-  const db = await initDB()
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readonly')
-    const store = transaction.objectStore(STORE_NAME)
-    const request = store.get(modelName)
+  try {
+    const db = await initDB()
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readonly')
+      const store = transaction.objectStore(STORE_NAME)
+      const request = store.get(modelName)
 
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => {
-      const entry = request.result
-      if (entry && entry.version === MODEL_VERSION) {
-        resolve(entry.data)
-      } else {
-        resolve(undefined)
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        const entry = request.result
+        if (entry && entry.version === MODEL_VERSION) {
+          resolve(entry.data)
+        } else {
+          resolve(undefined)
+        }
       }
-    }
-  })
+    })
+  } catch {
+    // IndexedDB 不可（タイムアウト・Private Browsing 等）— キャッシュなしで続行
+    console.warn(`IndexedDB unavailable for cache read (${modelName}), will download`)
+    return undefined
+  }
 }
 
 async function saveModelToCache(
   modelName: string,
   data: ArrayBuffer
 ): Promise<void> {
-  const db = await initDB()
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readwrite')
-    const store = transaction.objectStore(STORE_NAME)
-    const request = store.put({
-      name: modelName,
-      data,
-      cachedAt: Date.now(),
-      version: MODEL_VERSION,
-    })
+  try {
+    const db = await initDB()
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite')
+      const store = transaction.objectStore(STORE_NAME)
+      const request = store.put({
+        name: modelName,
+        data,
+        cachedAt: Date.now(),
+        version: MODEL_VERSION,
+      })
 
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve()
-  })
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve()
+    })
+  } catch {
+    // キャッシュ保存に失敗しても OCR 処理自体は続行可能
+    console.warn(`Failed to cache model ${modelName} — will re-download next time`)
+  }
 }
 
 async function downloadWithProgress(
@@ -106,13 +145,22 @@ async function downloadWithProgress(
     throw new Error(`Model file not found (HTML returned): ${url}`)
   }
 
+  // Safari Web Worker では response.body が null になる場合がある。
+  // その場合は arrayBuffer() で一括取得（進捗表示なし）にフォールバック。
+  if (!response.body) {
+    console.warn('ReadableStream not available (Safari Web Worker?) — falling back to arrayBuffer()')
+    const buf = await response.arrayBuffer()
+    if (onProgress) onProgress(1.0)
+    return buf
+  }
+
   const contentLength = parseInt(
     response.headers.get('content-length') || '0',
     10
   )
   let receivedLength = 0
 
-  const reader = response.body!.getReader()
+  const reader = response.body.getReader()
   const chunks: Uint8Array[] = []
 
   while (true) {
@@ -163,13 +211,17 @@ export async function loadModel(
 }
 
 export async function clearModelCache(): Promise<void> {
-  const db = await initDB()
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], 'readwrite')
-    const store = transaction.objectStore(STORE_NAME)
-    const request = store.clear()
+  try {
+    const db = await initDB()
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite')
+      const store = transaction.objectStore(STORE_NAME)
+      const request = store.clear()
 
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve()
-  })
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => resolve()
+    })
+  } catch {
+    console.warn('Failed to clear model cache (IndexedDB unavailable)')
+  }
 }

@@ -22,6 +22,9 @@ function initializeONNX() {
   ort.env.wasm.proxy = false
 }
 
+// ONNX セッション作成タイムアウト（Safari の WASM コンパイル無応答対策）
+const SESSION_TIMEOUT_MS = 60_000  // 60秒
+
 export async function createSession(
   modelData: ArrayBuffer,
   options: Partial<ort.InferenceSession.SessionOptions> = {}
@@ -36,7 +39,17 @@ export async function createSession(
   }
 
   try {
-    const session = await ort.InferenceSession.create(modelData, defaultOptions)
+    // タイムアウト付き ONNX セッション作成
+    // Safari で WASM コンパイルが永久にハングする場合に対応
+    const sessionPromise = ort.InferenceSession.create(modelData, defaultOptions)
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(
+        'ONNX session creation timed out. Your browser may not support WebAssembly SIMD. ' +
+        'Please try Chrome or Firefox. / ONNXセッション作成がタイムアウトしました。' +
+        'Chrome または Firefox をお試しください。'
+      )), SESSION_TIMEOUT_MS)
+    })
+    const session = await Promise.race([sessionPromise, timeoutPromise])
     return session
   } catch (error) {
     console.error('Failed to create ONNX session:', error)
