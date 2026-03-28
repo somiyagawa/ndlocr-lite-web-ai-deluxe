@@ -783,7 +783,7 @@ export default function App() {
 
               <div className="pending-viewer">
                 <div className="pending-viewer-buttons">
-                  <button className="btn btn-primary" onClick={() => setIsReadyToProcess(true)}>
+                  <button className="btn btn-ocr-start" onClick={() => setIsReadyToProcess(true)}>
                     {selectedRegion
                       ? L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयनित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })
                       : L(lang, { ja: 'OCRを開始', en: 'Start OCR', 'zh-CN': '开始OCR', 'zh-TW': '開始OCR', ko: 'OCR 시작', la: 'OCR incipere', eo: 'Komenci OCR', es: 'Iniciar OCR', de: 'OCR starten', ar: 'بدء OCR', hi: 'OCR शुरू करें', ru: 'Начать OCR', el: 'Έναρξη OCR', syc: 'ܫܪܝ OCR' })}

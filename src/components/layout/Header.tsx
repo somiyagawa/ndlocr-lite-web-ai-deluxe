@@ -8,6 +8,140 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.5',
+    date: '2026-03-28',
+    changes: {
+      ja: [
+        'OCR開始ボタンを大幅に目立たせる: 中央揃え・グラデーション背景・光るパルスアニメーション・シマー効果を追加',
+        'ダークモード対応: OCR開始ボタンの発光色をインディゴ系に調整',
+      ],
+      en: [
+        'OCR start button redesign: centered layout with gradient background, glowing pulse animation, and shimmer effect for maximum visibility',
+        'Dark mode: OCR start button glow color adjusted to indigo tones',
+      ],
+      'zh-CN': [
+        'OCR开始按钮重新设计：居中布局，渐变背景，发光脉冲动画和闪烁效果，大幅提升可见性',
+        '深色模式：OCR开始按钮发光色调整为靛蓝色系',
+      ],
+      'zh-TW': [
+        'OCR開始按鈕重新設計：置中佈局，漸層背景，發光脈衝動畫和閃爍效果，大幅提升可見性',
+        '深色模式：OCR開始按鈕發光色調整為靛藍色系',
+      ],
+      ko: [
+        'OCR 시작 버튼 재설계: 중앙 정렬, 그라데이션 배경, 빛나는 펄스 애니메이션 및 시머 효과로 가시성 극대화',
+        '다크 모드: OCR 시작 버튼 발광색을 인디고 계열로 조정',
+      ],
+      es: [
+        'Rediseño del botón de inicio OCR: diseño centrado con fondo degradado, animación de pulso luminoso y efecto de brillo para máxima visibilidad',
+        'Modo oscuro: color de brillo del botón OCR ajustado a tonos índigo',
+      ],
+      de: [
+        'OCR-Startbutton-Redesign: zentriertes Layout mit Verlaufshintergrund, leuchtender Puls-Animation und Schimmer-Effekt für maximale Sichtbarkeit',
+        'Dunkelmodus: Leuchtfarbe des OCR-Startbuttons auf Indigo-Töne angepasst',
+      ],
+      ru: [
+        'Редизайн кнопки запуска OCR: центрированная компоновка с градиентным фоном, пульсирующей подсветкой и эффектом мерцания для максимальной заметности',
+        'Тёмная тема: цвет свечения кнопки OCR скорректирован на индиго',
+      ],
+      el: [
+        'Επανασχεδιασμός κουμπιού εκκίνησης OCR: κεντραρισμένη διάταξη με ντεγκραντέ φόντο, παλλόμενη λάμψη και εφέ λαμπυρίσματος για μέγιστη ορατότητα',
+        'Σκοτεινή λειτουργία: χρώμα λάμψης κουμπιού OCR ρυθμισμένο σε τόνους λουλακιού',
+      ],
+      ar: [
+        'إعادة تصميم زر بدء OCR: تخطيط مركزي مع خلفية متدرجة وحركة نبض متوهجة وتأثير وميض لأقصى قدر من الوضوح',
+        'الوضع الداكن: تعديل لون توهج زر OCR إلى درجات النيلي',
+      ],
+      hi: [
+        'OCR प्रारंभ बटन पुनर्डिज़ाइन: केंद्रित लेआउट, ग्रेडिएंट पृष्ठभूमि, चमकदार पल्स एनिमेशन और शिमर प्रभाव से अधिकतम दृश्यता',
+        'डार्क मोड: OCR बटन की चमक का रंग इंडिगो टोन में समायोजित',
+      ],
+      sa: [
+        'OCR-प्रारम्भबटु पुनर्विन्यासः: मध्यस्थितिः, क्रमवर्णपृष्ठभूमिः, दीप्तिस्पन्दचलनं शिमरप्रभावश्च अधिकतमदृश्यतायै',
+        'अन्धकारप्रकारः: OCR-बटोः दीप्तिवर्णः नीलीवर्णे समायोजितः',
+      ],
+      la: [
+        'Redesignatio pulsantis OCR: dispositio centralis cum fundo gradientali, pulsatione lucente et effectu scintillationis ad maximam conspicuitatem',
+        'Modus obscurus: color fulgoris pulsantis OCR ad tonos indicos accommodatus',
+      ],
+      eo: [
+        'Redesigno de OCR-starta butono: centrigita aranĝo kun gradienta fono, lumanta pulsa animacio kaj brileta efiko por maksimuma videbleco',
+        'Malluma reĝimo: lumkoloro de OCR-butono alĝustigita al indigaj tonoj',
+      ],
+      syc: [
+        'ܬܘܩܢ ܚܕܬ ܕܨܘܚܬ ܫܘܪܝ OCR: ܣܝܡ ܒܡܨܥܬܐ ܥܡ ܓܘܢ̈ܐ ܡܫܬܚ̈ܠܦܢܐ ܘܢܘܗܪ ܢܦܨ ܘܒܪܩ ܠܓܠܝܘܬ ܣܘܓܐ',
+        'ܛܘܦܣ ܚܫܘܟ: ܓܘܢ ܢܘܗܪ ܕܨܘܚܬ OCR ܐܬܬܩܢ ܠܓܘ̈ܢܐ ܟܐ̈ܡܬܐ',
+      ],
+      cop: [
+        'ⲟⲩⲧⲟⲩⲃⲟ ⲙⲡⲓⲃⲟⲩⲧⲟⲛ ⲛⲧⲉ OCR: ⲟⲩⲥⲓⲙⲓ ⲛⲙⲏϯ ⲛⲉⲙ ⲟⲩⲛⲟⲩⲛⲉ ⲛⲁⲗⲗⲁⲅⲏ ⲛⲉⲙ ⲟⲩⲟⲩⲱⲓⲛⲓ ⲉϥⲛⲉϩⲛⲉϩ ⲛⲉⲙ ⲟⲩⲃⲉⲣⲃⲉⲣ',
+        'ⲡⲧⲩⲡⲟⲥ ⲛⲭⲁⲕⲓ: ⲡⲛⲟⲩⲛⲉ ⲛⲧⲉ ⲡⲟⲩⲱⲓⲛⲓ ⲙⲡⲓⲃⲟⲩⲧⲟⲛ OCR ⲁϥϫⲓⲥⲟⲃⲧ ⲉⲃⲟⲗ ⲉⲛⲟⲩⲛⲉ ⲛⲓⲛⲇⲓⲅⲟ',
+      ],
+      it: [
+        'Ridisegno del pulsante di avvio OCR: layout centrato con sfondo a gradiente, animazione a impulso luminoso ed effetto shimmer per massima visibilità',
+        'Modalità scura: colore luminoso del pulsante OCR regolato su tonalità indaco',
+      ],
+      pt: [
+        'Redesign do botão de início OCR: layout centralizado com fundo em degradê, animação de pulso luminoso e efeito de brilho para máxima visibilidade',
+        'Modo escuro: cor do brilho do botão OCR ajustada para tons de índigo',
+      ],
+      grc: [
+        'Ἀνασχεδίασις τοῦ πλήκτρου ἐνάρξεως OCR: μέση διάταξις μετὰ κεκλιμένου χρώματος, παλμικῆς λάμψεως καὶ στιλπνοῦ ἐφέκτου πρὸς μεγίστην ὁρατότητα',
+        'Σκοτεινὴ λειτουργία: τὸ χρῶμα τῆς λάμψεως τοῦ πλήκτρου OCR εἰς ἰνδικοὺς τόνους μετερρυθμίσθη',
+      ],
+      ang: [
+        'OCR-onginnanknæpp nīwgeworht: middelgesettan fadung mid hlēowendlicre grundhīwe, scīmendre heortgebyrde and glitenunge tō mǣstum gesihþe',
+        'Þēostru hīw: scīmunghīw þæs OCR-knæppes tō blǣwendum hlēowum gefēged',
+      ],
+      sw: [
+        'Kubuni upya kitufe cha kuanza OCR: mpangilio wa katikati wenye mandharinyuma ya rangi inayobadilika, mwangaza wa mapigo na athari ya mng\'ao kwa uonekano wa juu zaidi',
+        'Hali ya giza: rangi ya mwangaza wa kitufe cha OCR imerekebishwa kuwa toni za indigo',
+      ],
+      ha: [
+        'Sabon ƙirar maɓallin farawa OCR: tsari a tsakiya tare da bango mai launin gradient, haske mai bugun jini da tasirin ƙyalli don ganin ido mafi girma',
+        'Yanayin duhu: launin hasken maɓallin OCR an daidaita zuwa launin indigo',
+      ],
+      xh: [
+        'Ukuyilwa kutsha kweqhosha lokuqala i-OCR: ulungiselelo oluphakathi kunye nomva wegradienti, i-animation yokubonakala ngokukhanya nefekti yokukhazimla ukuze kubonakale kakhulu',
+        'Imowudi emnyama: umbala wokukhanya weqhosha le-OCR ulungiselelwe kwitoni ze-indigo',
+      ],
+      bn: [
+        'OCR শুরু বোতাম পুনর্নকশা: কেন্দ্রীভূত বিন্যাস, গ্রেডিয়েন্ট পটভূমি, জ্বলজ্বলে পালস অ্যানিমেশন এবং ঝিলিমিলি প্রভাব সর্বোচ্চ দৃশ্যমানতার জন্য',
+        'ডার্ক মোড: OCR বোতামের আভার রঙ ইন্ডিগো টোনে সমন্বিত',
+      ],
+      ur: [
+        'OCR شروع بٹن کی نئی ڈیزائن: مرکزی ترتیب، گریڈیئنٹ پس منظر، چمکدار پلس اینیمیشن اور شمر اثر زیادہ سے زیادہ نمایاں ہونے کے لیے',
+        'ڈارک موڈ: OCR بٹن کی چمک کا رنگ نیلے رنگ کے ٹونز میں ایڈجسٹ',
+      ],
+      fa: [
+        'طراحی مجدد دکمه شروع OCR: چیدمان مرکزی با پس‌زمینه گرادیانی، انیمیشن ضربان درخشنده و افکت درخشش برای حداکثر دید',
+        'حالت تاریک: رنگ درخشش دکمه OCR به تنالیته‌های نیلی تنظیم شد',
+      ],
+      he: [
+        'עיצוב מחדש של כפתור התחלת OCR: פריסה ממורכזת עם רקע מדורג, אנימציית פעימה זוהרת ואפקט נצנוץ לנראות מרבית',
+        'מצב כהה: צבע הזוהר של כפתור OCR הותאם לגווני אינדיגו',
+      ],
+      am: [
+        'የOCR ማስጀመሪያ ቁልፍ ዳግም ንድፍ፡ መካከለኛ አቀማመጥ ከግራዲየንት ዳራ፣ የሚያንጸባርቅ ንዝረት ተንቀሳቃሽ ምስል እና ብልጭታ ውጤት ለከፍተኛ ታይነት',
+        'ጨለማ ሁነታ፡ የOCR ቁልፍ ብርሃን ቀለም ወደ ኢንዲጎ ድምጾች ተስተካክሏል',
+      ],
+      my: [
+        'OCR စတင်ခလုတ် ပြန်လည်ဒီဇိုင်းဆွဲခြင်း- အလယ်ဗဟိုချိန်ညှိထားသော အပြင်အဆင်၊ gradient နောက်ခံ၊ တောက်ပသော pulse animation နှင့် shimmer effect ဖြင့် အမြင်အာရုံ အကောင်းဆုံးဖြစ်အောင်',
+        'Dark mode: OCR ခလုတ်၏ တောက်ပမှုအရောင်ကို indigo tone များသို့ ချိန်ညှိထားသည်',
+      ],
+      km: [
+        'ការរចនាថ្មីប៊ូតុងចាប់ផ្តើម OCR: ប្លង់កណ្តាលជាមួយផ្ទៃខាងក្រោយពណ៌ជម្រាល ចលនាផ្លែកភ្លឺ និងបែបផែនភ្លឺចាំងសម្រាប់ភាពមើលឃើញអតិបរមា',
+        'របៀបងងឹត: ពណ៌ភ្លឺរបស់ប៊ូតុង OCR ត្រូវបានកែតម្រូវទៅជាពណ៌ indigo',
+      ],
+      vi: [
+        'Thiết kế lại nút bắt đầu OCR: bố cục căn giữa với nền chuyển màu, hiệu ứng nhấp nháy phát sáng và hiệu ứng lấp lánh để tăng khả năng hiển thị tối đa',
+        'Chế độ tối: màu phát sáng của nút OCR được điều chỉnh sang tông màu chàm',
+      ],
+      ms: [
+        'Reka bentuk semula butang mula OCR: susun atur berpusat dengan latar belakang gradien, animasi denyutan bercahaya dan kesan berkilauan untuk keterlihatan maksimum',
+        'Mod gelap: warna cahaya butang OCR diselaraskan kepada ton indigo',
+      ],
+    },
+  },
+  {
     version: '4.4.4',
     date: '2026-03-28',
     changes: {
@@ -749,7 +883,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.4.4</span>
+        >v4.4.5</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

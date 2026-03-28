@@ -5831,10 +5831,11 @@ button.ai-status-clickable .ai-status-text {
 
 .pending-viewer-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  padding: 0 0.25rem;
+  padding: 0.5rem 0.25rem;
   align-items: center;
+  justify-content: center;
 }
 
 .pending-viewer-buttons .btn {
@@ -5842,6 +5843,55 @@ button.ai-status-clickable .ai-status-text {
   align-items: center;
   gap: 0.35rem;
   height: 2.25rem;
+}
+
+/* ── OCR開始ボタン: 光るグラデーション ── */
+@keyframes ocr-glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 24px rgba(59,130,246,0.25); }
+  50% { box-shadow: 0 0 16px rgba(59,130,246,0.7), 0 0 40px rgba(59,130,246,0.35); }
+}
+
+@keyframes ocr-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.btn-ocr-start {
+  background: linear-gradient(135deg, #3b82f6, #6366f1, #3b82f6);
+  background-size: 200% 200%;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 2.5rem;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 24px rgba(59,130,246,0.25);
+  animation: ocr-glow-pulse 2s ease-in-out infinite, ocr-shimmer 3s linear infinite;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-ocr-start:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 0 20px rgba(59,130,246,0.8), 0 0 50px rgba(99,102,241,0.4);
+  filter: brightness(1.1);
+}
+
+.btn-ocr-start:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 0 6px rgba(59,130,246,0.5);
+}
+
+[data-theme="dark"] .btn-ocr-start {
+  background: linear-gradient(135deg, #6366f1, #818cf8, #6366f1);
+  background-size: 200% 200%;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 0 12px rgba(99,102,241,0.6), 0 0 30px rgba(129,140,248,0.3);
+}
+
+[data-theme="dark"] .btn-ocr-start:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(99,102,241,0.9), 0 0 60px rgba(129,140,248,0.45);
 }
 
 /* ── image-with-preprocess (image + side panel layout) ── */
