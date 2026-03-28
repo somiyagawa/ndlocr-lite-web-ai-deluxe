@@ -139,6 +139,14 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
         'Reka bentuk semula butang mula OCR: susun atur berpusat dengan latar belakang gradien, animasi denyutan bercahaya dan kesan berkilauan untuk keterlihatan maksimum',
         'Mod gelap: warna cahaya butang OCR diselaraskan kepada ton indigo',
       ],
+      uk: [
+        'Редизайн кнопки запуску OCR: центроване розташування з градієнтним фоном, пульсуючим світінням та ефектом мерехтіння для максимальної помітності',
+        'Темна тема: колір світіння кнопки OCR скориговано на індиго',
+      ],
+      pl: [
+        'Przeprojektowanie przycisku startu OCR: wyśrodkowany układ z gradientowym tłem, pulsującą poświatą i efektem połysku dla maksymalnej widoczności',
+        'Tryb ciemny: kolor poświaty przycisku OCR dostosowany do odcieni indygo',
+      ],
     },
   },
   {
