@@ -1,0 +1,46 @@
+import type { Translations } from './ja'
+
+export const got: Translations = {
+  app: { title: 'NDL(Kotenseki)OCR-lite Web', subtitle: '𐌹𐌰𐍀𐌰𐌽𐌹𐍃𐌺 OCR 𐌲𐌰𐍅𐌰𐌿𐍂𐌺𐌹 𐌹𐌽 𐌸𐌰𐌼𐌼𐌰 𐍃𐌰𐌹𐍂𐌰' },
+  upload: {
+    dropzone: '𐌳𐍂𐌰𐌲 𐌱𐍉𐌺𐍉𐍃 𐌷𐌹𐌸𐍂𐍉, 𐌰𐌹𐌸𐌸𐌰𐌿 𐌱𐍂𐌹𐌲𐌲 𐌳𐌿 𐌲𐌰𐌻𐌹𐍃𐌰𐌽',
+    directoryButton: '𐌲𐌰𐌻𐌹𐍃𐌹 𐌼𐌰𐍀𐍀𐌰',
+    acceptedFormats: '𐌰𐌽𐌳𐌰𐌽𐌿𐌼𐌰𐌹 𐍆𐌰𐌿𐍂𐌼𐌰𐍄𐌴𐌹𐍃: JPG, PNG, PDF',
+    startButton: '𐌳𐌿𐌲𐌹𐌽𐌽𐌰𐌽 OCR',
+    clearButton: '𐌷𐍂𐌰𐌹𐌽𐌾𐌰𐌽',
+  },
+  progress: {
+    initializing: '𐌳𐌿𐌲𐌹𐌽𐌽𐌹𐌸...', loadingLayoutModel: '𐌷𐌻𐌰𐌸𐌰𐌽𐌳𐍃 𐌼𐌰𐌹𐌸𐌻... {percent}%',
+    loadingRecognitionModel: '𐌷𐌻𐌰𐌸𐌰𐌽𐌳𐍃 𐌿𐍆𐌺𐌿𐌽𐌽𐌰𐌽 𐌼𐌰𐌹𐌸𐌻... {percent}%',
+    layoutDetection: '𐍆𐌹𐌽𐌸𐌰𐌽𐌳𐍃 𐍃𐍄𐌰𐌱𐌰𐌻𐌰𐌽𐌳... {percent}%',
+    textRecognition: '𐌿𐍆𐌺𐌿𐌽𐌽𐌰𐌽𐌳𐍃 𐍃𐍄𐌰𐌱𐍉𐍃 ({current}/{total} 𐌻𐌰𐌽𐌳)',
+    readingOrder: '𐍅𐌰𐌿𐍂𐌺𐌾𐌰𐌽𐌳𐍃 𐍂𐌰𐌸𐌾𐌰𐌽 𐌻𐌰𐌹𐍃𐍄𐌿𐍃...',
+    generatingOutput: '𐌲𐌰𐍅𐌰𐌿𐍂𐌺𐌾𐌰𐌽𐌳𐍃 𐌿𐍃𐌲𐌹𐌱𐌰...',
+    processing: '𐍅𐌰𐌿𐍂𐌺𐌾𐌰𐌽𐌳𐍃: {current}/{total} 𐌱𐍉𐌺𐍉𐍃', done: '𐌿𐍃𐍄𐌰𐌿𐌷',
+  },
+  results: {
+    copy: '𐌲𐌰𐍅𐍂𐌹𐍄𐌰𐌽', download: '𐌰𐍆𐌷𐌻𐌰𐌸𐌰𐌽', downloadAll: '𐌰𐍆𐌷𐌻𐌰𐌸𐌰𐌽 𐌰𐌻𐌻𐌰𐌽𐍃 𐍃𐍄𐌰𐌱𐍉𐍃',
+    copied: '𐌲𐌰𐍅𐍂𐌹𐍄𐌰𐌽!', noResult: '𐌽𐌹 𐌿𐍃𐌲𐌹𐌱𐌰', regions: '{count} 𐌻𐌰𐌽𐌳',
+    processingTime: '𐌼𐌴𐌻 𐍅𐌰𐌿𐍂𐌺𐌾𐌰𐌽𐍃: {time}𐍃',
+  },
+  history: {
+    title: '𐍃𐍉𐌺𐌴𐌹𐌽𐍃', clearCache: '𐌷𐍂𐌰𐌹𐌽𐌾𐌰𐌽 𐌷𐌿𐌶𐌳', confirmClear: '𐌰𐍆𐌳𐌰𐌿𐌾𐌰𐌽 𐌰𐌻𐌻𐌰 𐍃𐍉𐌺𐌴𐌹𐌽𐍃?',
+    yes: '𐌰𐍆𐌳𐌰𐌿𐌾𐌰𐌽', cancel: '𐌰𐍆𐌻𐌴𐍄𐌰𐌽', empty: '𐌽𐌹 𐍃𐍉𐌺𐌴𐌹𐌽𐍃', noText: '𐌽𐌹 𐍃𐍄𐌰𐌱𐍉𐍃',
+  },
+  settings: {
+    title: '𐌲𐌰𐍂𐌴𐌷𐍄𐌴𐌹𐌽𐍃', modelCache: '𐌼𐌰𐌹𐌸𐌻 𐌷𐌿𐌶𐌳', clearModelCache: '𐌷𐍂𐌰𐌹𐌽𐌾𐌰𐌽 𐌼𐌰𐌹𐌸𐌻 𐌷𐌿𐌶𐌳',
+    confirmClearModel: '𐌰𐍆𐌳𐌰𐌿𐌾𐌰𐌽 ONNX 𐌼𐌰𐌹𐌸𐌻? 𐌸𐌰𐌹 𐍅𐌰𐌹𐍂𐌸𐌰𐌽𐌳 𐌰𐍆𐍄𐍂𐌰 𐌰𐍆𐌷𐌻𐌰𐌸𐌰𐌽.',
+    clearDone: '𐌷𐍂𐌰𐌹𐌽',
+  },
+  info: {
+    privacyNotice: '𐍃𐍉 𐌰𐍀𐍀 𐍅𐌰𐌿𐍂𐌺𐌴𐌹𐌸 𐌰𐌻𐌻𐌰𐍄𐌰 𐌹𐌽 𐌸𐌰𐌹𐌽𐌰𐌼𐌼𐌰 𐍃𐌰𐌹𐍂𐌰. 𐌱𐌹𐌻𐌳𐍉𐍃 𐌾𐌰𐌷 OCR 𐌿𐍃𐌲𐌹𐌱𐍉𐍃 𐌽𐌹 𐍃𐌰𐌽𐌳𐌾𐌰𐌽𐌳𐌰 𐌳𐌿 𐌿𐍄𐌰𐌽𐌰 𐌸𐌹𐌿𐌼𐌰𐌲𐌿.',
+    author: '𐌲𐌰𐍃𐌺𐌰𐍀𐌰𐌽𐍃 𐍆𐍂𐌰𐌼 Yuta Hashimoto',
+    githubLink: 'GitHub 𐌷𐌿𐌶𐌳',
+  },
+  language: { switchTo: '日本語' },
+  error: {
+    generic: '𐌳𐍅𐌰𐌻𐌰 𐍅𐌰𐍂𐌸', modelLoad: '𐌽𐌹 𐌼𐌰𐌷𐍄𐌰 𐌷𐌻𐌰𐌸𐌰𐌽 𐌼𐌰𐌹𐌸𐌻', ocr: '𐌳𐍅𐌰𐌻𐌰 𐌹𐌽 OCR',
+    fileLoad: '𐌽𐌹 𐌼𐌰𐌷𐍄𐌰 𐌷𐌻𐌰𐌸𐌰𐌽 𐌱𐍉𐌺𐍉𐍃', clipboardNotSupported: '𐌽𐌹 𐌼𐌰𐌲 𐌰𐍄𐌲𐌰𐌲𐌲𐌰𐌽 𐌺𐌻𐌹𐍀𐌱𐌰𐌿𐍂𐌳',
+  },
+  tooltip: { dragPageReorder: '𐌳𐍂𐌰𐌲 𐌳𐌿 𐌲𐌰𐍂𐌰𐌹𐌳𐌾𐌰𐌽' },
+}

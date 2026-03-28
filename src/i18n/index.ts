@@ -14,8 +14,52 @@ import { el } from './el'
 import { syc } from './syc'
 import { cop } from './cop'
 import { sa } from './sa'
+import { it } from './it'
+import { pt } from './pt'
+import { uk } from './uk'
+import { pl } from './pl'
+import { th } from './th'
+import { id } from './id'
+import { vi } from './vi'
+import { ms } from './ms'
+import { fa } from './fa'
+import { he } from './he'
+import { bn } from './bn'
+import { ur } from './ur'
+import { am } from './am'
+import { my } from './my'
+import { km } from './km'
+import { sw } from './sw'
+import { ha } from './ha'
+import { xh } from './xh'
+import { grc } from './grc'
+import { ang } from './ang'
+import { hu } from './hu'
+import { cs } from './cs'
+import { mt } from './mt'
+import { gn } from './gn'
+import { got } from './got'
+import { cu } from './cu'
+import { hit } from './hit'
+import { akk } from './akk'
+import { sux } from './sux'
+import { egy } from './egy'
+import { ain } from './ain'
+import { ryu } from './ryu'
 
-export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo' | 'es' | 'de' | 'ar' | 'hi' | 'ru' | 'el' | 'syc' | 'cop' | 'sa'
+export type Language =
+  | 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko'
+  | 'es' | 'pt' | 'it' | 'de' | 'pl' | 'cs' | 'hu' | 'uk' | 'ru'
+  | 'el' | 'grc' | 'mt'
+  | 'ar' | 'fa' | 'he' | 'ur'
+  | 'hi' | 'bn' | 'sa'
+  | 'th' | 'vi' | 'ms' | 'id' | 'km' | 'my'
+  | 'am' | 'sw' | 'ha' | 'xh'
+  | 'syc' | 'cop' | 'egy'
+  | 'la' | 'eo' | 'ang' | 'got' | 'cu'
+  | 'gn'
+  | 'akk' | 'sux' | 'hit'
+  | 'ain' | 'ryu'
 export type TranslationParams = Record<string, string | number>
 
 /** Display labels for the language selector */
@@ -25,39 +69,81 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   'zh-CN': '简体中文',
   'zh-TW': '繁體中文',
   ko: '한국어',
-  la: 'Latina',
-  eo: 'Esperanto',
   es: 'Español',
+  pt: 'Português',
+  it: 'Italiano',
   de: 'Deutsch',
-  ar: 'العربية',
-  hi: 'हिन्दी',
+  pl: 'Polski',
+  cs: 'Čeština',
+  hu: 'Magyar',
+  uk: 'Українська',
   ru: 'Русский',
   el: 'Ελληνικά',
+  grc: 'Ἑλληνική (ἀρχ.)',
+  mt: 'Malti',
+  ar: 'العربية',
+  fa: 'فارسی',
+  he: 'עברית',
+  ur: 'اردو',
+  hi: 'हिन्दी',
+  bn: 'বাংলা',
+  sa: 'संस्कृतम्',
+  th: 'ภาษาไทย',
+  vi: 'Tiếng Việt',
+  ms: 'Bahasa Melayu',
+  id: 'Bahasa Indonesia',
+  km: 'ភាសាខ្មែរ',
+  my: 'မြန်မာဘာသာ',
+  am: 'አማርኛ',
+  sw: 'Kiswahili',
+  ha: 'Hausa',
+  xh: 'isiXhosa',
   syc: 'ܣܘܪܝܝܐ',
   cop: 'ⲙⲉⲧⲣⲉⲙⲛⲕⲏⲙⲉ',
-  sa: 'संस्कृतम्',
+  la: 'Latina',
+  eo: 'Esperanto',
+  ang: 'Englisc (eald)',
+  got: '𐌲𐌿𐍄𐌹𐍃𐌺',
+  cu: 'Словѣ́ньскъ',
+  gn: "Avañe'ẽ",
+  akk: '𒀝𒅗𒁺𒌑 (Akkadû)',
+  sux: '𒅴𒂠 (Emegir)',
+  hit: '𒉈𒅆𒇷 (Nešili)',
+  egy: '𓂋𓏤𓈖𓆎𓅓𓏏 (Mdw-nṯr)',
+  ain: 'アイヌ イタㇰ',
+  ryu: 'ウチナーグチ',
 }
 
 /** All supported language codes, in display order */
-export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'de', 'ru', 'el', 'ar', 'hi', 'sa', 'syc', 'cop', 'la', 'eo']
+export const LANGUAGES: Language[] = [
+  'ja', 'en', 'zh-CN', 'zh-TW', 'ko',
+  'es', 'pt', 'it', 'de', 'pl', 'cs', 'hu', 'uk', 'ru',
+  'el', 'grc', 'mt',
+  'ar', 'fa', 'he', 'ur',
+  'hi', 'bn', 'sa',
+  'th', 'vi', 'ms', 'id', 'km', 'my',
+  'am', 'sw', 'ha', 'xh',
+  'syc', 'cop',
+  'la', 'eo', 'ang', 'got', 'cu',
+  'gn',
+  'akk', 'sux', 'hit', 'egy',
+  'ain', 'ryu',
+]
 
 const translations: Record<Language, Record<string, Record<string, string>>> = {
-  ja,
-  en,
-  'zh-CN': zhCN,
-  'zh-TW': zhTW,
-  ko,
-  la,
-  eo,
-  es,
-  de,
-  ar,
-  hi,
-  ru,
-  el,
-  syc,
-  cop,
-  sa,
+  ja, en,
+  'zh-CN': zhCN, 'zh-TW': zhTW,
+  ko, es, pt, it, de, pl, cs, hu, uk, ru,
+  el, grc, mt,
+  ar, fa, he, ur,
+  hi, bn, sa,
+  th, vi, ms, id, km, my,
+  am, sw, ha, xh,
+  syc, cop, egy,
+  la, eo, ang, got, cu,
+  gn,
+  akk, sux, hit,
+  ain, ryu,
 }
 
 function getNestedValue(obj: Record<string, unknown>, key: string): string {
@@ -96,14 +182,36 @@ export function getStoredLang(): Language {
   if (browserLang.startsWith('ja')) return 'ja'
   if (browserLang.startsWith('ko')) return 'ko'
   if (browserLang.startsWith('es')) return 'es'
+  if (browserLang.startsWith('pt')) return 'pt'
+  if (browserLang.startsWith('it')) return 'it'
   if (browserLang.startsWith('de')) return 'de'
-  if (browserLang.startsWith('ar')) return 'ar'
-  if (browserLang.startsWith('hi')) return 'hi'
+  if (browserLang.startsWith('pl')) return 'pl'
+  if (browserLang.startsWith('cs')) return 'cs'
+  if (browserLang.startsWith('hu')) return 'hu'
+  if (browserLang.startsWith('uk')) return 'uk'
   if (browserLang.startsWith('ru')) return 'ru'
   if (browserLang.startsWith('el')) return 'el'
+  if (browserLang.startsWith('ar')) return 'ar'
+  if (browserLang.startsWith('fa')) return 'fa'
+  if (browserLang.startsWith('he')) return 'he'
+  if (browserLang.startsWith('ur')) return 'ur'
+  if (browserLang.startsWith('hi')) return 'hi'
+  if (browserLang.startsWith('bn')) return 'bn'
   if (browserLang.startsWith('sa')) return 'sa'
+  if (browserLang.startsWith('th')) return 'th'
+  if (browserLang.startsWith('vi')) return 'vi'
+  if (browserLang.startsWith('ms')) return 'ms'
+  if (browserLang.startsWith('id')) return 'id'
+  if (browserLang.startsWith('km')) return 'km'
+  if (browserLang.startsWith('my')) return 'my'
+  if (browserLang.startsWith('am')) return 'am'
+  if (browserLang.startsWith('sw')) return 'sw'
+  if (browserLang.startsWith('ha')) return 'ha'
+  if (browserLang.startsWith('xh')) return 'xh'
+  if (browserLang.startsWith('mt')) return 'mt'
   if (browserLang.startsWith('la')) return 'la'
   if (browserLang.startsWith('eo')) return 'eo'
+  if (browserLang.startsWith('gn')) return 'gn'
   if (browserLang === 'zh-TW' || browserLang === 'zh-Hant') return 'zh-TW'
   if (browserLang.startsWith('zh')) return 'zh-CN'
   return 'ja'

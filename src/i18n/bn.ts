@@ -1,0 +1,65 @@
+import type { Translations } from './ja'
+
+export const bn: Translations = {
+  app: {
+    title: 'NDL(Kotenseki)OCR-lite Web',
+    subtitle: 'ব্রাউজারে জাপানি OCR টুল',
+  },
+  upload: {
+    dropzone: 'এখানে ফাইল টেনে আনুন, অথবা নির্বাচন করতে ক্লিক করুন',
+    directoryButton: 'ফোল্ডার নির্বাচন',
+    acceptedFormats: 'সমর্থিত ফরম্যাট: JPG, PNG, PDF',
+    startButton: 'OCR শুরু',
+    clearButton: 'মুছুন',
+  },
+  progress: {
+    initializing: 'আরম্ভ হচ্ছে...',
+    loadingLayoutModel: 'লেআউট মডেল লোড হচ্ছে... {percent}%',
+    loadingRecognitionModel: 'শনাক্তকরণ মডেল লোড হচ্ছে... {percent}%',
+    layoutDetection: 'টেক্সট এলাকা শনাক্ত হচ্ছে... {percent}%',
+    textRecognition: 'টেক্সট শনাক্তকরণ ({current}/{total} এলাকা)',
+    readingOrder: 'পড়ার ক্রম প্রক্রিয়াকরণ...',
+    generatingOutput: 'আউটপুট তৈরি হচ্ছে...',
+    processing: 'প্রক্রিয়াকরণ: {current}/{total} ফাইল',
+    done: 'সম্পন্ন',
+  },
+  results: {
+    copy: 'কপি',
+    download: 'ডাউনলোড',
+    downloadAll: 'সমস্ত টেক্সট ডাউনলোড',
+    copied: 'কপি হয়েছে!',
+    noResult: 'কোনো ফলাফল নেই',
+    regions: '{count} এলাকা',
+    processingTime: 'প্রক্রিয়াকরণ সময়: {time}সে',
+  },
+  history: {
+    title: 'ইতিহাস',
+    clearCache: 'ক্যাশ মুছুন',
+    confirmClear: 'সমস্ত প্রক্রিয়াকরণ ইতিহাস মুছবেন?',
+    yes: 'মুছুন',
+    cancel: 'বাতিল',
+    empty: 'কোনো প্রক্রিয়াকরণ ইতিহাস নেই',
+    noText: 'কোনো টেক্সট নেই',
+  },
+  settings: {
+    title: 'সেটিংস',
+    modelCache: 'মডেল ক্যাশ',
+    clearModelCache: 'মডেল ক্যাশ মুছুন',
+    confirmClearModel: 'ক্যাশ করা ONNX মডেল মুছবেন? পরবর্তী চালু করার সময় পুনরায় ডাউনলোড হবে।',
+    clearDone: 'মুছে ফেলা হয়েছে',
+  },
+  info: {
+    privacyNotice: 'এই অ্যাপটি সম্পূর্ণরূপে ব্রাউজারে চলে। ছবি ফাইল এবং OCR ফলাফল কোনো বাহ্যিক সার্ভারে পাঠানো হয় না।',
+    author: 'নির্মাতা: Yuta Hashimoto (National Museum of Japanese History / National Diet Library)',
+    githubLink: 'GitHub সংগ্রহস্থল',
+  },
+  language: { switchTo: '日本語' },
+  error: {
+    generic: 'একটি ত্রুটি ঘটেছে',
+    modelLoad: 'মডেল লোড ব্যর্থ',
+    ocr: 'OCR প্রক্রিয়াকরণে ত্রুটি',
+    fileLoad: 'ফাইল লোড ব্যর্থ',
+    clipboardNotSupported: 'ক্লিপবোর্ড অ্যাক্সেস করা যাচ্ছে না',
+  },
+  tooltip: { dragPageReorder: 'পুনর্বিন্যাস করতে টেনে আনুন' },
+}

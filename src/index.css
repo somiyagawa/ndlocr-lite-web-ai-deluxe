@@ -614,6 +614,19 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .lang-dropdown-item-name {
   white-space: nowrap;
 }
+.lang-dropdown-item-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  background: var(--color-primary);
+  color: white;
+  opacity: 0.75;
+  margin-left: auto;
+  flex-shrink: 0;
+}
 .lang-dropdown-section-label {
   padding: 0.35rem 0.75rem 0.15rem;
   font-size: 0.7rem;
@@ -5845,10 +5858,15 @@ button.ai-status-clickable .ai-status-text {
   height: 2.25rem;
 }
 
-/* ── OCR開始ボタン: 光るグラデーション ── */
+/* ── OCR開始ボタン: ポンドブルーで光る（ダークモードではテーマオレンジ） ── */
 @keyframes ocr-glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 24px rgba(59,130,246,0.25); }
-  50% { box-shadow: 0 0 16px rgba(59,130,246,0.7), 0 0 40px rgba(59,130,246,0.35); }
+  0%, 100% { box-shadow: 0 0 8px rgba(58,158,201,0.5), 0 0 24px rgba(58,158,201,0.25); }
+  50% { box-shadow: 0 0 16px rgba(58,158,201,0.7), 0 0 40px rgba(58,158,201,0.35); }
+}
+
+@keyframes ocr-glow-pulse-dark {
+  0%, 100% { box-shadow: 0 0 8px rgba(230,164,76,0.5), 0 0 24px rgba(230,164,76,0.25); }
+  50% { box-shadow: 0 0 16px rgba(230,164,76,0.7), 0 0 40px rgba(230,164,76,0.35); }
 }
 
 @keyframes ocr-shimmer {
@@ -5857,7 +5875,7 @@ button.ai-status-clickable .ai-status-text {
 }
 
 .btn-ocr-start {
-  background: linear-gradient(135deg, #3b82f6, #6366f1, #3b82f6);
+  background: linear-gradient(135deg, #3a9ec9, #2d86ad, #3a9ec9);
   background-size: 200% 200%;
   color: white;
   font-size: 1.1rem;
@@ -5866,32 +5884,33 @@ button.ai-status-clickable .ai-status-text {
   padding: 0.75rem 2.5rem;
   height: auto;
   border-radius: var(--radius);
-  box-shadow: 0 0 8px rgba(59,130,246,0.5), 0 0 24px rgba(59,130,246,0.25);
+  box-shadow: 0 0 8px rgba(58,158,201,0.5), 0 0 24px rgba(58,158,201,0.25);
   animation: ocr-glow-pulse 2s ease-in-out infinite, ocr-shimmer 3s linear infinite;
   transition: all 0.2s ease;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.25);
 }
 
 .btn-ocr-start:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 0 20px rgba(59,130,246,0.8), 0 0 50px rgba(99,102,241,0.4);
+  box-shadow: 0 0 20px rgba(58,158,201,0.8), 0 0 50px rgba(45,134,173,0.4);
   filter: brightness(1.1);
 }
 
 .btn-ocr-start:active:not(:disabled) {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 0 6px rgba(59,130,246,0.5);
+  box-shadow: 0 0 6px rgba(58,158,201,0.5);
 }
 
 [data-theme="dark"] .btn-ocr-start {
-  background: linear-gradient(135deg, #6366f1, #818cf8, #6366f1);
+  background: linear-gradient(135deg, #e6a44c, #d4922e, #e6a44c);
   background-size: 200% 200%;
   border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: 0 0 12px rgba(99,102,241,0.6), 0 0 30px rgba(129,140,248,0.3);
+  box-shadow: 0 0 12px rgba(230,164,76,0.6), 0 0 30px rgba(212,146,46,0.3);
+  animation: ocr-glow-pulse-dark 2s ease-in-out infinite, ocr-shimmer 3s linear infinite;
 }
 
 [data-theme="dark"] .btn-ocr-start:hover:not(:disabled) {
-  box-shadow: 0 0 24px rgba(99,102,241,0.9), 0 0 60px rgba(129,140,248,0.45);
+  box-shadow: 0 0 24px rgba(230,164,76,0.9), 0 0 60px rgba(212,146,46,0.45);
 }
 
 /* ── image-with-preprocess (image + side panel layout) ── */

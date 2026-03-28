@@ -8,6 +8,174 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.6',
+    date: '2026-03-28',
+    changes: {
+      ja: [
+        'UI言語セレクタを3セクションに再構成: 現代語 / 現代語（試験版）/ 古典語（試験版）',
+        'アイヌ語 (ain)、ウチナーグチ (ryu) を現代語（試験版）として追加',
+        '古典・歴史言語をすべて古典語（試験版）に分類: サンスクリット、ラテン語、古典ギリシア語、古英語、ゴート語、古代教会スラヴ語、シリア語、コプト語、アッカド語、シュメール語、ヒッタイト語、古代エジプト語',
+        'エスペラント (eo)、グアラニー語 (gn) を現代語セクションに配置',
+        'ウクライナ語 (uk)、ポーランド語 (pl) を追加',
+        '試験版言語にバッジ表示を追加',
+        '全48言語の国旗/記号アイコンを完備',
+      ],
+      en: [
+        'UI language selector restructured into 3 sections: Modern / Modern (experimental) / Classical (experimental)',
+        'Added Ainu (ain) and Okinawan/Uchinaguchi (ryu) as Modern (experimental)',
+        'All classical/historical languages grouped under Classical (experimental): Sanskrit, Latin, Ancient Greek, Old English, Gothic, Old Church Slavonic, Syriac, Coptic, Akkadian, Sumerian, Hittite, Ancient Egyptian',
+        'Esperanto (eo) and Guarani (gn) placed in Modern section',
+        'Added Ukrainian (uk) and Polish (pl)',
+        'Beta badge added to experimental languages',
+        'Flag/symbol icons completed for all 48 languages',
+      ],
+      'zh-CN': [
+        'UI语言选择器重组为3个分区：现代语 / 现代语（试验版）/ 古典语（试验版）',
+        '添加阿伊努语 (ain)、冲绳语 (ryu) 为现代语（试验版）',
+        '所有古典/历史语言归入古典语（试验版）',
+        '世界语 (eo)、瓜拉尼语 (gn) 放入现代语分区',
+        '添加乌克兰语 (uk)、波兰语 (pl)',
+        '试验版语言添加徽章标记',
+        '全48种语言的旗帜/符号图标齐全',
+      ],
+      'zh-TW': [
+        'UI語言選擇器重組為3個分區：現代語 / 現代語（試驗版）/ 古典語（試驗版）',
+        '新增阿伊努語 (ain)、沖繩語 (ryu) 為現代語（試驗版）',
+        '所有古典/歷史語言歸入古典語（試驗版）',
+        '世界語 (eo)、瓜拉尼語 (gn) 放入現代語分區',
+        '新增烏克蘭語 (uk)、波蘭語 (pl)',
+        '試驗版語言新增徽章標記',
+        '全48種語言的旗幟/符號圖標齊全',
+      ],
+      ko: [
+        'UI 언어 선택기를 3개 섹션으로 재구성: 현대어 / 현대어(시험판) / 고전어(시험판)',
+        '아이누어 (ain), 오키나와어 (ryu)를 현대어(시험판)로 추가',
+        '모든 고전/역사 언어를 고전어(시험판)로 분류',
+        '에스페란토 (eo), 과라니어 (gn)를 현대어 섹션에 배치',
+        '우크라이나어 (uk), 폴란드어 (pl) 추가',
+        '시험판 언어에 배지 표시 추가',
+        '전체 48개 언어의 국기/기호 아이콘 완비',
+      ],
+      es: [
+        'Selector de idioma UI reestructurado en 3 secciones: Modernas / Modernas (experimental) / Clásicas (experimental)',
+        'Añadidos ainu (ain) y okinawense (ryu) como modernos experimentales',
+        'Todas las lenguas clásicas/históricas agrupadas como clásicas experimentales',
+        'Esperanto (eo) y guaraní (gn) en la sección moderna',
+        'Añadidos ucraniano (uk) y polaco (pl)',
+        'Insignia beta añadida a idiomas experimentales',
+        'Iconos de bandera/símbolo completados para los 48 idiomas',
+      ],
+      de: [
+        'UI-Sprachauswahl in 3 Abschnitte umstrukturiert: Modern / Modern (experimentell) / Klassisch (experimentell)',
+        'Ainu (ain) und Okinawisch (ryu) als moderne experimentelle Sprachen hinzugefügt',
+        'Alle klassischen/historischen Sprachen unter Klassisch (experimentell) gruppiert',
+        'Esperanto (eo) und Guaraní (gn) im modernen Abschnitt platziert',
+        'Ukrainisch (uk) und Polnisch (pl) hinzugefügt',
+        'Beta-Abzeichen für experimentelle Sprachen hinzugefügt',
+        'Flaggen-/Symbolicons für alle 48 Sprachen vervollständigt',
+      ],
+      ru: [
+        'Переработка селектора языков UI на 3 секции: Современные / Современные (эксперим.) / Классические (эксперим.)',
+        'Добавлены айнский (ain) и окинавский (ryu) как экспериментальные современные',
+        'Все классические/исторические языки сгруппированы как классические экспериментальные',
+        'Эсперанто (eo) и гуарани (gn) размещены в секции современных',
+        'Добавлены украинский (uk) и польский (pl)',
+        'Значок «бета» добавлен к экспериментальным языкам',
+        'Иконки флагов/символов завершены для всех 48 языков',
+      ],
+      uk: [
+        'Селектор мови UI реструктуровано на 3 секції: Сучасні / Сучасні (експерим.) / Класичні (експерим.)',
+        'Додано айнську (ain) та окінавську (ryu) як сучасні експериментальні',
+        'Усі класичні/історичні мови згруповано як класичні експериментальні',
+        'Есперанто (eo) та гуарані (gn) розміщено у секції сучасних',
+        'Додано українську (uk) та польську (pl)',
+        'Позначку «бета» додано до експериментальних мов',
+        'Іконки прапорів/символів завершено для всіх 48 мов',
+      ],
+      pl: [
+        'Selektor języka UI przebudowany na 3 sekcje: Współczesne / Współczesne (eksperymentalne) / Klasyczne (eksperymentalne)',
+        'Dodano ajnuski (ain) i okinawski (ryu) jako eksperymentalne nowoczesne',
+        'Wszystkie klasyczne/historyczne języki zgrupowane jako klasyczne eksperymentalne',
+        'Esperanto (eo) i guarani (gn) umieszczone w sekcji nowoczesnych',
+        'Dodano ukraiński (uk) i polski (pl)',
+        'Znaczek beta dodany do języków eksperymentalnych',
+        'Ikony flag/symboli uzupełnione dla wszystkich 48 języków',
+      ],
+      it: [
+        'Selettore lingua UI ristrutturato in 3 sezioni: Moderne / Moderne (sperimentali) / Classiche (sperimentali)',
+        'Aggiunti ainu (ain) e okinawense (ryu) come moderni sperimentali',
+        'Tutte le lingue classiche/storiche raggruppate come classiche sperimentali',
+        'Esperanto (eo) e guaraní (gn) nella sezione moderna',
+        'Aggiunti ucraino (uk) e polacco (pl)',
+        'Badge beta aggiunto alle lingue sperimentali',
+        'Icone bandiera/simbolo completate per tutte le 48 lingue',
+      ],
+      pt: [
+        'Seletor de idioma UI reestruturado em 3 seções: Modernas / Modernas (experimental) / Clássicas (experimental)',
+        'Adicionados ainu (ain) e okinawense (ryu) como modernos experimentais',
+        'Todas as línguas clássicas/históricas agrupadas como clássicas experimentais',
+        'Esperanto (eo) e guarani (gn) na seção moderna',
+        'Adicionados ucraniano (uk) e polonês (pl)',
+        'Badge beta adicionado a idiomas experimentais',
+        'Ícones de bandeira/símbolo completos para todos os 48 idiomas',
+      ],
+      el: [
+        'Αναδιάρθρωση επιλογέα γλώσσας UI σε 3 ενότητες: Σύγχρονες / Σύγχρονες (πειραματικές) / Κλασικές (πειραματικές)',
+        'Προστέθηκαν Αϊνού (ain) και Οκινάουα (ryu) ως σύγχρονες πειραματικές',
+        'Όλες οι κλασικές/ιστορικές γλώσσες ομαδοποιήθηκαν ως κλασικές πειραματικές',
+        'Εσπεράντο (eo) και Γκουαρανί (gn) στην ενότητα σύγχρονων',
+        'Προστέθηκαν ουκρανικά (uk) και πολωνικά (pl)',
+        'Badge beta σε πειραματικές γλώσσες',
+        'Εικονίδια σημαίας/συμβόλου ολοκληρώθηκαν για τις 48 γλώσσες',
+      ],
+      ar: [
+        'إعادة هيكلة محدد لغة واجهة المستخدم إلى 3 أقسام: حديثة / حديثة (تجريبي) / كلاسيكية (تجريبي)',
+        'إضافة الأينوية (ain) والأوكيناوية (ryu) كحديثة تجريبية',
+        'تجميع جميع اللغات الكلاسيكية/التاريخية كلاسيكية تجريبية',
+        'الإسبرانتو (eo) والغوارانية (gn) في القسم الحديث',
+        'إضافة الأوكرانية (uk) والبولندية (pl)',
+        'شارة تجريبي للغات التجريبية',
+        'أيقونات الأعلام/الرموز مكتملة لجميع اللغات الـ 48',
+      ],
+      hi: [
+        'UI भाषा चयनकर्ता को 3 खंडों में पुनर्गठित: आधुनिक / आधुनिक (प्रायोगिक) / शास्त्रीय (प्रायोगिक)',
+        'ऐनू (ain) और ओकिनावान (ryu) को आधुनिक प्रायोगिक के रूप में जोड़ा',
+        'सभी शास्त्रीय/ऐतिहासिक भाषाओं को शास्त्रीय प्रायोगिक में वर्गीकृत',
+        'एस्पेरांतो (eo) और गुआरानी (gn) को आधुनिक खंड में रखा',
+        'यूक्रेनी (uk) और पोलिश (pl) जोड़ा',
+        'प्रायोगिक भाषाओं में बीटा बैज जोड़ा',
+        'सभी 48 भाषाओं के ध्वज/प्रतीक आइकन पूर्ण',
+      ],
+      la: [
+        'Selector linguae UI in tres sectiones restructuratus: Modernae / Modernae (experimentales) / Classicae (experimentales)',
+        'Ainu (ain) et Okinawensis (ryu) addita ut modernae experimentales',
+        'Omnes linguae classicae/historicae sub classicis experimentalibus congregatae',
+        'Esperanto (eo) et Guaraní (gn) in sectione moderna collocatae',
+        'Ucrainica (uk) et Polonica (pl) additae',
+        'Insigne beta linguis experimentalibus additum',
+        'Icones vexillorum/symbolorum pro omnibus XLVIII linguis completae',
+      ],
+      eo: [
+        'UI-lingva elektilo restrukturita en 3 sekciojn: Modernaj / Modernaj (eksperimentaj) / Klasikaj (eksperimentaj)',
+        'Ajnua (ain) kaj Okinava (ryu) aldonitaj kiel modernaj eksperimentaj',
+        'Ĉiuj klasikaj/historiaj lingvoj grupiĝis sub klasikaj eksperimentaj',
+        'Esperanto (eo) kaj Gvarania (gn) en la moderna sekcio',
+        'Ukraina (uk) kaj Pola (pl) aldonitaj',
+        'Beta insigno aldonita al eksperimentaj lingvoj',
+        'Flagaj/simbolaj ikonoj kompletaj por ĉiuj 48 lingvoj',
+      ],
+      sa: [
+        'UI-भाषानिर्वाचकः त्रिभागेषु पुनर्विन्यस्तः: आधुनिकाः / आधुनिकाः (परीक्षणम्) / शास्त्रीयाः (परीक्षणम्)',
+        'ऐनुभाषा (ain) उचिनागुचिश्च (ryu) आधुनिकपरीक्षणरूपेण योजिते',
+        'सर्वाः शास्त्रीयाः/ऐतिहासिकभाषाः शास्त्रीयपरीक्षणेषु वर्गीकृताः',
+        'एस्पेरान्तो (eo) ग्वारणी (gn) च आधुनिकभागे स्थापिते',
+        'यूक्रेनी (uk) पोलिश् (pl) च योजिते',
+        'परीक्षणभाषासु बीटा-चिह्नं योजितम्',
+        'सर्वासां ४८ भाषाणां ध्वज/प्रतीकचिह्नानि पूर्णानि',
+      ],
+    },
+  },
+  {
     version: '4.4.5',
     date: '2026-03-28',
     changes: {
@@ -797,16 +965,48 @@ export const Header = memo(function Header({
     'zh-TW': '\u{1F1ED}\u{1F1F0}', // 🇭🇰
     ko: '\u{1F1F0}\u{1F1F7}',      // 🇰🇷
     es: '\u{1F1EA}\u{1F1F8}',      // 🇪🇸
+    pt: '\u{1F1E7}\u{1F1F7}',      // 🇧🇷
+    it: '\u{1F1EE}\u{1F1F9}',      // 🇮🇹
     de: '\u{1F1E9}\u{1F1EA}',      // 🇩🇪
-    ar: '\u{1F1F8}\u{1F1E6}',      // 🇸🇦
-    hi: '\u{1F1EE}\u{1F1F3}',      // 🇮🇳
+    pl: '\u{1F1F5}\u{1F1F1}',      // 🇵🇱
+    cs: '\u{1F1E8}\u{1F1FF}',      // 🇨🇿
+    hu: '\u{1F1ED}\u{1F1FA}',      // 🇭🇺
+    uk: '\u{1F1FA}\u{1F1E6}',      // 🇺🇦
     ru: '\u{1F1F7}\u{1F1FA}',      // 🇷🇺
     el: '\u{1F1EC}\u{1F1F7}',      // 🇬🇷
-    sa: '\u{1F549}\uFE0F',          // 🕉️ (Sanskrit/India)
-    syc: '\u{2670}',                // ☰ (Syriac cross)
-    cop: '\u{2625}\uFE0F',          // ☥ (Ankh / Coptic)
-    la: '\u{1F3DB}\uFE0F',          // 🏛️
+    mt: '\u{1F1F2}\u{1F1F9}',      // 🇲🇹
+    ar: '\u{1F1F8}\u{1F1E6}',      // 🇸🇦
+    fa: '\u{1F1EE}\u{1F1F7}',      // 🇮🇷
+    he: '\u{1F1EE}\u{1F1F1}',      // 🇮🇱
+    ur: '\u{1F1F5}\u{1F1F0}',      // 🇵🇰
+    hi: '\u{1F1EE}\u{1F1F3}',      // 🇮🇳
+    bn: '\u{1F1E7}\u{1F1E9}',      // 🇧🇩
+    th: '\u{1F1F9}\u{1F1ED}',      // 🇹🇭
+    vi: '\u{1F1FB}\u{1F1F3}',      // 🇻🇳
+    ms: '\u{1F1F2}\u{1F1FE}',      // 🇲🇾
+    id: '\u{1F1EE}\u{1F1E9}',      // 🇮🇩
+    km: '\u{1F1F0}\u{1F1ED}',      // 🇰🇭
+    my: '\u{1F1F2}\u{1F1F2}',      // 🇲🇲
+    am: '\u{1F1EA}\u{1F1F9}',      // 🇪🇹
+    sw: '\u{1F1F9}\u{1F1FF}',      // 🇹🇿
+    ha: '\u{1F1F3}\u{1F1EC}',      // 🇳🇬
+    xh: '\u{1F1FF}\u{1F1E6}',      // 🇿🇦
     eo: '\u{1F30D}',                // 🌍
+    gn: '\u{1F1F5}\u{1F1FE}',      // 🇵🇾
+    ain: '\u{1F43B}',               // 🐻 (アイヌ — 熊)
+    ryu: '\u{1F33A}',               // 🌺 (ウチナーグチ — ハイビスカス)
+    sa: '\u{1F549}\uFE0F',          // 🕉️
+    la: '\u{1F3DB}\uFE0F',          // 🏛️
+    grc: '\u{1F3FA}',               // 🏺
+    ang: '\u{2694}\uFE0F',          // ⚔️
+    got: '\u{1F5E1}\uFE0F',         // 🗡️
+    cu: '\u{2626}\uFE0F',           // ☦️
+    syc: '\u{271D}\uFE0F',          // ✝️
+    cop: '\u{2625}\uFE0F',          // ☥
+    akk: '\u{1F4DC}',               // 📜
+    sux: '\u{1F3DB}\uFE0F',         // 🏛️
+    hit: '\u{2604}\uFE0F',          // ☄️
+    egy: '\u{1F3FA}',               // 🏺
   }
 
   const themeTitle = theme === 'dark'
@@ -817,15 +1017,18 @@ export const Header = memo(function Header({
   const [showChangelog, setShowChangelog] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
 
-  const CLASSICAL_LANGS = ['la', 'sa', 'syc', 'cop'] as const
-  const MODERN_LANGS = LANGUAGES.filter(c => !(CLASSICAL_LANGS as readonly string[]).includes(c))
-
-  const CLASSICAL_LABELS: Record<string, Record<string, string>> = {
-    la:  { ja: 'ラテン語', en: 'Latin', 'zh-CN': '拉丁语', 'zh-TW': '拉丁語', ko: '라틴어', la: 'Latina', eo: 'Latina', es: 'Latín', de: 'Latein', ar: 'اللاتينية', hi: 'लैटिन', ru: 'Латынь', el: 'Λατινικά', syc: 'ܠܛܝܢܝܐ', cop: 'ⲗⲁⲧⲓⲛⲟⲛ', sa: 'लातिनी' },
-    sa:  { ja: '梵語', en: 'Sanskrit', 'zh-CN': '梵语', 'zh-TW': '梵語', ko: '산스크리트어', la: 'Sanscrita', eo: 'Sanskrito', es: 'Sánscrito', de: 'Sanskrit', ar: 'السنسكريتية', hi: 'संस्कृत', ru: 'Санскрит', el: 'Σανσκριτικά', syc: 'ܣܢܣܩܪܝܛ', cop: 'ⲥⲁⲛⲥⲕⲣⲓⲧ', sa: 'संस्कृतम्' },
-    syc: { ja: 'シリア語', en: 'Syriac', 'zh-CN': '叙利亚语', 'zh-TW': '敘利亞語', ko: '시리아어', la: 'Syriaca', eo: 'Siria', es: 'Siríaco', de: 'Syrisch', ar: 'السريانية', hi: 'सीरियाई', ru: 'Сирийский', el: 'Συριακά', syc: 'ܣܘܪܝܝܐ', cop: 'ⲙⲉⲧⲥⲩⲣⲓⲁⲛⲟⲥ', sa: 'सिरियाक्' },
-    cop: { ja: 'コプト語', en: 'Coptic', 'zh-CN': '科普特语', 'zh-TW': '科普特語', ko: '콥트어', la: 'Coptica', eo: 'Kopta', es: 'Copto', de: 'Koptisch', ar: 'القبطية', hi: 'कॉप्टिक', ru: 'Коптский', el: 'Κοπτικά', syc: 'ܩܘܦܛܝܐ', cop: 'ⲙⲉⲧⲣⲉⲙⲛⲕⲏⲙⲉ', sa: 'कोप्तिक्' },
-  }
+  // 古典語（試験版）: 古典・歴史言語 + 古代語
+  const CLASSICAL_LANGS: Language[] = [
+    'sa', 'la', 'grc', 'ang', 'got', 'cu', 'syc', 'cop',
+    'akk', 'sux', 'hit', 'egy',
+  ]
+  // 現代語（試験版）: アイヌ語、ウチナーグチ
+  const EXPERIMENTAL_MODERN_LANGS: Language[] = ['ain', 'ryu']
+  // 現代語: それ以外すべて（eo, gn 含む）
+  const MODERN_LANGS = LANGUAGES.filter(c =>
+    !(CLASSICAL_LANGS as string[]).includes(c) &&
+    !(EXPERIMENTAL_MODERN_LANGS as string[]).includes(c)
+  )
 
   const handleVersionClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -891,7 +1094,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.4.5</span>
+        >v4.4.6</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
@@ -1062,6 +1265,7 @@ export const Header = memo(function Header({
             </button>
             {langOpen && (
               <div className="lang-dropdown-menu">
+                {/* ── 現代語 ── */}
                 <div className="lang-dropdown-section-label">{L(lang, {
                   ja: '── 現代語 ──', en: '── Modern ──', 'zh-CN': '── 现代语 ──', 'zh-TW': '── 現代語 ──',
                   ko: '── 현대어 ──', la: '── Modernae ──', eo: '── Modernaj ──', es: '── Modernas ──',
@@ -1082,11 +1286,44 @@ export const Header = memo(function Header({
                     <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
                   </button>
                 ))}
+
+                {/* ── 現代語（試験版） ── */}
                 <div className="lang-dropdown-section-label">{L(lang, {
-                  ja: '── 古典語 ──', en: '── Classical ──', 'zh-CN': '── 古典语 ──', 'zh-TW': '── 古典語 ──',
-                  ko: '── 고전어 ──', la: '── Classicae ──', eo: '── Klasikaj ──', es: '── Clásicas ──',
-                  de: '── Klassisch ──', ar: '── كلاسيكية ──', hi: '── शास्त्रीय ──', ru: '── Классические ──',
-                  el: '── Κλασικές ──', sa: '── शास्त्रीयाः ──', syc: '── ܩ̈ܕ̈ܝ̈ܡ̈ܬ̈ܐ ──', cop: '── ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ ──'
+                  ja: '── 現代語（試験版） ──', en: '── Modern (experimental) ──',
+                  'zh-CN': '── 现代语（试验版） ──', 'zh-TW': '── 現代語（試驗版） ──',
+                  ko: '── 현대어（시험판） ──', es: '── Modernas (experimental) ──',
+                  de: '── Modern (experimentell) ──', ru: '── Современные (эксперим.) ──',
+                  ar: '── حديثة (تجريبي) ──', hi: '── आधुनिक (प्रायोगिक) ──',
+                  el: '── Σύγχρονες (πειραματικές) ──', la: '── Modernae (experimentales) ──',
+                  eo: '── Modernaj (eksperimentaj) ──', sa: '── आधुनिकाः (परीक्षणम्) ──',
+                  syc: '── ܚ̈ܕ̈ܬ̈ܬ̈ܐ (ܢܣܝܢܐ) ──', cop: '── ⲛⲓⲕⲉⲙⲟⲇⲉⲣⲛ (ⲡⲓⲣⲁⲥⲙⲟⲥ) ──'
+                })}</div>
+                {EXPERIMENTAL_MODERN_LANGS.map(code => (
+                  <button
+                    key={code}
+                    className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
+                    onClick={() => {
+                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                      setLangOpen(false)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                    <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                    <span className="lang-dropdown-item-badge">{L(lang, { ja: '試験版', en: 'beta' })}</span>
+                  </button>
+                ))}
+
+                {/* ── 古典語（試験版） ── */}
+                <div className="lang-dropdown-section-label">{L(lang, {
+                  ja: '── 古典語（試験版） ──', en: '── Classical (experimental) ──',
+                  'zh-CN': '── 古典语（试验版） ──', 'zh-TW': '── 古典語（試驗版） ──',
+                  ko: '── 고전어（시험판） ──', es: '── Clásicas (experimental) ──',
+                  de: '── Klassisch (experimentell) ──', ru: '── Классические (эксперим.) ──',
+                  ar: '── كلاسيكية (تجريبي) ──', hi: '── शास्त्रीय (प्रायोगिक) ──',
+                  el: '── Κλασικές (πειραματικές) ──', la: '── Classicae (experimentales) ──',
+                  eo: '── Klasikaj (eksperimentaj) ──', sa: '── शास्त्रीयाः (परीक्षणम्) ──',
+                  syc: '── ܩ̈ܕ̈ܝ̈ܡ̈ܬ̈ܐ (ܢܣܝܢܐ) ──', cop: '── ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ (ⲡⲓⲣⲁⲥⲙⲟⲥ) ──'
                 })}</div>
                 {CLASSICAL_LANGS.map(code => (
                   <button
@@ -1099,7 +1336,8 @@ export const Header = memo(function Header({
                     }}
                   >
                     <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
-                    <span className="lang-dropdown-item-name">{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
+                    <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                    <span className="lang-dropdown-item-badge">{L(lang, { ja: '試験版', en: 'beta' })}</span>
                   </button>
                 ))}
               </div>
