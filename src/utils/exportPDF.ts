@@ -12,10 +12,8 @@
  * 不可視テキスト (opacity: 0.01) を画像の上に重ねる。
  * 目的は検索 (Ctrl+F) とテキスト選択の提供であり、視覚表示ではない。
  *
- * 1 ブロック = 1 回の drawText（縦書き・横書き共通）。
- * 複数 drawText に分割すると PDF ビューアがギャップを半角スペースとして
- * 解釈するため、必ず単一 drawText にする。
- * フォントサイズはテキスト幅がブロック幅を超えないよう逆算。
+ * ■ 横書きブロック: 1 ブロック = 1 回の drawText。
+ * ■ 縦書きブロック: 1 文字 = 1 回の drawText で、画像上の文字位置に配置。
  *
  * ブロック座標は originalWidth × originalHeight（元画像ピクセル）基準。
  * imageDataUrl がサムネイルでも、originalWidth/originalHeight を使って
@@ -31,6 +29,9 @@ const TEXT_OPACITY = 0.01
 
 // CJK全角文字の幅は概ね fontSize の 0.5〜0.6 倍（フォント依存）
 const CJK_WIDTH_RATIO = 0.55
+
+// 縦書きブロック判定: height / width がこの値以上なら縦書きとみなす
+const VERTICAL_ASPECT_RATIO = 1.3
 
 // ---- ユーティリティ ----
 
@@ -149,12 +150,15 @@ export async function downloadBatchPDF(
  *
  * === テキストレイヤー設計 ===
  *
- * 各ブロックのテキストを **1 回の drawText** で描画する（縦書き・横書き共通）。
- * 複数の drawText に分割すると PDF ビューアがオブジェクト間のギャップを
- * 半角スペースとして解釈してしまうため、必ず 1 ブロック = 1 drawText とする。
+ * ■ 横書きブロック: 1 ブロック = 1 回の drawText。
+ *   フォントサイズはテキスト幅がブロック幅を超えないよう逆算。
+ *   テキストをブロックの垂直中央に配置。
  *
- * テキストは不可視 (opacity 0.01) で、目的は検索 (Ctrl+F) とテキスト選択のみ。
- * フォントサイズはテキスト幅がブロック幅（またはページ幅）を超えないよう逆算する。
+ * ■ 縦書きブロック (height/width >= VERTICAL_ASPECT_RATIO):
+ *   1 文字 = 1 回の drawText で、各文字を画像上の正しい Y 座標に配置。
+ *   フォントサイズはブロック幅から逆算（1文字が列幅に収まるサイズ）。
+ *   文字間のY間隔はブロック高さを文字数で等分。
+ *   → 検索ハイライトが画像上の文字位置と一致する。
  *
  * ブロック座標は originalWidth × originalHeight の空間で定義されているため、
  * coordW/coordH にその値を使ってスケーリングする。
@@ -202,36 +206,78 @@ async function addPageToPdf(
     const bw = block.width * scaleX
     const bh = block.height * scaleY
 
-    // 改行を除去して連続文字列にする（1 drawText = スペース誤挿入なし）
-    const rawText = block.text.replace(/\n/g, '')
-    const safeText = filterEncodableText(font, rawText)
-    if (!safeText.trim()) continue
+    const isVertical = block.height / block.width >= VERTICAL_ASPECT_RATIO
 
-    const charCount = safeText.length
+    if (isVertical) {
+      // ---- 縦書きブロック: 1文字ずつ正しいY座標に配置 ----
+      const rawText = block.text.replace(/\n/g, '')
+      const safeText = filterEncodableText(font, rawText)
+      if (!safeText.trim()) continue
 
-    // フォントサイズ逆算:
-    // テキスト水平幅 ≈ charCount × fontSize × CJK_WIDTH_RATIO
-    // これがブロック幅を超えないようにする。
-    // ブロック幅が狭い場合（縦書き等）はページ幅を上限にとる。
-    const maxWidth = Math.max(bw, pdfW * 0.8)
-    let fontSize = maxWidth / (charCount * CJK_WIDTH_RATIO)
-    fontSize = Math.max(1, Math.min(fontSize, 14))
+      const chars = [...safeText]  // Unicode-safe split
+      const charCount = chars.length
+      if (charCount === 0) continue
 
-    // テキストをブロックの中央付近に配置
-    // byTop はブロック上端。テキストベースラインを bh の中央に置く。
-    const textY = byTop - (bh / 2) - (fontSize / 2)
+      // フォントサイズ: ブロック幅に1文字が収まるサイズ
+      let fontSize = bw / CJK_WIDTH_RATIO
+      fontSize = Math.max(1, Math.min(fontSize, 14))
 
-    try {
-      page.drawText(safeText, {
-        x: bx,
-        y: Math.max(textY, 0),
-        size: fontSize,
-        font,
-        color: rgb(0, 0, 0),
-        opacity: TEXT_OPACITY,
-      })
-    } catch (e) {
-      console.warn('[exportPDF] drawText failed for block:', e)
+      // 各文字のY間隔: ブロック高さを文字数で等分
+      const charStep = bh / charCount
+
+      for (let i = 0; i < charCount; i++) {
+        const ch = chars[i]
+        if (!ch.trim()) continue
+
+        // 文字のY座標: ブロック上端から i 番目の位置
+        // byTop はブロック上端（PDF上端）、下に行くほど Y が減る
+        const charY = byTop - (charStep * i) - fontSize
+
+        // X座標: ブロックの水平中央に配置
+        const charX = bx + (bw - fontSize * CJK_WIDTH_RATIO) / 2
+
+        try {
+          page.drawText(ch, {
+            x: Math.max(charX, 0),
+            y: Math.max(charY, 0),
+            size: fontSize,
+            font,
+            color: rgb(0, 0, 0),
+            opacity: TEXT_OPACITY,
+          })
+        } catch (e) {
+          // フォントにない文字はスキップ
+        }
+      }
+    } else {
+      // ---- 横書きブロック: 1 回の drawText ----
+      const rawText = block.text.replace(/\n/g, '')
+      const safeText = filterEncodableText(font, rawText)
+      if (!safeText.trim()) continue
+
+      const charCount = safeText.length
+
+      // フォントサイズ逆算:
+      // テキスト水平幅 ≈ charCount × fontSize × CJK_WIDTH_RATIO
+      // これがブロック幅を超えないようにする。
+      let fontSize = bw / (charCount * CJK_WIDTH_RATIO)
+      fontSize = Math.max(1, Math.min(fontSize, 14))
+
+      // テキストをブロックの垂直中央に配置
+      const textY = byTop - (bh / 2) - (fontSize / 2)
+
+      try {
+        page.drawText(safeText, {
+          x: bx,
+          y: Math.max(textY, 0),
+          size: fontSize,
+          font,
+          color: rgb(0, 0, 0),
+          opacity: TEXT_OPACITY,
+        })
+      } catch (e) {
+        console.warn('[exportPDF] drawText failed for block:', e)
+      }
     }
   }
 }
