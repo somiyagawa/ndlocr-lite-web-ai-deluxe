@@ -204,7 +204,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ### v4.4.3 — 2026-03-28
 
-**PDF フォント /Widths エラー修正・テキスト検索選択復旧** — Google Fonts CSS2 API が CJK フォントを 100 以上の unicode-range スライスに分割して返す問題を解消。旧実装では最初のスライス（日本語グリフ未収録）のみ取得していたため、Acrobat で「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーが発生し、テキスト検索・選択が不可能だった。Noto Sans JP SubsetOTF（完全な日本語グリフセット、約 4.3 MB）を jsDelivr CDN から直接取得する方式に変更。fontkit の CJK サブセット処理による /Widths テーブル破損を回避するため `subset: false` に設定。CDN フォールバック対応（SubsetOTF → フル CJK OTF）、IndexedDB キャッシュキーを更新して旧キャッシュを自動無効化。
+**PDF フォント /Widths エラー修正・テキスト検索選択復旧** — Google Fonts CSS2 API が CJK フォントを 100 以上の unicode-range スライスに分割して返す問題を解消。旧実装では最初のスライス（日本語グリフ未収録）のみ取得していたため、Acrobat で「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーが発生し、テキスト検索・選択が不可能だった。Noto Sans JP SubsetOTF（完全な日本語グリフセット、約 4.3 MB）を jsDelivr CDN から直接取得する方式に変更。fontkit の CJK サブセット処理による /Widths テーブル破損を回避するため `subset: false` に設定。CJK 横書きテキストの文字単位配置に変更（`maxWidth` のスペース改行問題を修正）。テキスト透過度を `opacity: 0` → `0.01` に変更（一部ビューアの検索除外問題を回避）。Blob 生成時の `Uint8Array.buffer` 使用によるPDF破損リスクを解消。CDN フォールバック対応（SubsetOTF → フル CJK OTF）、IndexedDB キャッシュキーを更新して旧キャッシュを自動無効化。
 
 ### v4.4.2 — 2026-03-27
 
@@ -212,7 +212,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ### v4.4.1 — 2026-03-27
 
-**画像補正パネル閉じるボタン・バグ報告修正** — 携帯版の画像補正ボトムシート右上に✕閉じるボタンを追加。バグ報告のmailto送信方式を `window.location.href` に変更し、COOPヘッダー環境・モバイルでの送信失敗を修正。送信メール本文のバージョン表記を更新。
+**画像補正パネル閉じるボタン** — 携帯版の画像補正ボトムシート右上に✕閉じるボタンを追加。
 
 ### v4.4.0 — 2026-03-27
 

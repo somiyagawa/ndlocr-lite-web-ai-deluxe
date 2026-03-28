@@ -17,6 +17,9 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
         'PDF /Widths修正: fontkitのCJKフォントサブセット処理による /Widths テーブル破損を回避（subset: false に変更）',
         'Acrobat互換性: 「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーを解消',
         'PDFテキスト検索・選択: 日本語テキストレイヤーが正常に埋め込まれ、Acrobat上で検索・選択が可能に',
+        'PDFテキスト配置: CJK横書きテキストの文字単位配置に変更（maxWidthのスペース改行問題を修正）',
+        'PDFテキスト透過度: opacity 0→0.01に変更（一部ビューアがopacity:0テキストを検索除外する問題を回避）',
+        'PDF Blob生成: Uint8Array.bufferの代わりにUint8Arrayを直接使用（ビュー時のPDF破損を防止）',
         'フォントキャッシュ: CDNフォールバック対応（SubsetOTF → フルCJK OTF）、IndexedDBキャッシュキーを更新して旧キャッシュを自動無効化',
       ],
       en: [
@@ -25,6 +28,9 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
         'PDF /Widths fix: avoid fontkit CJK font subsetting corruption by disabling subset embedding',
         'Acrobat compatibility: resolved "NotoSansJPThin-Regular /Widths incorrect" error',
         'PDF text search/select: Japanese text layer now correctly embedded, enabling search and selection in Acrobat',
+        'PDF text positioning: switched to per-character placement for CJK horizontal text (fixes maxWidth space-based wrapping failure)',
+        'PDF text opacity: changed from 0 to 0.01 (avoids some viewers excluding fully transparent text from search index)',
+        'PDF Blob fix: pass Uint8Array directly instead of .buffer (prevents corrupt PDF when Uint8Array is a view)',
         'Font cache: CDN fallback support (SubsetOTF → full CJK OTF), updated IndexedDB cache key to auto-invalidate old corrupt cache',
       ],
     },
@@ -53,8 +59,6 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     changes: {
       ja: [
         '携帯版: 画像補正パネルに✕閉じるボタンを追加（ボトムシート右上に丸形ボタン）',
-        'バグ報告: mailto送信方式をwindow.location.hrefに変更 — COOPヘッダー環境・モバイルでの送信失敗を修正',
-        'バグ報告: 送信メール本文のバージョン表記を v4.4.1 に更新',
       ],
       en: [
         'Mobile: added close button to image correction panel (circular button at top-right of bottom sheet)',

@@ -26,6 +26,8 @@ interface TranslationStrings {
   sending: string
   sent: string
   sentMessage: string
+  errorMessage: string
+  retry: string
 }
 
 const translations: Record<string, TranslationStrings> = {
@@ -47,8 +49,10 @@ const translations: Record<string, TranslationStrings> = {
     send: '送信',
     cancel: 'キャンセル',
     sending: '送信中…',
-    sent: '送信完了',
-    sentMessage: 'メールクライアントが開きます。送信ボタンを押して下さい。',
+    sent: '送信完了！',
+    sentMessage: 'ご報告ありがとうございます。内容を確認いたします。',
+    errorMessage: '送信に失敗しました。ネットワーク接続を確認して再度お試し下さい。',
+    retry: '再送信',
   },
   en: {
     title: 'Bug Report / Feature Request',
@@ -68,8 +72,10 @@ const translations: Record<string, TranslationStrings> = {
     send: 'Send',
     cancel: 'Cancel',
     sending: 'Sending…',
-    sent: 'Sent',
-    sentMessage: 'Your email client will open. Please press Send.',
+    sent: 'Sent!',
+    sentMessage: 'Thank you for your report. We will review it shortly.',
+    errorMessage: 'Submission failed. Please check your network connection and try again.',
+    retry: 'Retry',
   },
   'zh-CN': {
     title: '错误报告 / 功能建议',
@@ -89,8 +95,10 @@ const translations: Record<string, TranslationStrings> = {
     send: '发送',
     cancel: '取消',
     sending: '发送中…',
-    sent: '已发送',
-    sentMessage: '邮件客户端将打开。请点击发送。',
+    sent: '已发送！',
+    sentMessage: '感谢您的反馈。我们会尽快查看。',
+    errorMessage: '发送失败。请检查网络连接后重试。',
+    retry: '重试',
   },
   'zh-TW': {
     title: '錯誤報告 / 功能建議',
@@ -110,8 +118,10 @@ const translations: Record<string, TranslationStrings> = {
     send: '發送',
     cancel: '取消',
     sending: '發送中…',
-    sent: '已發送',
-    sentMessage: '郵件客戶端將開啟。請點擊發送。',
+    sent: '已發送！',
+    sentMessage: '感謝您的回報。我們會盡快查看。',
+    errorMessage: '發送失敗。請檢查網路連線後重試。',
+    retry: '重試',
   },
   ko: {
     title: '버그 보고 / 기능 요청',
@@ -131,8 +141,10 @@ const translations: Record<string, TranslationStrings> = {
     send: '보내기',
     cancel: '취소',
     sending: '보내는 중…',
-    sent: '전송 완료',
-    sentMessage: '이메일 클라이언트가 열립니다. 보내기를 눌러주세요.',
+    sent: '전송 완료!',
+    sentMessage: '보고해 주셔서 감사합니다. 곧 확인하겠습니다.',
+    errorMessage: '전송 실패. 네트워크 연결을 확인하고 다시 시도해 주세요.',
+    retry: '다시 시도',
   },
 }
 
@@ -146,6 +158,18 @@ function getBrowserInfo(): string {
   return `${ua} | Screen: ${screen}`
 }
 
+const APP_VERSION = '4.4.3'
+
+/**
+ * Web3Forms アクセスキー
+ *
+ * Vercel 環境では Netlify Forms が使えないため、
+ * クライアントサイドで動作する Web3Forms API を使用する。
+ * https://web3forms.com で無料キーを取得し、
+ * Vercel の環境変数 VITE_WEB3FORMS_KEY に設定する。
+ */
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined
+
 export const BugReportModal = memo(function BugReportModal({ lang, onClose }: BugReportModalProps) {
   const strings = getStrings(lang)
 
@@ -154,42 +178,57 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
   const [category, setCategory] = useState<'bug' | 'feature' | 'other'>('bug')
   const [description, setDescription] = useState('')
   const [steps, setSteps] = useState('')
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const categoryLabel = category === 'bug' ? strings.categoryBug
     : category === 'feature' ? strings.categoryFeature
     : strings.categoryOther
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
+    setStatus('sending')
 
-    const browserInfo = getBrowserInfo()
-    const subject = `[BLUEPOND ${categoryLabel}] ${description.slice(0, 60)}`
-    const body = [
-      `Category: ${categoryLabel}`,
-      name ? `Name: ${name}` : '',
-      email ? `Reply-to: ${email}` : '',
-      '',
-      '--- Description ---',
+    // Web3Forms API — Vercel 等あらゆるホスティングで動作するクライアントサイド送信
+    // https://web3forms.com で無料キーを取得し VITE_WEB3FORMS_KEY に設定する
+    if (!WEB3FORMS_KEY) {
+      console.error('[BugReport] VITE_WEB3FORMS_KEY is not set. Cannot submit.')
+      setStatus('error')
+      return
+    }
+
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: `[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`,
+      from_name: name || 'Anonymous',
+      email: email || 'noreply@example.com',
+      category: `${category} (${categoryLabel})`,
       description,
-      '',
-      steps ? '--- Steps to Reproduce ---' : '',
-      steps,
-      '',
-      '--- Environment ---',
-      `Browser: ${browserInfo}`,
-      `App Version: v4.4.1`,
-      `URL: ${window.location.href}`,
-      `Timestamp: ${new Date().toISOString()}`,
-    ].filter(Boolean).join('\n')
+      steps: steps || '(N/A)',
+      browser: getBrowserInfo(),
+      app_version: APP_VERSION,
+      page_url: window.location.href,
+      timestamp: new Date().toISOString(),
+      // ハニーポット（スパム対策）
+      botcheck: '',
+    }
 
-    const mailto = `mailto:miyagawa.so.36u@kyoto-u.jp?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    // COOP (Cross-Origin-Opener-Policy: same-origin) 環境では
-    // window.open() や <a target="_blank"> がブロックされるため、
-    // window.location.href に直接代入する方式を使用。
-    // モバイルブラウザでも mailto: の直接遷移が最も確実。
-    window.location.href = mailto
-    setSent(true)
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const result = await response.json()
+      if (response.ok && result.success) {
+        setStatus('sent')
+      } else {
+        console.error('Form submission failed:', result)
+        setStatus('error')
+      }
+    } catch (err) {
+      console.error('Form submission error:', err)
+      setStatus('error')
+    }
   }, [name, email, category, categoryLabel, description, steps])
 
   return (
@@ -200,13 +239,26 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
           <button className="modal-close" onClick={onClose} type="button">&times;</button>
         </div>
 
-        {sent ? (
+        {status === 'sent' ? (
           <div className="bug-report-sent">
             <div className="bug-report-sent-icon">✓</div>
             <p>{strings.sentMessage}</p>
             <button className="preprocess-btn preprocess-btn-primary" onClick={onClose} type="button">
               OK
             </button>
+          </div>
+        ) : status === 'error' ? (
+          <div className="bug-report-sent">
+            <div className="bug-report-sent-icon" style={{ color: 'var(--color-danger, #dc3545)' }}>✕</div>
+            <p>{strings.errorMessage}</p>
+            <div className="bug-report-actions">
+              <button className="preprocess-btn preprocess-btn-secondary" onClick={onClose} type="button">
+                {strings.cancel}
+              </button>
+              <button className="preprocess-btn preprocess-btn-primary" onClick={() => setStatus('idle')} type="button">
+                {strings.retry}
+              </button>
+            </div>
           </div>
         ) : (
           <form className="bug-report-form" onSubmit={handleSubmit}>
@@ -291,9 +343,9 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
               <button
                 type="submit"
                 className="preprocess-btn preprocess-btn-primary"
-                disabled={!description.trim()}
+                disabled={!description.trim() || status === 'sending'}
               >
-                {strings.send}
+                {status === 'sending' ? strings.sending : strings.send}
               </button>
             </div>
           </form>
