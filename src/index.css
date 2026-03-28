@@ -673,6 +673,15 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   margin-left: auto;
   flex-shrink: 0;
 }
+/* 準備中の言語（グレーアウト・選択不可） */
+.lang-dropdown-item-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.lang-dropdown-item-disabled .lang-dropdown-item-badge {
+  background: var(--color-text-muted, #999);
+}
 .lang-dropdown-section-label {
   padding: 0.35rem 0.75rem 0.15rem;
   font-size: 0.7rem;

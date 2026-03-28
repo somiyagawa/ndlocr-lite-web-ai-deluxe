@@ -1017,6 +1017,8 @@ export const Header = memo(function Header({
   ]
   // 現代語（試験版）: アイヌ語、ウチナーグチ
   const EXPERIMENTAL_MODERN_LANGS: Language[] = ['ain', 'ryu']
+  // 準備中の言語（プルダウンには表示するが選択不可・グレーアウト）
+  const DISABLED_LANGS: Set<string> = new Set(['ain', 'ryu', 'egy'])
   // 現代語: それ以外すべて（eo, gn 含む）
   const MODERN_LANGS = LANGUAGES.filter(c =>
     !(CLASSICAL_LANGS as string[]).includes(c) &&
@@ -1269,21 +1271,25 @@ export const Header = memo(function Header({
                   eo: '── Modernaj (eksperimentaj) ──', sa: '── आधुनिकाः (परीक्षणम्) ──',
                   syc: '── ܚ̈ܕ̈ܬ̈ܬ̈ܐ (ܢܣܝܢܐ) ──', cop: '── ⲛⲓⲕⲉⲙⲟⲇⲉⲣⲛ (ⲡⲓⲣⲁⲥⲙⲟⲥ) ──'
                 })}</div>
-                {EXPERIMENTAL_MODERN_LANGS.map(code => (
-                  <button
-                    key={code}
-                    className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
-                    onClick={() => {
-                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                      setLangOpen(false)
-                      setMenuOpen(false)
-                    }}
-                  >
-                    <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
-                    <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
-                    <span className="lang-dropdown-item-badge">{L(lang, { ja: '試験版', en: 'beta' })}</span>
-                  </button>
-                ))}
+                {EXPERIMENTAL_MODERN_LANGS.map(code => {
+                  const isDisabled = DISABLED_LANGS.has(code)
+                  return (
+                    <button
+                      key={code}
+                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}${isDisabled ? ' lang-dropdown-item-disabled' : ''}`}
+                      disabled={isDisabled}
+                      onClick={isDisabled ? undefined : () => {
+                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                        setLangOpen(false)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                      <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                      <span className="lang-dropdown-item-badge">{isDisabled ? L(lang, { ja: '準備中', en: 'soon' }) : L(lang, { ja: '試験版', en: 'beta' })}</span>
+                    </button>
+                  )
+                })}
 
                 {/* ── 古典語（試験版） ── */}
                 <div className="lang-dropdown-section-label">{L(lang, {
@@ -1296,21 +1302,25 @@ export const Header = memo(function Header({
                   eo: '── Klasikaj (eksperimentaj) ──', sa: '── शास्त्रीयाः (परीक्षणम्) ──',
                   syc: '── ܩ̈ܕ̈ܝ̈ܡ̈ܬ̈ܐ (ܢܣܝܢܐ) ──', cop: '── ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ (ⲡⲓⲣⲁⲥⲙⲟⲥ) ──'
                 })}</div>
-                {CLASSICAL_LANGS.map(code => (
-                  <button
-                    key={code}
-                    className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
-                    onClick={() => {
-                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                      setLangOpen(false)
-                      setMenuOpen(false)
-                    }}
-                  >
-                    <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
-                    <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
-                    <span className="lang-dropdown-item-badge">{L(lang, { ja: '試験版', en: 'beta' })}</span>
-                  </button>
-                ))}
+                {CLASSICAL_LANGS.map(code => {
+                  const isDisabled = DISABLED_LANGS.has(code)
+                  return (
+                    <button
+                      key={code}
+                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}${isDisabled ? ' lang-dropdown-item-disabled' : ''}`}
+                      disabled={isDisabled}
+                      onClick={isDisabled ? undefined : () => {
+                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                        setLangOpen(false)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                      <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                      <span className="lang-dropdown-item-badge">{isDisabled ? L(lang, { ja: '準備中', en: 'soon' }) : L(lang, { ja: '試験版', en: 'beta' })}</span>
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>
