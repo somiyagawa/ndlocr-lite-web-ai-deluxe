@@ -190,8 +190,9 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
     : strings.categoryOther
 
   /**
-   * GitHub Issues にリダイレクトする（Web3Forms 未設定時のフォールバック）。
-   * COOP ヘッダー環境でも window.location.href は動作する。
+   * GitHub Issues を新しいタブで開く（Web3Forms 未設定時のフォールバック）。
+   * COOP: same-origin 環境では window.location.href だとアプリ全体が遷移してしまうため、
+   * <a target="_blank"> のクリックをシミュレートして新タブで開く。
    */
   const submitViaGitHub = useCallback(() => {
     const title = encodeURIComponent(
@@ -213,18 +214,25 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
     const body = encodeURIComponent(bodyParts.filter(Boolean).join('\n'))
     const url = `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
 
-    // window.location.href で遷移（COOP 環境でも安全）
-    window.location.href = url
+    // <a> 要素を生成して新タブで開く（COOP 環境で安全に動作）
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.rel = 'noopener noreferrer'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }, [name, email, category, categoryLabel, description, steps])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('sending')
 
-    // Web3Forms キーが未設定 → GitHub Issues にフォールバック
+    // Web3Forms キーが未設定 → GitHub Issues を新タブで開く
     if (!WEB3FORMS_KEY) {
-      console.log('[BugReport] Web3Forms key not set — redirecting to GitHub Issues')
+      console.log('[BugReport] Web3Forms key not set — opening GitHub Issues in new tab')
       submitViaGitHub()
+      setStatus('sent')
       return
     }
 
@@ -244,21 +252,31 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
     }
 
     try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 15000) // 15秒タイムアウト
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       })
+      clearTimeout(timeout)
       const result = await response.json()
       if (response.ok && result.success) {
         setStatus('sent')
       } else {
         console.error('Form submission failed:', result)
-        setStatus('error')
+        // Web3Forms 失敗 → GitHub Issues にフォールバック
+        console.log('[BugReport] Web3Forms failed — falling back to GitHub Issues')
+        submitViaGitHub()
+        setStatus('sent')
       }
     } catch (err) {
       console.error('Form submission error:', err)
-      setStatus('error')
+      // ネットワークエラー・タイムアウト → GitHub Issues にフォールバック
+      console.log('[BugReport] Fetch error — falling back to GitHub Issues')
+      submitViaGitHub()
+      setStatus('sent')
     }
   }, [name, email, category, categoryLabel, description, steps, submitViaGitHub])
 
