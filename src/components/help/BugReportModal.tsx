@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from 'react'
+import { useState, memo } from 'react'
 import type { Language } from '../../i18n'
 
 interface BugReportModalProps {
@@ -152,16 +152,71 @@ function getStrings(lang: Language): TranslationStrings {
   return translations[lang] || translations['en']
 }
 
-function getBrowserInfo(): string {
-  const ua = navigator.userAgent
-  const screen = `${window.screen.width}x${window.screen.height}`
-  return `${ua} | Screen: ${screen}`
-}
+/** ブラウザ情報（セッション中不変） */
+const browserInfo = (() => {
+  try {
+    return `${navigator.userAgent} | Screen: ${window.screen.width}x${window.screen.height}`
+  } catch {
+    return 'unknown'
+  }
+})()
 
 const APP_VERSION = '4.4.4'
 const REPORT_EMAIL = 'miyagawa.so.kb@u.tsukuba.ac.jp'
 const GITHUB_ISSUES_URL = 'https://github.com/somiyagawa/ndlocr-lite-web-ai-deluxe/issues/new'
 const TWITTER_HANDLE = 'So_Miyagawa'
+
+/** 送信リンク用の URL 群 */
+interface SubmitUrls {
+  github: string
+  mailto: string
+  twitter: string
+}
+
+/** フォームデータから各送信先 URL を一括生成（「次へ」押下時に1回だけ呼ぶ） */
+function buildSubmitUrls(
+  catLabel: string,
+  desc: string,
+  reporter: string,
+  stepsText: string,
+  isBug: boolean,
+): SubmitUrls {
+  // --- 共通の本文パーツ ---
+  const lines: string[] = [
+    `[${catLabel}]`,
+    '',
+    `App Version: v${APP_VERSION}`,
+    `Browser: ${browserInfo}`,
+  ]
+  if (reporter) lines.push(`Reporter: ${reporter}`)
+  lines.push('', 'Description:', desc)
+  if (isBug && stepsText.trim()) {
+    lines.push('', 'Steps to Reproduce:', stepsText)
+  }
+  const plainBody = lines.join('\n')
+
+  // --- GitHub Issues ---
+  const ghTitle = encodeURIComponent(`[${catLabel}] ${desc.slice(0, 80)}`)
+  const mdBody = plainBody
+    .replace('Description:', '## Description')
+    .replace('Steps to Reproduce:', '## Steps to Reproduce')
+    .replace(/^(App Version:)/m, '**$1**')
+    .replace(/^(Browser:)/m, '**$1**')
+    .replace(/^(Reporter:)/m, '**$1**')
+  const github = `${GITHUB_ISSUES_URL}?title=${ghTitle}&body=${encodeURIComponent(mdBody)}`
+
+  // --- mailto ---
+  const mailSubject = encodeURIComponent(`[NDL OCR v${APP_VERSION}] ${catLabel}: ${desc.slice(0, 60)}`)
+  const mailto = `mailto:${REPORT_EMAIL}?subject=${mailSubject}&body=${encodeURIComponent(plainBody)}`
+
+  // --- Twitter / X（280文字制限） ---
+  const twPrefix = `@${TWITTER_HANDLE} [NDL OCR v${APP_VERSION}] ${catLabel}: `
+  const maxLen = 280 - twPrefix.length - 3
+  const twText = twPrefix + (desc.length > maxLen ? desc.slice(0, maxLen) + '...' : desc)
+  const twitter = `https://x.com/intent/tweet?text=${encodeURIComponent(twText)}`
+
+  return { github, mailto, twitter }
+}
 
 export const BugReportModal = memo(function BugReportModal({ lang, onClose }: BugReportModalProps) {
   const strings = getStrings(lang)
@@ -171,65 +226,22 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
   const [category, setCategory] = useState<'bug' | 'feature' | 'other'>('bug')
   const [description, setDescription] = useState('')
   const [steps, setSteps] = useState('')
-  const [showLinks, setShowLinks] = useState(false)
+  /** 「次へ」押下後に URL を格納。null ならフォーム画面を表示 */
+  const [urls, setUrls] = useState<SubmitUrls | null>(null)
 
   const categoryLabel = category === 'bug' ? strings.categoryBug
     : category === 'feature' ? strings.categoryFeature
     : strings.categoryOther
 
-  /** 報告本文を組み立てる */
-  const reportBody = useMemo(() => {
-    const parts = [
-      `[${categoryLabel}]`,
-      '',
-      `App Version: v${APP_VERSION}`,
-      `Browser: ${getBrowserInfo()}`,
-      name ? `Reporter: ${name}${email ? ` (${email})` : ''}` : '',
-      '',
-      'Description:',
-      description,
-    ]
-    if (category === 'bug' && steps.trim()) {
-      parts.push('', 'Steps to Reproduce:', steps)
-    }
-    return parts.filter(Boolean).join('\n')
-  }, [name, email, category, categoryLabel, description, steps])
-
-  /** GitHub Issues URL */
-  const githubUrl = useMemo(() => {
-    const title = encodeURIComponent(`[${categoryLabel}] ${description.slice(0, 80)}`)
-    const mdBody = reportBody
-      .replace('Description:', '## Description')
-      .replace('Steps to Reproduce:', '## Steps to Reproduce')
-      .replace(/^App Version:/m, '**App Version:**')
-      .replace(/^Browser:/m, '**Browser:**')
-      .replace(/^Reporter:/m, '**Reporter:**')
-    const body = encodeURIComponent(mdBody)
-    return `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
-  }, [categoryLabel, description, reportBody])
-
-  /** mailto: URL */
-  const mailtoUrl = useMemo(() => {
-    const subject = encodeURIComponent(`[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`)
-    const body = encodeURIComponent(reportBody)
-    return `mailto:${REPORT_EMAIL}?subject=${subject}&body=${body}`
-  }, [categoryLabel, description, reportBody])
-
-  /** Twitter / X メンション URL（280文字に収める） */
-  const twitterUrl = useMemo(() => {
-    const prefix = `@${TWITTER_HANDLE} [NDL OCR v${APP_VERSION}] ${categoryLabel}: `
-    const maxDesc = 280 - prefix.length - 3 // 末尾の "..." 分
-    const truncated = description.length > maxDesc
-      ? description.slice(0, maxDesc) + '...'
-      : description
-    const text = encodeURIComponent(prefix + truncated)
-    return `https://x.com/intent/tweet?text=${text}`
-  }, [categoryLabel, description])
-
+  /** 「次へ」— URL を1回だけ生成して画面切替 */
   const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault()
-    setShowLinks(true)
+    const reporter = name + (email ? ` (${email})` : '')
+    setUrls(buildSubmitUrls(categoryLabel, description, reporter.trim(), steps, category === 'bug'))
   }
+
+  /** 「戻る」— フォーム画面へ戻す */
+  const handleBack = () => setUrls(null)
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -239,13 +251,13 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
           <button className="modal-close" onClick={onClose} type="button">&times;</button>
         </div>
 
-        {showLinks ? (
+        {urls ? (
           <div className="bug-report-sent">
             <h3>{strings.chooseMethod}</h3>
             <p>{strings.sentMessage}</p>
             <div className="bug-report-link-buttons">
               <a
-                href={githubUrl}
+                href={urls.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
@@ -253,13 +265,13 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
                 {strings.viaGitHub}
               </a>
               <a
-                href={mailtoUrl}
+                href={urls.mailto}
                 className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
               >
                 {strings.viaEmail}
               </a>
               <a
-                href={twitterUrl}
+                href={urls.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
@@ -267,7 +279,12 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
                 {strings.viaTwitter}
               </a>
             </div>
-            <button className="preprocess-btn preprocess-btn-secondary" onClick={onClose} type="button" style={{ marginTop: '12px' }}>
+            <button
+              className="preprocess-btn preprocess-btn-secondary"
+              onClick={handleBack}
+              type="button"
+              style={{ marginTop: '12px' }}
+            >
               {strings.cancel}
             </button>
           </div>
@@ -342,7 +359,7 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
               <input
                 type="text"
                 className="bug-report-browser"
-                value={getBrowserInfo()}
+                value={browserInfo}
                 readOnly
               />
             </div>
