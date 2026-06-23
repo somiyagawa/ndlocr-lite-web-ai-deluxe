@@ -5,10 +5,10 @@ export const ko: Translations = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '브라우저 기반 일본어 OCR 도구',
     confirmDiscard: '현재 OCR 결과가 삭제됩니다. 계속하시겠습니까?',
-    landingDesc: '현대 인쇄체에서 고전 흘림체까지 — 일본 국립국회도서관 OCR 엔진 기반 브라우저 완결형 일본어 자동 전사',
+    landingDesc: '현대 인쇄체에서 고전 흘림체, 청대 이전 한적까지 — 일본 국립국회도서관 OCR 엔진 기반 브라우저 완결형 자동 전사',
     backgroundCredit: '배경 사진: 비에이·아오이이케 — MaedaAkihiko, CC BY-SA 4.0',
-    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
-    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    splashDesc: '일본 고서 및 청대 이전 한적 지원 — 일본 국립국회도서관 OCR 엔진 기반 기능 확장판',
+    processingDesc: '일본 고서 및 청대 이전 한적 지원 — 일본 국립국회도서관 OCR 엔진 기반 기능 확장판',
   },
   nav: {
     previous: '이전',
@@ -96,7 +96,7 @@ export const ko: Translations = {
   },
   header: {
     changelog: '업데이트 기록',
-    subtitle: '현대 인쇄체에서 흘림체까지',
+    subtitle: '현대 인쇄체에서 흘림체・한적까지',
     sectionModern: '── 현대어 ──',
     sectionModernExp: '── 현대어（시험판） ──',
     sectionClassicalExp: '── 고전어（시험판） ──',
@@ -273,6 +273,11 @@ export const ko: Translations = {
     taketoriDesc: '다케토리 모노가타리 — NDL 디지털 컬렉션 흘림체 필사본',
     tamamizuLabel: '다마미즈 모노가타리 (IIIF / 흘림체)',
     tamamizuDesc: '다마미즈 모노가타리 — 교토대학 도서관 소장 채색 삽화 오토기조시 (IIIF)',
+    kanseki: '한적',
+    shikiLabel: '사기 (IIIF / 한적)',
+    shikiDesc: '사기 — 사마천 저. 게이초 11년 이전 판본. 일본 국립국회도서관 디지털 컬렉션 (IIIF)',
+    bencaoLabel: '본초강목 (IIIF / 한적)',
+    bencaoDesc: '본초강목 — 명・이시진 저. 일본 국립국회도서관 디지털 컬렉션 (IIIF)',
   },
 
 }

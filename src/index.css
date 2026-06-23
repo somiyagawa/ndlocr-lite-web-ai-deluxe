@@ -55,7 +55,7 @@
 .splash-description {
   font-size: clamp(0.65rem, 1.5vw, 0.85rem);
   letter-spacing: 0.08em;
-  color: rgba(200, 225, 255, 0.65);
+  color: rgba(220, 235, 255, 0.85);
   opacity: 0;
   margin-top: 0.5rem;
   animation: splash-sub-in 0.6s ease 0.6s both;
@@ -460,6 +460,8 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   display: flex;
   gap: 0.4rem;
   align-items: center;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .btn-start-ocr {
@@ -1093,6 +1095,12 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   letter-spacing: 0.06em;
 }
 
+.sample-tile-badge-kanseki {
+  background: #8b4513;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 .sample-tile-iiif-placeholder {
   width: 100%;
   height: 100%;
@@ -1298,6 +1306,29 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: linear-gradient(90deg, var(--color-success), #6ee7b7);
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
   animation: pulse-glow 1.5s ease-in-out;
+}
+
+.progress-bar-indeterminate {
+  width: 30% !important;
+  animation: indeterminate-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes indeterminate-slide {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(233%); }
+  100% { transform: translateX(0); }
+}
+
+.progress-first-time-note {
+  font-size: 0.82rem;
+  color: var(--color-text, #1f2937);
+  margin-top: 0.75rem;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg-secondary, rgba(0, 0, 0, 0.05));
+  border-radius: 6px;
+  border-left: 3px solid var(--color-primary, #3b82f6);
+  font-weight: 500;
 }
 
 .progress-message {
@@ -2270,6 +2301,8 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: var(--color-border-light);
   color: var(--color-text-secondary);
   transition: all var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .ai-status.connected {

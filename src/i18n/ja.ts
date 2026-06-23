@@ -4,10 +4,10 @@ export const ja: Record<string, Record<string, string>> = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ブラウザで動く日本語OCRツール',
     confirmDiscard: '現在のOCR結果は破棄されます。よろしいですか？',
-    landingDesc: '現代の活字から古典籍のくずし字まで — 国立国会図書館OCRエンジンによるブラウザ完結型日本語自動書き起こし',
+    landingDesc: '現代の活字から古典籍のくずし字、清代以前の漢籍まで — 国立国会図書館OCRエンジンによるブラウザ完結型自動書き起こし',
     backgroundCredit: '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0',
-    splashDesc: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
-    processingDesc: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
+    splashDesc: '和古書・清代以前の漢籍にも対応 — 国立国会図書館の縦書きに強い自動書き起こしOCRソフト機能拡張版',
+    processingDesc: '和古書・清代以前の漢籍にも対応 — 国立国会図書館の縦書きに強い自動書き起こしOCRソフト機能拡張版',
   },
   nav: {
     previous: '前のファイル',
@@ -83,7 +83,7 @@ export const ja: Record<string, Record<string, string>> = {
   },
   header: {
     changelog: '更新履歴',
-    subtitle: '現代の活字からくずし字まで',
+    subtitle: '現代の活字からくずし字・漢籍まで',
     sectionModern: '── 現代語 ──',
     sectionModernExp: '── 現代語（試験版） ──',
     sectionClassicalExp: '── 古典語（試験版） ──',
@@ -320,6 +320,11 @@ export const ja: Record<string, Record<string, string>> = {
     taketoriDesc: '竹取物語 — 国立国会図書館デジタルコレクション所蔵のくずし字写本',
     tamamizuLabel: '玉水物語（IIIF・くずし字）',
     tamamizuDesc: '玉水物語 — 京都大学附属図書館蔵・彩色挿図付きお伽草子写本（IIIF Presentation API）',
+    kanseki: '漢籍',
+    shikiLabel: '史記（IIIF・漢籍）',
+    shikiDesc: '史記 — 司馬遷撰。慶長11年以前刊本。国立国会図書館デジタルコレクション（IIIF）',
+    bencaoLabel: '本草綱目（IIIF・漢籍）',
+    bencaoDesc: '本草綱目 — 明・李時珍撰。国立国会図書館デジタルコレクション（IIIF）',
   },
 } as const
 

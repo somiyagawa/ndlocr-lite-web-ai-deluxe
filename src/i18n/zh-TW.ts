@@ -5,10 +5,10 @@ export const zhTW: Translations = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '瀏覽器端日語OCR工具',
     confirmDiscard: '目前的OCR結果將被捨棄。是否繼續？',
-    landingDesc: '從現代印刷體到古典草書 — 基於日本國立國會圖書館OCR引擎的瀏覽器端日語自動轉錄',
+    landingDesc: '從現代印刷體到古��草書及清代以前的���籍 — 基於日本國立國會圖書館OCR引擎���瀏覽器端自動轉錄',
     backgroundCredit: '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
-    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
-    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    splashDesc: '支援日本和古書及���代以前的漢籍 ��� 基於日本國立國會圖書館OCR��擎的功能擴展版',
+    processingDesc: '支援日本和古書��清代以前的漢籍 ��� 基於日本國��國會圖書館OCR引擎的功能擴展版',
   },
   nav: {
     previous: '上一個',
@@ -96,7 +96,7 @@ export const zhTW: Translations = {
   },
   header: {
     changelog: '更新紀錄',
-    subtitle: '現代印刷體到古典草書',
+    subtitle: '現代印刷體到草書・漢籍',
     sectionModern: '── 現代語 ──',
     sectionModernExp: '── 現代語（試驗版） ──',
     sectionClassicalExp: '── 古典語（試驗版） ──',
@@ -273,6 +273,11 @@ export const zhTW: Translations = {
     taketoriDesc: '竹取物語 — 日本國立國會圖書館數位典藏草書手稿',
     tamamizuLabel: '玉水物語（IIIF・草書）',
     tamamizuDesc: '玉水物語 — 京都大學圖書館藏・彩色插圖御伽草子寫本（IIIF）',
+    kanseki: '漢籍',
+    shikiLabel: '史記（IIIF・漢籍）',
+    shikiDesc: '史記 — 司馬遷撰。慶長11年以前刊本。日本國立國會圖書館數位典藏（IIIF）',
+    bencaoLabel: '本草綱目（IIIF・漢籍）',
+    bencaoDesc: '本草綱目 — 明・李時珍撰。日本國立國會圖書館數位典藏（IIIF）',
   },
 
 }

@@ -5,10 +5,10 @@ export const en: Translations = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Japanese OCR Tool Running in the Browser',
     confirmDiscard: 'Current OCR results will be discarded. Continue?',
-    landingDesc: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+    landingDesc: 'From modern print to classical kuzushiji and pre-modern Chinese texts — browser-based OCR powered by the National Diet Library',
     backgroundCredit: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
-    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
-    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    splashDesc: 'Supports Japanese classical books and pre-Qing Chinese texts — extended OCR built on the National Diet Library engine',
+    processingDesc: 'Supports Japanese classical books and pre-Qing Chinese texts — extended OCR built on the National Diet Library engine',
   },
   nav: {
     previous: 'Previous',
@@ -102,7 +102,7 @@ export const en: Translations = {
   },
   header: {
     changelog: 'Changelog',
-    subtitle: 'Modern print to kuzushiji',
+    subtitle: 'Modern print to kuzushiji & Chinese classics',
     sectionModern: '── Modern ──',
     sectionModernExp: '── Modern (experimental) ──',
     sectionClassicalExp: '── Classical (experimental) ──',
@@ -322,5 +322,10 @@ export const en: Translations = {
     taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
     tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
     tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+    kanseki: 'Chinese classics',
+    shikiLabel: 'Shiji (IIIF / Chinese classics)',
+    shikiDesc: 'Shiji (Records of the Grand Historian) by Sima Qian — Pre-1606 woodblock print. NDL Digital Collections (IIIF)',
+    bencaoLabel: 'Bencao Gangmu (IIIF / Chinese classics)',
+    bencaoDesc: 'Bencao Gangmu (Compendium of Materia Medica) by Li Shizhen (Ming dynasty). NDL Digital Collections (IIIF)',
   },
 }

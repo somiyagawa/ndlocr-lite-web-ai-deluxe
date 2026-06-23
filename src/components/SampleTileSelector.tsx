@@ -11,6 +11,8 @@ import type { OCRMode } from '../types/ocr'
 interface SampleTileBase {
   id: string
   category: 'modern' | 'koten'
+  /** バッジ表示の種別（省略時は category に基づく） */
+  badgeKey?: 'kanseki'
 }
 
 interface LocalSampleTile extends SampleTileBase {
@@ -52,6 +54,22 @@ const SAMPLES: SampleTile[] = [
     manifestUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00013653/manifest.json',
     thumbnailUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00013653/canvas/3/thumbnail',
     category: 'koten',
+  },
+  {
+    type: 'iiif',
+    id: 'shiki',
+    manifestUrl: 'https://dl.ndl.go.jp/api/iiif/2569987/manifest.json',
+    thumbnailUrl: 'https://dl.ndl.go.jp/api/iiif/2569987/R0000001/full/,180/0/default.jpg',
+    category: 'koten',
+    badgeKey: 'kanseki',
+  },
+  {
+    type: 'iiif',
+    id: 'bencao',
+    manifestUrl: 'https://dl.ndl.go.jp/api/iiif/2556408/manifest.json',
+    thumbnailUrl: 'https://dl.ndl.go.jp/api/iiif/2556408/R0000001/full/,180/0/default.jpg',
+    category: 'koten',
+    badgeKey: 'kanseki',
   },
 ]
 
@@ -123,9 +141,16 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, 
                   ? 'IIIF'
                   : sample.category === 'modern'
                     ? t(lang as any, 'samples.modernPrint')
-                    : t(lang as any, 'samples.kuzushiji')
+                    : sample.badgeKey === 'kanseki'
+                      ? t(lang as any, 'samples.kanseki')
+                      : t(lang as any, 'samples.kuzushiji')
                 }
               </span>
+              {sample.type === 'iiif' && sample.badgeKey === 'kanseki' && (
+                <span className="sample-tile-badge sample-tile-badge-kanseki">
+                  {t(lang as any, 'samples.kanseki')}
+                </span>
+              )}
             </div>
             <span className="sample-tile-title">{t(lang as any, `samples.${sample.id}Label`)}</span>
           </button>

@@ -5,10 +5,10 @@ export const zhCN: Translations = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '浏览器端日语OCR工具',
     confirmDiscard: '当前OCR结果将被丢弃。是否继续？',
-    landingDesc: '从现代印刷体到古典草书 — 基于日本国立国会图书馆OCR引擎的浏览器端日语自动转录',
+    landingDesc: '从现代印刷体到古典草书及清代以前的汉籍 — 基于日本国立国会图书馆OCR引擎的浏览器端自动转录',
     backgroundCredit: '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
-    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
-    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    splashDesc: '支持日本和古书及清代以前的汉籍 — 基于日本国立国会图书馆OCR引擎的功能扩展版',
+    processingDesc: '支持日本和古书及清代以前的汉籍 — 基于日本国立国会图书馆OCR引擎的功能扩展版',
   },
   nav: {
     previous: '上一个',
@@ -96,7 +96,7 @@ export const zhCN: Translations = {
   },
   header: {
     changelog: '更新日志',
-    subtitle: '现代印刷体到古典草书',
+    subtitle: '现代印刷体到草书・汉籍',
     sectionModern: '── 现代语 ──',
     sectionModernExp: '── 现代语（试验版） ──',
     sectionClassicalExp: '── 古典语（试验版） ──',
@@ -273,6 +273,11 @@ export const zhCN: Translations = {
     taketoriDesc: '竹取物语 — 日本国立国会图书馆数字馆藏草书手稿',
     tamamizuLabel: '玉水物语（IIIF・草书）',
     tamamizuDesc: '玉水物语 — 京都大学图书馆藏・彩色插图御伽草子写本（IIIF）',
+    kanseki: '汉籍',
+    shikiLabel: '史记（IIIF・汉籍）',
+    shikiDesc: '史记 — 司马迁撰。庆长11年以前刊本。日本国立国会图书馆数字馆藏（IIIF）',
+    bencaoLabel: '本草纲目（IIIF・汉籍）',
+    bencaoDesc: '本草纲目 — 明・李时珍撰。日本国立国会图书馆数字馆藏（IIIF）',
   },
 
 }

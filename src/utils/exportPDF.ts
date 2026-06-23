@@ -228,7 +228,10 @@ async function addPageToPdf(
     const isVertical = block.height / block.width >= VERTICAL_ASPECT_RATIO
 
     if (isVertical) {
-      // ---- 縦書きブロック: 1文字ずつ正しいY座標に配置 ----
+      // ---- 縦書きブロック ----
+      // 2層構造:
+      // (1) 1文字ずつ正しいY座標に配置 → テキスト選択・コピー時の正しい順序
+      // (2) ブロック全文を極小フォントで1回描画 → 複数文字の検索ヒット
       const rawText = block.text.replace(/\n/g, '')
       const safeText = filterEncodableText(font, rawText)
       if (!safeText.trim()) continue
@@ -244,15 +247,12 @@ async function addPageToPdf(
       // 各文字のY間隔: ブロック高さを文字数で等分
       const charStep = bh / charCount
 
+      // (1) 1文字ずつ配置（テキスト選択・コピー用）
       for (let i = 0; i < charCount; i++) {
         const ch = chars[i]
         if (!ch.trim()) continue
 
-        // 文字のY座標: ブロック上端から i 番目の位置
-        // byTop はブロック上端（PDF上端）、下に行くほど Y が減る
         const charY = byTop - (charStep * i) - fontSize
-
-        // X座標: ブロックの水平中央に配置
         const charX = bx + (bw - fontSize * CJK_WIDTH_RATIO) / 2
 
         try {
@@ -264,9 +264,23 @@ async function addPageToPdf(
             color: rgb(0, 0, 0),
             opacity: TEXT_OPACITY,
           })
-        } catch (e) {
+        } catch {
           // フォントにない文字はスキップ
         }
+      }
+
+      // (2) 全文を極小フォントで1回描画（検索用、不可視）
+      try {
+        page.drawText(safeText, {
+          x: bx,
+          y: Math.max(byTop - bh - 1, 0),
+          size: 0.5,
+          font,
+          color: rgb(0, 0, 0),
+          opacity: 0.001,
+        })
+      } catch {
+        // ignore
       }
     } else {
       // ---- 横書きブロック: 1 回の drawText ----

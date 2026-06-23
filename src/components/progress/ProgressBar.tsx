@@ -133,33 +133,83 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
   const isDownloading = stage === 'loading_models' && modelProgress != null
   const labels = MODEL_LABELS[lang] ?? MODEL_LABELS.en!
 
-  if (isDownloading) {
+  const isInitializing = stage === 'initializing' || stage === 'initializing_models'
+
+  if (isDownloading || isInitializing) {
+    const firstTimeNote = L(lang, {
+      ja: '初回はOCRモデル（約150MB）のダウンロードが必要です。次回以降はキャッシュから高速に読み込まれます。',
+      en: 'First use requires downloading OCR models (~150 MB). They will be cached for faster loading next time.',
+      'zh-CN': '首次使用需下载OCR模型（约150MB）。之后将从缓存快速加载。',
+      'zh-TW': '首次使用需下載OCR模型（約150MB）。之後將從快取快速載入。',
+      ko: '처음 사용 시 OCR 모델(~150MB)을 다운로드합니다. 이후에는 캐시에서 빠르게 로드됩니다.',
+      la: 'Primo usu exemplaria OCR (~150 MB) descendi debent. Postea e promptuario celeriter legentur.',
+      eo: 'Unua uzo postulas elŝuton de OCR-modeloj (~150 MB). Poste ili rapide ŝarĝiĝos el kaŝmemoro.',
+      es: 'El primer uso requiere descargar modelos OCR (~150 MB). Se almacenarán en caché para cargas futuras.',
+      de: 'Beim ersten Mal werden OCR-Modelle (~150 MB) heruntergeladen. Danach werden sie aus dem Cache geladen.',
+      ar: 'يتطلب الاستخدام الأول تنزيل نماذج OCR (~150 ميجابايت). سيتم تخزينها مؤقتًا للتحميل السريع لاحقًا.',
+      hi: 'पहली बार OCR मॉडल (~150 MB) डाउनलोड करना आवश्यक है। बाद में कैश से तेज़ी से लोड होगा।',
+      ru: 'При первом использовании загружаются модели OCR (~150 МБ). В дальнейшем они будут загружаться из кэша.',
+      el: 'Η πρώτη χρήση απαιτεί λήψη μοντέλων OCR (~150 MB). Θα αποθηκευτούν για γρήγορη φόρτωση στο μέλλον.',
+      syc: 'ܒܩܕܡܝܬܐ ܙܕܩ ܠܡܢܚܬܘ ܡ̈ܕܝܪܬܐ ܕOCR (~150 MB). ܒܬܪܟ ܡܢ ܡܣܟܒܬܐ ܢܬܛܥ̈ܢܢ ܒܥܓܠ.',
+      cop: 'ⲡⲉϩⲟⲩⲓⲧ ⲛⲥⲟⲡ ⲉϥⲉⲣⲭⲣⲓⲁ ⲛⲧⲁⲗⲟ ⲛⲧⲉ ⲙⲟⲇⲉⲗ OCR (~150 MB). ⲙⲉⲛⲉⲛⲥⲁ ⲛⲁⲓ ⲥⲉⲛⲁⲧⲁⲗⲟⲟⲩ ⲛϭⲉⲡⲏ.',
+      sa: 'प्रथमवारं OCR नमूनानां (~150 MB) अवतारणम् आवश्यकम्। ततः परं कोशात् शीघ्रं स्थाप्यन्ते।',
+    })
+
+    const preparingNote = L(lang, {
+      ja: 'モデルを準備中です。しばらくお待ちください…',
+      en: 'Preparing models, please wait…',
+      'zh-CN': '正在准备模型，请稍候…',
+      'zh-TW': '正在準備模型，請稍候…',
+      ko: '모델을 준비 중입니다. 잠시만 기다려 주세요…',
+      la: 'Exemplaria parantur, quaeso exspecta…',
+      eo: 'Preparas modelojn, bonvolu atendi…',
+      es: 'Preparando modelos, por favor espere…',
+      de: 'Modelle werden vorbereitet, bitte warten…',
+      ar: 'جارٍ إعداد النماذج، يرجى الانتظار…',
+      hi: 'मॉडल तैयार हो रहे हैं, कृपया प्रतीक्षा करें…',
+      ru: 'Подготовка моделей, пожалуйста подождите…',
+      el: 'Προετοιμασία μοντέλων, παρακαλώ περιμένετε…',
+      syc: 'ܡܛܝܒ ܡ̈ܕܝܪܬܐ، ܐܣܬܟܝ…',
+      cop: 'ⲉϥⲥⲟⲃⲧⲉ ⲛⲛⲓⲙⲟⲇⲉⲗ, ϫⲉⲙϩⲏⲧ…',
+      sa: 'नमूनानि सज्जीक्रियन्ते, प्रतीक्षताम्…',
+    })
+
     return (
       <div className="progress-container">
-        <div className="progress-title">{labels.downloading}...</div>
-        <div className="model-download-bars">
-          {(
-            [
-              ['layout', labels.layout],
-              ['rec30', labels.rec30],
-              ['rec50', labels.rec50],
-              ['rec100', labels.rec100],
-            ] as const
-          ).map(([key, label]) => (
-            <div key={key} className="model-download-row">
-              <div className="model-download-label">{label}</div>
-              <div className="model-download-bar-wrap">
-                <div className="progress-bar-track">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${Math.round(modelProgress[key] * 100)}%` }}
-                  />
-                </div>
-                <span className="model-download-pct">{Math.round(modelProgress[key] * 100)}%</span>
-              </div>
-            </div>
-          ))}
+        <div className="progress-title">
+          {isDownloading ? `${labels.downloading}...` : preparingNote}
         </div>
+        {isDownloading && modelProgress && (
+          <div className="model-download-bars">
+            {(
+              [
+                ['layout', labels.layout],
+                ['rec30', labels.rec30],
+                ['rec50', labels.rec50],
+                ['rec100', labels.rec100],
+              ] as const
+            ).map(([key, label]) => (
+              <div key={key} className="model-download-row">
+                <div className="model-download-label">{label}</div>
+                <div className="model-download-bar-wrap">
+                  <div className="progress-bar-track">
+                    <div
+                      className="progress-bar-fill"
+                      style={{ width: `${Math.round(modelProgress[key] * 100)}%` }}
+                    />
+                  </div>
+                  <span className="model-download-pct">{Math.round(modelProgress[key] * 100)}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {isInitializing && !isDownloading && (
+          <div className="progress-bar-track">
+            <div className="progress-bar-fill progress-bar-indeterminate" />
+          </div>
+        )}
+        <div className="progress-first-time-note">{firstTimeNote}</div>
       </div>
     )
   }
